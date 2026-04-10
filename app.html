@@ -4,282 +4,769 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CustomsAI — HTS Classification Engine</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#0a0f1e;--surface:#111827;--surface2:#1a2233;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.12);
-  --accent:#28a745;--accent-dim:rgba(40,167,69,0.12);--accent-glow:rgba(40,167,69,0.25);
-  --text:#e2e8f0;--muted:#94a3b8;--faint:#64748b;
-  --red:#f85149;--amber:#d29922;--blue:#58a6ff;
-  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+/* ══════════════════════════════════════════════════════════
+   SIXPAY FINTECH DESIGN SYSTEM — CustomsAI
+   Palette: Matte Dark #0A0B0F · Neon Green #C8FF00
+   Typography: Poppins 300-900 · JetBrains Mono
+══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0A0B0F;
+  --surface: #111318;
+  --card:    #14161D;
+  --card2:   #1A1D26;
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.10);
+  --neon:    #C8FF00;
+  --neon-dim:rgba(200,255,0,0.10);
+  --neon-glow:rgba(200,255,0,0.25);
+  --text:    #F4F4F8;
+  --muted:   #6B7280;
+  --faint:   #374151;
+  --red:     #FF4D4D;
+  --amber:   #FFB800;
+  --blue:    #4D9EFF;
+  --green:   #22C55E;
+  --font:    'Poppins', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.08);
 }
-html{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;}
-body{min-height:100vh;display:flex;flex-direction:column;}
 
-/* ── CONSENT MODAL ── */
-.consent-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.consent-card{background:#0d1f35;border:1px solid rgba(88,166,255,0.2);border-radius:20px;padding:40px;max-width:540px;width:100%;box-shadow:0 40px 80px rgba(0,0,0,0.6);}
-.consent-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
-.consent-logo-mark{width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;color:#0a0f1e;}
-.consent-logo-text{font-weight:700;font-size:17px;color:#fff;}
-.consent-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:#79c0ff;font-size:11px;font-weight:500;border-radius:20px;padding:4px 10px;margin-bottom:18px;}
-.consent-card h2{font-size:22px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3;}
-.consent-card p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
-.consent-items{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;}
-.consent-item{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);line-height:1.5;}
-.consent-item-icon{font-size:16px;flex-shrink:0;margin-top:-1px;}
-.consent-checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;cursor:pointer;}
-.consent-checkbox{width:18px;height:18px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;cursor:pointer;}
-.consent-checkbox.checked{background:var(--accent);border-color:var(--accent);}
-.consent-checkbox-label{font-size:12px;color:var(--muted);line-height:1.6;cursor:pointer;}
-.consent-checkbox-label a{color:var(--blue);text-decoration:none;}
-.consent-checkbox-label a:hover{text-decoration:underline;}
-.consent-btn{width:100%;padding:13px;background:var(--accent);color:#0a0f1e;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;opacity:.4;pointer-events:none;}
-.consent-btn.active{opacity:1;pointer-events:all;}
-.consent-btn.active:hover{background:#34d058;transform:translateY(-1px);}
-.consent-footer{text-align:center;margin-top:14px;font-size:11px;color:var(--faint);}
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
 
-/* ── MAIN LAYOUT ── */
-.app{display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+body { min-height: 100vh; }
 
-/* SIDEBAR */
-.logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.logo-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:#0a0f1e;flex-shrink:0;}
-.logo-text{font-size:13px;font-weight:600;color:#fff;}
-.logo-tag{font-size:10px;color:var(--muted);font-family:var(--mono);}
-.nav{padding:12px 8px;flex:1;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .12s;margin-bottom:2px;}
-.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
-.nav-item.active{background:var(--accent-dim);color:var(--accent);}
-.sidebar-foot{padding:10px 8px;border-top:1px solid var(--border);}
-.api-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;padding-left:4px;}
-.api-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:11px;font-family:var(--mono);color:var(--text);outline:none;}
-.api-input:focus{border-color:var(--accent);}
-.version-tag{font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:8px;font-family:var(--mono);}
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(200,255,0,0.2); border-radius: 2px; }
 
-/* TOPBAR */
-.topbar{height:50px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
-.topbar-title{font-size:13px;font-weight:500;color:#fff;}
-.topbar-right{display:flex;align-items:center;gap:10px;}
-.engine-badge{font-size:10px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border:1px solid rgba(40,167,69,.2);border-radius:20px;padding:2px 9px;}
-.legal-badge{display:flex;align-items:center;gap:4px;font-size:10px;color:#79c0ff;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.15);border-radius:20px;padding:2px 9px;cursor:pointer;transition:all .12s;}
-.legal-badge:hover{background:rgba(88,166,255,.15);}
+/* ── KEYFRAME ANIMATIONS ── */
+@keyframes fadeUp    { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+@keyframes slideLeft { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+@keyframes pulseGlow { 0%,100%{ box-shadow:0 0 16px rgba(200,255,0,0.2); } 50%{ box-shadow:0 0 32px rgba(200,255,0,0.45); } }
+@keyframes neonPulse { 0%,100%{ opacity:1; } 50%{ opacity:.5; } }
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes barFill   { from { width: 0; } }
+@keyframes countUp   { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes shimmer   {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes float     { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
 
-/* CONTENT */
-.content{display:grid;grid-template-columns:420px 1fr;flex:1;overflow:hidden;}
-.left-panel{border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
-.right-panel{padding:20px;overflow-y:auto;}
+.fade-up   { animation: fadeUp   .6s ease both; }
+.fade-up-1 { animation: fadeUp   .6s .1s ease both; }
+.fade-up-2 { animation: fadeUp   .6s .2s ease both; }
+.fade-up-3 { animation: fadeUp   .6s .3s ease both; }
+.fade-up-4 { animation: fadeUp   .6s .4s ease both; }
+.slide-l   { animation: slideLeft .5s .15s ease both; }
 
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.card-header{padding:14px 16px 0;display:flex;align-items:center;gap:8px;}
-.card-icon{color:var(--accent);font-size:16px;}
-.card-title{font-size:14px;font-weight:600;color:#fff;}
-.card-sub{font-size:12px;color:var(--muted);margin-top:1px;}
-.card-body{padding:14px 16px;}
-.label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.desc-input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border-color .15s;}
-.desc-input:focus{border-color:var(--accent);}
-.desc-input::placeholder{color:rgba(255,255,255,.2);}
-.row{display:flex;gap:10px;align-items:center;margin-top:10px;}
-.origin-select{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--font);font-size:12px;color:var(--text);outline:none;flex:1;}
-.classify-btn{background:var(--accent);color:#0a0f1e;border:none;border-radius:8px;padding:9px 18px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;}
-.classify-btn:hover:not(:disabled){background:#34d058;}
-.classify-btn:disabled{opacity:.5;cursor:not-allowed;}
-.chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 16px 14px;}
-.chip{font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s;font-family:var(--mono);}
-.chip:hover{border-color:var(--accent);color:var(--accent);}
-
-/* ── LEGAL CONFIDENCE SCORE ── */
-.lcs-widget{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:12px;}
-.lcs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.lcs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
-.lcs-score{font-size:22px;font-weight:700;font-family:var(--mono);}
-.lcs-high{color:var(--accent);}
-.lcs-medium{color:var(--amber);}
-.lcs-low{color:var(--red);}
-.lcs-bar-bg{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
-.lcs-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
-.lcs-bar-high{background:linear-gradient(90deg,#1e7a34,var(--accent));}
-.lcs-bar-medium{background:linear-gradient(90deg,#92600a,var(--amber));}
-.lcs-bar-low{background:linear-gradient(90deg,#9b1c1c,var(--red));}
-.lcs-note{font-size:10px;color:var(--faint);margin-top:6px;line-height:1.5;}
-.verify-row{display:flex;gap:6px;margin-top:8px;}
-.verify-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 8px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:6px;font-size:10px;font-weight:500;color:#79c0ff;cursor:pointer;text-decoration:none;transition:all .12s;font-family:var(--font);}
-.verify-btn:hover{background:rgba(88,166,255,.16);border-color:rgba(88,166,255,.35);}
-
-/* RESULTS */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);}
-.empty-icon{font-size:36px;margin-bottom:12px;opacity:.3;}
-.empty-title{font-size:15px;font-weight:500;color:rgba(255,255,255,.4);margin-bottom:6px;}
-.empty-sub{font-size:12px;max-width:320px;}
-.result-hts{font-family:var(--mono);font-size:32px;font-weight:500;color:var(--accent);letter-spacing:.04em;}
-.result-desc{font-size:13px;color:var(--muted);margin-top:4px;}
-.conf-badge{display:inline-block;font-size:10px;font-family:var(--mono);font-weight:500;padding:3px 9px;border-radius:20px;margin-top:8px;}
-.conf-HIGH{background:rgba(40,167,69,.15);color:var(--accent);border:1px solid rgba(40,167,69,.2);}
-.conf-MEDIUM{background:rgba(210,153,34,.15);color:var(--amber);border:1px solid rgba(210,153,34,.2);}
-.conf-LOW{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.2);}
-.duty-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;}
-.duty-cell{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px;}
-.duty-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
-.duty-val{font-size:22px;font-weight:500;font-family:var(--mono);}
-.duty-free{color:var(--accent);}.duty-low{color:#60a5fa;}.duty-mid{color:var(--amber);}.duty-high{color:var(--red);}
-.duty-sub{font-size:11px;color:var(--muted);margin-top:3px;}
-.gri-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:14px;}
-.gri-rule{font-size:11px;font-weight:600;color:#a78bfa;font-family:var(--mono);margin-bottom:5px;}
-.gri-text{font-size:12px;color:var(--text);line-height:1.6;}
-.section-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px;}
-.flag{display:flex;align-items:flex-start;gap:7px;padding:8px 11px;border-radius:7px;font-size:12px;margin-bottom:5px;}
-.flag-risk{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.15);color:#ffa198;}
-.flag-info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);color:#79c0ff;}
-.flag-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px;}
-.dot-risk{background:var(--red);}.dot-info{background:#58a6ff;}
-.save-btn{width:100%;margin-top:14px;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;font-family:var(--font);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;}
-.save-btn:hover{border-color:var(--accent);color:var(--accent);}
-.save-btn.saved{background:var(--accent-dim);border-color:rgba(40,167,69,.3);color:var(--accent);}
-
-/* ── DYNAMIC RESULT DISCLAIMER ── */
-.result-disclaimer{background:rgba(210,153,34,0.06);border:1px solid rgba(210,153,34,0.18);border-radius:8px;padding:10px 12px;margin-top:12px;display:flex;align-items:flex-start;gap:8px;}
-.rd-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
-.rd-text{font-size:10px;color:rgba(210,153,34,0.8);line-height:1.6;}
-.rd-text strong{color:var(--amber);}
-.rd-text a{color:var(--amber);text-decoration:none;opacity:.8;}
-.rd-text a:hover{text-decoration:underline;opacity:1;}
-
-/* MEMO & TABS */
-.memo-box{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--mono);font-size:11px;color:var(--text);white-space:pre-wrap;line-height:1.7;max-height:380px;overflow-y:auto;margin-top:10px;}
-.tabs{display:flex;gap:1px;border-bottom:1px solid var(--border);margin:0 -20px;padding:0 20px;}
-.tab{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .12s;margin-bottom:-1px;}
-.tab:hover{color:var(--text);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-body{padding-top:14px;display:none;}
-.tab-body.active{display:block;}
-.alt-table{width:100%;border-collapse:collapse;font-size:11px;}
-.alt-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-family:var(--mono);}
-.alt-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text);}
-.alt-table .mono{font-family:var(--mono);color:var(--muted);}
-
-/* LOADING */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;}
-.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loading-step{font-size:12px;color:var(--muted);font-family:var(--mono);transition:color .3s;}
-.loading-step.active{color:var(--accent);}
-.loading-step.done{color:var(--accent);opacity:.5;}
-
-/* PAYWALL */
-.paywall-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50;}
-.paywall-card{background:#0d1f35;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;max-width:360px;width:100%;margin:16px;}
-.paywall-icon{width:52px;height:52px;background:var(--accent-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;}
-.paywall-card h2{font-size:18px;font-weight:700;text-align:center;margin-bottom:8px;}
-.paywall-card p{font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px;}
-.paywall-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);margin-bottom:8px;}
-.paywall-feat::before{content:"✓";color:var(--accent);font-weight:700;flex-shrink:0;}
-.btn-upgrade{width:100%;padding:11px;background:var(--accent);color:#0a0f1e;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;margin-top:18px;margin-bottom:8px;}
-.btn-upgrade:hover{background:#34d058;}
-.btn-api{width:100%;padding:11px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;}
-
-/* HISTORY */
-.history-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.history-header h2{font-size:15px;font-weight:600;color:#fff;}
-.btn-sm{padding:5px 12px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);}
-.btn-sm:hover{color:var(--text);}
-.btn-sm.green{background:var(--accent);color:#0a0f1e;border-color:transparent;}
-.sku-table{width:100%;border-collapse:collapse;font-size:11px;}
-.sku-table th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;}
-.sku-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);}
-.sku-table .hts{font-family:var(--mono);color:var(--accent);font-weight:600;}
-.engine-badge2{font-size:10px;padding:2px 7px;border-radius:20px;}
-.badge-ai{background:rgba(88,166,255,.15);color:#79c0ff;}
-.badge-rules{background:rgba(210,153,34,.15);color:var(--amber);}
-.empty-history{text-align:center;padding:48px;color:var(--muted);font-size:13px;}
-
-/* ── STICKY LEGAL FOOTER ── */
-.legal-footer{flex-shrink:0;background:#060d1a;border-top:1px solid rgba(255,255,255,.06);padding:8px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
-.lf-text{font-size:10px;color:rgba(255,255,255,.2);line-height:1.5;font-family:var(--mono);}
-.lf-links{display:flex;gap:12px;flex-shrink:0;}
-.lf-link{font-size:10px;color:rgba(255,255,255,.2);cursor:pointer;text-decoration:none;transition:color .12s;font-family:var(--mono);}
-.lf-link:hover{color:rgba(255,255,255,.5);}
+/* ══════════════════════════════════════════════════════════
+   CONSENT MODAL — Glassmorphism Sixpay style
+══════════════════════════════════════════════════════════ */
+.consent-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(10,11,15,0.85);
+  backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn .4s ease;
+}
+.consent-card {
+  background: var(--card);
+  border: 1px solid rgba(200,255,0,0.12);
+  border-radius: 24px;
+  padding: 48px 44px;
+  max-width: 520px; width: 100%;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(200,255,0,0.05);
+  animation: fadeUp .5s ease;
+  position: relative; overflow: hidden;
+}
+.consent-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+}
+.consent-logo { display:flex; align-items:center; gap:12px; margin-bottom:32px; }
+.consent-logo-mark {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--neon); display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: #0A0B0F;
+  box-shadow: 0 0 24px var(--neon-glow);
+}
+.consent-logo-text { font-size: 18px; font-weight: 700; color: var(--text); }
+.consent-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--neon-dim); border: 1px solid rgba(200,255,0,0.2);
+  color: var(--neon); font-size: 10px; font-weight: 600;
+  border-radius: 20px; padding: 4px 12px; margin-bottom: 20px;
+  text-transform: uppercase; letter-spacing: .1em; font-family: var(--mono);
+}
+.consent-badge::before { content:''; width:6px; height:6px; background:var(--neon); border-radius:50%; animation: neonPulse 2s infinite; }
+.consent-card h2 { font-size: 26px; font-weight: 800; line-height:1.25; margin-bottom:10px; letter-spacing:-.02em; }
+.consent-card p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.consent-items {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; margin-bottom: 22px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.ci { display:flex; align-items:flex-start; gap:10px; font-size: 12.5px; color: var(--muted); line-height:1.6; }
+.ci-icon { font-size:15px; flex-shrink:0; }
+.consent-cb-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; background: rgba(200,255,0,0.03);
+  border: 1px solid rgba(200,255,0,0.1); border-radius: 12px;
+  margin-bottom: 22px; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.consent-cb-row:hover { border-color: rgba(200,255,0,0.25); background: rgba(200,255,0,0.05); }
+.consent-cb {
+  width: 20px; height: 20px; border: 1.5px solid rgba(200,255,0,0.3);
+  border-radius: 6px; flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; transition: all .2s; background: transparent;
+}
+.consent-cb.on { background: var(--neon); border-color: var(--neon); box-shadow: 0 0 16px var(--neon-glow); color: #0A0B0F; font-weight: 800; font-size: 12px; }
+.consent-cb-label { font-size: 12.5px; color: var(--muted); line-height: 1.65; cursor: pointer; }
+.consent-cb-label a { color: var(--neon); text-decoration: none; }
+.consent-cb-label a:hover { text-decoration: underline; }
+.consent-btn {
+  width: 100%; padding: 15px; background: var(--neon);
+  color: #0A0B0F; border: none; border-radius: 12px;
+  font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: .02em;
+  opacity: .35; pointer-events: none;
+  transition: all .2s; box-shadow: none;
+}
+.consent-btn.on { opacity:1; pointer-events:all; box-shadow: 0 4px 28px var(--neon-glow); }
+.consent-btn.on:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(200,255,0,0.4); }
+.consent-foot { text-align:center; margin-top:14px; font-size:11px; color:var(--faint); font-family:var(--mono); }
 
 /* TERMS MODAL */
-.terms-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
-.terms-card{background:#0d1a2b;border:1px solid var(--border2);border-radius:16px;padding:32px;max-width:620px;width:100%;max-height:80vh;overflow-y:auto;}
-.terms-card h2{font-size:18px;font-weight:700;color:#fff;margin-bottom:16px;}
-.terms-card h3{font-size:13px;font-weight:600;color:#fff;margin:18px 0 6px;}
-.terms-card p,.terms-card li{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px;}
-.terms-card ul{padding-left:16px;}
-.terms-close{margin-top:20px;width:100%;padding:10px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);border-radius:8px;cursor:pointer;font-family:var(--font);font-size:13px;}
-.terms-close:hover{background:rgba(255,255,255,.1);color:var(--text);}
+.terms-overlay { position:fixed;inset:0;background:rgba(10,11,15,.85);backdrop-filter:blur(16px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px; }
+.terms-card { background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:640px;width:100%;max-height:82vh;overflow-y:auto; }
+.terms-card h2 { font-size:20px;font-weight:800;color:var(--text);margin-bottom:18px; }
+.terms-card h3 { font-size:12px;font-weight:700;color:var(--neon);margin:20px 0 6px;text-transform:uppercase;letter-spacing:.08em; }
+.terms-card p, .terms-card li { font-size:12.5px;color:var(--muted);line-height:1.75;margin-bottom:8px; }
+.terms-card ul { padding-left:18px; }
+.terms-close { margin-top:24px;width:100%;padding:12px;background:rgba(200,255,0,0.06);border:1px solid rgba(200,255,0,0.2);color:var(--neon);border-radius:10px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;transition:all .2s; }
+.terms-close:hover { background:rgba(200,255,0,0.12); }
 
-@media(max-width:700px){.sidebar{display:none;}.content{grid-template-columns:1fr;}.right-panel{display:none;}.left-panel{border-right:none;}}
+/* ══════════════════════════════════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════════════════════════════════ */
+.layout { display:flex; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.logo {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-mark {
+  width: 36px; height: 36px; background: var(--neon);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 800; color: #0A0B0F;
+  box-shadow: 0 0 20px var(--neon-glow); flex-shrink: 0;
+}
+.logo-text { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.02em; }
+.logo-tag { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+
+/* Usage */
+.usage-wrap { padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.usage-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.usage-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.usage-num { font-size: 12px; font-family: var(--mono); color: var(--text); }
+.usage-bar { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; }
+.usage-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--neon), rgba(200,255,0,0.6));
+  transition: width .6s ease;
+  box-shadow: 0 0 8px var(--neon-glow);
+}
+.usage-note { font-size: 10px; color: var(--faint); margin-top: 7px; font-family: var(--mono); }
+
+.nav { padding: 16px 14px; flex: 1; }
+.nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--faint); padding: 4px 10px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 13px; color: var(--muted); cursor: pointer;
+  transition: all .2s; margin-bottom: 2px; font-weight: 500;
+  user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+.nav-item.active {
+  background: rgba(200,255,0,0.08);
+  color: var(--neon);
+  border: 1px solid rgba(200,255,0,0.12);
+}
+.nav-item.active svg { opacity: 1; }
+.nav-item svg { opacity: .4; flex-shrink: 0; transition: opacity .2s; }
+.nav-pill {
+  margin-left: auto; font-size: 10px; font-family: var(--mono);
+  background: rgba(200,255,0,0.1); color: var(--neon);
+  padding: 2px 8px; border-radius: 20px;
+}
+
+.sidebar-foot { padding: 16px 16px 20px; border-top: 1px solid var(--border); }
+.api-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 7px; }
+.api-input-wrap { position: relative; }
+.api-inp {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 34px 9px 12px;
+  font-size: 11px; font-family: var(--mono); color: var(--text); outline: none;
+  transition: border-color .2s;
+}
+.api-inp:focus { border-color: rgba(200,255,0,0.35); }
+.api-inp::placeholder { color: var(--faint); }
+.api-dot {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--faint);
+  transition: all .3s;
+}
+.api-dot.live { background: var(--neon); box-shadow: 0 0 8px var(--neon-glow); animation: neonPulse 2s infinite; }
+.ver { font-size: 10px; color: var(--faint); text-align: center; margin-top: 12px; font-family: var(--mono); }
+
+/* ══════════════════════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════════════════════ */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOPBAR */
+.topbar {
+  height: 60px; flex-shrink: 0;
+  background: rgba(10,11,15,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.tb-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+.tb-sep { width: 1px; height: 18px; background: var(--border2); }
+.tb-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.tb-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; padding: 5px 12px; border-radius: 20px;
+  cursor: pointer; font-weight: 600; transition: all .2s;
+}
+.tb-legal { background: rgba(77,158,255,0.08); border: 1px solid rgba(77,158,255,0.2); color: #7AB8FF; }
+.tb-legal:hover { background: rgba(77,158,255,0.15); }
+.tb-engine { background: rgba(200,255,0,0.08); border: 1px solid rgba(200,255,0,0.18); color: var(--neon); }
+
+/* ══════════════════════════════════════════════════════════
+   HERO SECTION
+══════════════════════════════════════════════════════════ */
+.hero {
+  padding: 56px 40px 40px;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero::after {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse at right top, rgba(200,255,0,0.06), transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--neon-dim); border: 1px solid rgba(200,255,0,0.18);
+  color: var(--neon); font-size: 10px; font-weight: 700;
+  border-radius: 20px; padding: 5px 14px; margin-bottom: 20px;
+  text-transform: uppercase; letter-spacing: .1em; font-family: var(--mono);
+}
+.hero-tag::before { content:''; width:7px; height:7px; background:var(--neon); border-radius:50%; animation:neonPulse 2s infinite; }
+.hero h1 {
+  font-size: clamp(34px, 4vw, 54px);
+  font-weight: 900; letter-spacing: -.03em;
+  line-height: 1.08; color: var(--text);
+  margin-bottom: 14px;
+}
+.hero h1 .neon { color: var(--neon); }
+.hero-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.65; margin-bottom: 32px; font-weight: 400; }
+.hero-metrics {
+  display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+}
+.hm {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.hm-val { font-size: 20px; font-weight: 800; color: var(--neon); font-family: var(--mono); }
+.hm-lbl { font-size: 11px; color: var(--muted); font-weight: 500; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.btn-neon {
+  padding: 13px 28px; background: var(--neon); color: #0A0B0F;
+  border: none; border-radius: 12px; font-family: var(--font);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .25s; box-shadow: 0 4px 24px var(--neon-glow);
+  text-decoration: none; letter-spacing: .01em;
+}
+.btn-neon:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(200,255,0,0.4); }
+.btn-ghost {
+  padding: 12px 24px; background: transparent; color: var(--text);
+  border: 1px solid var(--border2); border-radius: 12px;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; text-decoration: none;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.14); }
+
+/* ══════════════════════════════════════════════════════════
+   WORKSPACE — CENTRAL DASHBOARD
+══════════════════════════════════════════════════════════ */
+.workspace {
+  flex: 1; display: grid;
+  grid-template-columns: 440px 1fr;
+  overflow: hidden;
+}
+
+/* LEFT — TRANSACTION INPUT CARD */
+.input-col {
+  border-right: 1px solid var(--border);
+  padding: 24px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  transition: border-color .25s, box-shadow .25s;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-head {
+  padding: 18px 20px 0;
+  display: flex; align-items: center; gap: 12px;
+}
+.card-icon {
+  width: 36px; height: 36px;
+  background: var(--neon-dim); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--neon); font-size: 16px; flex-shrink: 0;
+}
+.card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.card-body { padding: 16px 20px; }
+
+.desc-ta {
+  width: 100%; background: var(--card2);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; font-family: var(--font);
+  font-size: 13px; color: var(--text); resize: none;
+  outline: none; transition: border-color .2s; min-height: 96px;
+  line-height: 1.6; font-weight: 400;
+}
+.desc-ta:focus { border-color: rgba(200,255,0,0.35); }
+.desc-ta::placeholder { color: var(--faint); }
+
+.input-row { display: flex; gap: 10px; margin-top: 12px; align-items: stretch; }
+.origin-sel {
+  flex: 1; background: var(--card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 0 14px; font-family: var(--font);
+  font-size: 13px; color: var(--text); outline: none; height: 44px;
+  cursor: pointer; transition: border-color .2s;
+}
+.origin-sel:focus { border-color: rgba(200,255,0,0.35); }
+.classify-btn {
+  height: 44px; padding: 0 22px;
+  background: var(--neon); color: #0A0B0F;
+  border: none; border-radius: 12px;
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  transition: all .25s; white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 2px 16px var(--neon-glow);
+}
+.classify-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,255,0,0.4); }
+.classify-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; background: var(--faint); color: var(--muted); }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(10,11,15,.3); border-top-color: #0A0B0F; border-radius: 50%; animation: spin .65s linear infinite; }
+
+.shortcut { font-size: 10px; color: var(--faint); text-align: right; margin-top: 7px; font-family: var(--mono); }
+
+/* CHIPS */
+.chips { padding: 0 20px 18px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chips-lbl { font-size: 10px; color: var(--faint); margin-right: 3px; font-family: var(--mono); }
+.chip {
+  font-size: 10px; padding: 4px 11px; border-radius: 20px;
+  background: var(--card2); border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer;
+  transition: all .18s; font-family: var(--mono);
+}
+.chip:hover { border-color: rgba(200,255,0,0.3); color: var(--neon); background: var(--neon-dim); }
+
+/* RECENT TRANSACTIONS card */
+.txn-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.txn-header { padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.txn-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.txn-count { font-size: 10px; font-family: var(--mono); color: var(--neon); background: var(--neon-dim); padding: 2px 8px; border-radius: 20px; }
+.txn-empty { padding: 28px 20px; text-align: center; font-size: 12px; color: var(--faint); }
+.txn-list { max-height: 220px; overflow-y: auto; }
+.txn-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,.03);
+  cursor: pointer; transition: background .15s;
+}
+.txn-item:last-child { border-bottom: none; }
+.txn-item:hover { background: rgba(255,255,255,.02); }
+.txn-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--neon-dim); display: flex; align-items: center;
+  justify-content: center; font-size: 13px; flex-shrink: 0;
+}
+.txn-info { flex: 1; min-width: 0; }
+.txn-hts { font-size: 12px; font-weight: 700; color: var(--neon); font-family: var(--mono); }
+.txn-desc { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.txn-duty { font-size: 12px; font-family: var(--mono); font-weight: 600; flex-shrink: 0; }
+.txn-duty.high { color: var(--red); }
+.txn-duty.mid { color: var(--amber); }
+.txn-duty.low { color: var(--green); }
+.txn-duty.free { color: var(--neon); }
+.txn-delete { background: none; border: none; color: rgba(255,255,255,.15); cursor: pointer; font-size: 16px; padding: 0 4px; transition: color .15s; flex-shrink: 0; }
+.txn-delete:hover { color: var(--red); }
+
+/* ══════════════════════════════════════════════════════════
+   RIGHT — RESULT PANEL
+══════════════════════════════════════════════════════════ */
+.result-col { padding: 24px 28px; overflow-y: auto; }
+
+/* EMPTY */
+.empty-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 60vh; text-align: center;
+}
+.empty-gfx {
+  width: 100px; height: 100px; border-radius: 24px;
+  background: linear-gradient(135deg, rgba(200,255,0,.08), rgba(200,255,0,.02));
+  border: 1px solid rgba(200,255,0,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; margin-bottom: 20px;
+  animation: float 4s ease-in-out infinite;
+}
+.empty-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: var(--muted); max-width: 320px; line-height: 1.65; }
+
+/* LOADING */
+.loading-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 60vh; gap: 18px;
+}
+.load-ring {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 3px solid var(--card2); border-top: 3px solid var(--neon);
+  animation: spin .7s linear infinite;
+  box-shadow: 0 0 24px var(--neon-glow);
+}
+.load-step { font-size: 12px; color: var(--muted); font-family: var(--mono); transition: color .3s; }
+.load-step.act { color: var(--neon); }
+.load-step.done { color: rgba(200,255,0,0.35); }
+
+/* RESULT CONTENT */
+.result-wrap { animation: fadeUp .4s ease; }
+
+/* HTS hero */
+.hts-hero {
+  background: linear-gradient(135deg, rgba(200,255,0,.07), rgba(200,255,0,.02));
+  border: 1px solid rgba(200,255,0,.14);
+  border-radius: 20px; padding: 28px; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.hts-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+}
+.hts-code { font-family: var(--mono); font-size: 38px; font-weight: 700; color: var(--neon); letter-spacing: .04em; }
+.hts-desc { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.hts-meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.conf-badge {
+  font-size: 10px; font-family: var(--mono); font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: .06em;
+}
+.conf-HIGH { background: rgba(200,255,0,.12); color: var(--neon); border: 1px solid rgba(200,255,0,.2); }
+.conf-MEDIUM { background: rgba(255,184,0,.1); color: var(--amber); border: 1px solid rgba(255,184,0,.2); }
+.conf-LOW { background: rgba(255,77,77,.1); color: var(--red); border: 1px solid rgba(255,77,77,.2); }
+.hts-timing { font-size: 11px; color: var(--faint); font-family: var(--mono); }
+
+/* DUTY GRID */
+.duty-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.duty-cell {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; transition: border-color .2s, transform .2s;
+}
+.duty-cell:hover { border-color: var(--border2); transform: translateY(-2px); }
+.duty-lbl { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+.duty-val { font-size: 26px; font-weight: 800; font-family: var(--mono); line-height: 1; }
+.duty-sub { font-size: 11px; color: var(--faint); margin-top: 5px; }
+.d-free { color: var(--neon); }
+.d-low { color: #60a5fa; }
+.d-mid { color: var(--amber); }
+.d-high { color: var(--red); }
+
+/* LCS Widget */
+.lcs-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; margin-bottom: 16px;
+}
+.lcs-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.lcs-lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.lcs-score { font-size: 24px; font-weight: 800; font-family: var(--mono); }
+.lcs-high { color: var(--neon); }
+.lcs-medium { color: var(--amber); }
+.lcs-low { color: var(--red); }
+.lcs-bar-bg { height: 8px; background: var(--card2); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+.lcs-bar {
+  height: 100%; border-radius: 4px;
+  animation: barFill .8s .2s ease both;
+}
+.lcs-bar-high { background: linear-gradient(90deg, var(--neon), rgba(200,255,0,0.6)); box-shadow: 0 0 10px var(--neon-glow); }
+.lcs-bar-medium { background: linear-gradient(90deg, var(--amber), rgba(255,184,0,0.6)); }
+.lcs-bar-low { background: linear-gradient(90deg, var(--red), rgba(255,77,77,0.6)); }
+.lcs-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
+.verify-row { display: flex; gap: 8px; margin-top: 12px; }
+.verify-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px; background: rgba(77,158,255,.06); border: 1px solid rgba(77,158,255,.15);
+  border-radius: 8px; font-size: 10px; font-weight: 600; color: #7AB8FF;
+  cursor: pointer; text-decoration: none; transition: all .15s; font-family: var(--font);
+}
+.verify-btn:hover { background: rgba(77,158,255,.14); border-color: rgba(77,158,255,.28); }
+
+/* TABS */
+.result-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+.rtab {
+  padding: 10px 16px; font-size: 12px; font-weight: 600;
+  cursor: pointer; color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all .18s; margin-bottom: -1px;
+}
+.rtab:hover { color: var(--text); }
+.rtab.active { color: var(--neon); border-bottom-color: var(--neon); }
+.rtab-body { padding-top: 18px; display: none; }
+.rtab-body.active { display: block; }
+
+/* FLAGS */
+.flag-list { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+.flag {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; border-radius: 10px; font-size: 12.5px;
+}
+.flag-risk { background: rgba(255,77,77,.05); border: 1px solid rgba(255,77,77,.12); color: #ff9999; }
+.flag-info { background: rgba(77,158,255,.05); border: 1px solid rgba(77,158,255,.12); color: #93c5fd; }
+.flag-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.dot-risk { background: var(--red); } .dot-info { background: var(--blue); }
+
+/* DISCLAIMER */
+.disclaimer-box {
+  background: rgba(255,184,0,.04); border: 1px solid rgba(255,184,0,.12);
+  border-radius: 10px; padding: 12px 14px; margin-top: 14px;
+  display: flex; gap: 10px;
+}
+.db-text { font-size: 11px; color: rgba(255,184,0,.7); line-height: 1.65; }
+.db-text strong { color: var(--amber); }
+.db-text a { color: var(--amber); text-decoration: none; opacity: .8; }
+.db-text a:hover { opacity: 1; text-decoration: underline; }
+
+/* GRI BOX */
+.gri-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; margin-top: 2px;
+}
+.gri-rule { font-size: 11px; font-weight: 700; color: #c4b5fd; font-family: var(--mono); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .07em; }
+.gri-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+.sec-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 16px 0 8px; }
+
+.alt-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.alt-table th { text-align:left; padding:6px 10px; border-bottom:1px solid var(--border); color:var(--muted); font-weight:700; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+.alt-table td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.03); color:var(--text); }
+.alt-table .mono { font-family:var(--mono); color:var(--neon); }
+
+/* MEMO */
+.memo-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; font-family: var(--mono);
+  font-size: 11px; color: var(--text); white-space: pre-wrap;
+  line-height: 1.8; max-height: 400px; overflow-y: auto; margin-top: 2px;
+}
+
+/* SAVE BTN */
+.save-btn {
+  width: 100%; margin-top: 16px; padding: 11px;
+  border-radius: 12px; border: 1px solid rgba(200,255,0,0.2);
+  background: rgba(200,255,0,0.05); font-family: var(--font);
+  font-size: 13px; font-weight: 600; color: var(--neon);
+  cursor: pointer; transition: all .2s;
+}
+.save-btn:hover { background: rgba(200,255,0,.1); border-color: rgba(200,255,0,.35); }
+.save-btn.saved { background: rgba(200,255,0,.12); box-shadow: 0 0 14px var(--neon-glow); }
+.copy-btn {
+  font-size: 11px; padding: 5px 12px;
+  border: 1px solid var(--border2); border-radius: 8px;
+  background: transparent; color: var(--muted); cursor: pointer;
+  font-family: var(--font); transition: all .15s;
+}
+.copy-btn:hover { border-color: var(--neon); color: var(--neon); }
+
+/* PAYWALL */
+.pw-overlay { position:fixed;inset:0;background:rgba(10,11,15,.85);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px; }
+.pw-card {
+  background: var(--card); border: 1px solid rgba(200,255,0,.15);
+  border-radius: 24px; padding: 40px; max-width: 380px; width: 100%;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 60px rgba(200,255,0,.06);
+  position: relative; overflow: hidden; text-align: center;
+}
+.pw-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent); }
+.pw-icon { width:60px;height:60px;background:var(--neon-dim);border:1px solid rgba(200,255,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:24px; }
+.pw-card h2 { font-size:22px;font-weight:800;margin-bottom:8px; }
+.pw-card p { font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6; }
+.pw-feat { display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);margin-bottom:10px;text-align:left; }
+.pw-feat::before { content:'✓';color:var(--neon);font-weight:800;flex-shrink:0; }
+.pw-up { width:100%;padding:13px;background:var(--neon);color:#0A0B0F;border:none;border-radius:12px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:22px;box-shadow:0 4px 24px var(--neon-glow);transition:all .2s; }
+.pw-up:hover { transform:translateY(-2px);box-shadow:0 8px 36px rgba(200,255,0,.4); }
+.pw-api { width:100%;padding:11px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;font-family:var(--font);font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s; }
+.pw-api:hover { color:var(--text);border-color:var(--border2); }
+
+/* LEGAL FOOTER */
+.legal-foot {
+  flex-shrink: 0; background: rgba(10,11,15,.7);
+  border-top: 1px solid var(--border);
+  padding: 8px 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  backdrop-filter: blur(10px);
+}
+.lf-text { font-size: 10px; color: rgba(255,255,255,.15); font-family: var(--mono); line-height: 1.5; }
+.lf-links { display: flex; gap: 14px; flex-shrink: 0; }
+.lf-link { font-size: 10px; color: rgba(255,255,255,.18); cursor: pointer; text-decoration: none; font-family: var(--mono); transition: color .15s; }
+.lf-link:hover { color: var(--neon); }
+
+/* HISTORY VIEW */
+.history-view { padding: 28px 32px; overflow-y: auto; flex: 1; }
+.history-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:22px; }
+.history-head h2 { font-size:20px;font-weight:800;letter-spacing:-.02em; }
+.history-head p { font-size:12px;color:var(--muted);margin-top:3px; }
+.hh-btns { display:flex;gap:10px; }
+.btn-xs { padding:7px 14px;font-size:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .15s; }
+.btn-xs:hover { color:var(--text);border-color:var(--border2); }
+.btn-xs.neon { background:var(--neon);color:#0A0B0F;border-color:transparent; }
+.btn-xs.neon:hover { box-shadow:0 2px 16px var(--neon-glow); }
+.sku-table { width:100%;border-collapse:collapse;font-size:12px; }
+.sku-table th { text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em; }
+.sku-table td { padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text); }
+.sku-table .hts { font-family:var(--mono);color:var(--neon);font-weight:700;font-size:13px; }
+.eng-badge { font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--mono); }
+.eng-ai { background:rgba(77,158,255,.12);color:#93c5fd; }
+.eng-rules { background:rgba(255,184,0,.1);color:var(--amber); }
+.sku-empty { text-align:center;padding:56px;color:var(--muted);font-size:13px; }
+.del-btn { background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;font-size:16px;padding:0 4px;transition:color .15s; }
+.del-btn:hover { color:var(--red); }
+
+@media(max-width:700px){
+  .workspace { grid-template-columns: 1fr; }
+  .result-col { display: none; }
+  .sidebar { display: none; }
+}
 </style>
 </head>
 <body>
 
 <!-- ══════════════════════════════════════════════
-     PHASE 1: PRE-FLIGHT CONSENT MODAL (Zonos-style)
-     Placement: First thing user sees. Blocks all access.
-     ══════════════════════════════════════════════ -->
+     CONSENT MODAL
+══════════════════════════════════════════════ -->
 <div class="consent-overlay" id="consent-modal">
   <div class="consent-card">
     <div class="consent-logo">
       <div class="consent-logo-mark">CA</div>
       <div class="consent-logo-text">CustomsAI</div>
     </div>
-    <div class="consent-badge">⚖️ Decision Support Tool — Not Legal Advice</div>
-    <h2>Before you classify your first product</h2>
-    <p>CustomsAI uses AI and the General Rules of Interpretation (GRI) to assist with HTS tariff classification. Please understand how this tool works and its limitations.</p>
+    <div class="consent-badge">⚖ Decision Support Tool — Not Legal Advice</div>
+    <h2>Before you classify<br>your first product</h2>
+    <p>CustomsAI applies AI and General Rules of Interpretation (GRI) to assist with HTS tariff classification. Please review the limitations below.</p>
     <div class="consent-items">
-      <div class="consent-item"><span class="consent-item-icon">🤖</span><span>CustomsAI generates <strong>classification suggestions</strong>, not binding customs determinations. Final classification decisions remain with CBP or your local customs authority.</span></div>
-      <div class="consent-item"><span class="consent-item-icon">⚠️</span><span>Duty rates and trade action data (Section 301, 232) are updated periodically but <strong>may not reflect real-time changes</strong>. Always verify before filing.</span></div>
-      <div class="consent-item"><span class="consent-item-icon">🔍</span><span>A licensed U.S. Customs Broker should review all classifications <strong>prior to formal entry filing</strong>. The importer of record bears full responsibility.</span></div>
-      <div class="consent-item"><span class="consent-item-icon">🔒</span><span>Product descriptions you enter are processed to generate results. See our Privacy Policy for data handling details.</span></div>
+      <div class="ci"><span class="ci-icon">🤖</span><span>CustomsAI generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions remain with CBP.</span></div>
+      <div class="ci"><span class="ci-icon">⚠️</span><span>Duty rates and Section 301/232 data are updated periodically but <strong>may not reflect real-time changes</strong>. Always verify before filing.</span></div>
+      <div class="ci"><span class="ci-icon">🔍</span><span>A licensed U.S. Customs Broker should review all classifications <strong>prior to formal entry filing</strong>.</span></div>
+      <div class="ci"><span class="ci-icon">🔒</span><span>Product descriptions are processed to generate results. See our Privacy Policy for data handling.</span></div>
     </div>
-    <div class="consent-checkbox-row" onclick="toggleConsent()">
-      <div class="consent-checkbox" id="consent-check"></div>
-      <div class="consent-checkbox-label">I understand that CustomsAI is a <strong>decision support tool</strong> and not a substitute for professional legal or customs brokerage advice. I have read and agree to the <a href="#" onclick="showTerms(event)">Terms of Use</a> and <a href="#" onclick="showTerms(event)">Privacy Policy</a>.</div>
+    <div class="consent-cb-row" onclick="toggleConsent()">
+      <div class="consent-cb" id="consent-cb"></div>
+      <div class="consent-cb-label">I understand CustomsAI is a <strong>decision support tool</strong>, not a substitute for professional customs brokerage advice. I agree to the <a href="#" onclick="showTerms(event)">Terms of Use</a> and <a href="#" onclick="showTerms(event)">Privacy Policy</a>.</div>
     </div>
     <button class="consent-btn" id="consent-btn" onclick="acceptConsent()">Start Classifying →</button>
-    <div class="consent-footer">🔐 Session agreement · Stored locally · Reset anytime</div>
+    <div class="consent-foot">🔐 Session agreement · Stored locally · Reset anytime</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     TERMS OF SERVICE MODAL
-     ══════════════════════════════════════════════ -->
+<!-- TERMS MODAL -->
 <div class="terms-overlay" id="terms-modal" style="display:none;">
   <div class="terms-card">
     <h2>Terms of Use & Privacy Policy</h2>
-    <h3>1. Nature of Service — Decision Support Tool</h3>
-    <p>CustomsAI ("Service") provides automated HTS tariff classification suggestions using artificial intelligence. <strong>All outputs are informational only and do not constitute legal advice, binding customs rulings, or professional customs brokerage services</strong> under 19 U.S.C. § 1641 or equivalent regulations.</p>
+    <h3>1. Nature of Service</h3>
+    <p>CustomsAI provides automated HTS tariff classification suggestions using AI. <strong>All outputs are informational only</strong> and do not constitute legal advice, binding customs rulings, or professional customs brokerage services under 19 U.S.C. § 1641.</p>
     <h3>2. Non-Binding Nature of AI Outputs</h3>
-    <p>Classification results generated by the Service: (a) are not binding on any customs authority; (b) do not constitute a binding ruling under 19 CFR Part 177; (c) may differ from determinations made by U.S. Customs and Border Protection (CBP) or foreign customs authorities; and (d) should be independently verified by a licensed customs broker before use in formal entry filings.</p>
+    <p>Results: (a) are not binding on any customs authority; (b) do not constitute a CBP binding ruling under 19 CFR Part 177; (c) should be independently verified by a licensed customs broker before formal entry filing.</p>
     <h3>3. Limitation of Liability</h3>
-    <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, CustomsAI's total aggregate liability for any claims arising from use of the Service shall not exceed the greater of: (a) $100 USD, or (b) the total fees paid by you in the 30 days preceding the claim. CustomsAI shall not be liable for any indirect, consequential, incidental, or punitive damages, including but not limited to customs penalties, back-duties, interest charges, or seizure of goods.</p>
+    <p>CustomsAI's total aggregate liability shall not exceed the greater of $100 USD or fees paid in the prior 30 days. CustomsAI shall not be liable for customs penalties, back-duties, or seizure of goods.</p>
     <h3>4. User Responsibilities</h3>
     <ul>
       <li>The importer of record bears full legal responsibility for all customs declarations</li>
-      <li>Users must verify all classifications with official government sources (USITC, EU TARIC)</li>
-      <li>Users must engage a licensed customs broker for formal entry filings</li>
-      <li>Users acknowledge that HTS schedules and trade action rates change frequently</li>
+      <li>Users must verify classifications with USITC, CBP, or licensed broker</li>
+      <li>HTS schedules and trade action rates change frequently — always verify</li>
     </ul>
     <h3>5. Data Usage</h3>
-    <p>Product descriptions submitted may be used in <strong>anonymized, aggregated form</strong> to improve classification accuracy. No personally identifiable information is retained beyond the current session. You may opt out by using the Rules Engine mode (no API key required).</p>
+    <p>Product descriptions may be used in <strong>anonymized, aggregated form</strong> to improve accuracy. No PII is retained beyond the current session.</p>
     <h3>6. Governing Law</h3>
-    <p>These Terms are governed by the laws of the State of Israel, without regard to conflict of law principles. Disputes shall be resolved in the courts of Tel Aviv, Israel.</p>
+    <p>These Terms are governed by the laws of the State of Israel. Disputes shall be resolved in Tel Aviv, Israel.</p>
     <button class="terms-close" onclick="closeTerms()">Close — I understand</button>
+  </div>
+</div>
+
+<!-- PAYWALL -->
+<div class="pw-overlay" id="paywall" style="display:none;">
+  <div class="pw-card">
+    <div class="pw-icon">🛡️</div>
+    <h2>3 free uses reached</h2>
+    <p>Add your Gemini API key to continue free, or upgrade to Pro for unlimited access.</p>
+    <div class="pw-feat">Unlimited HTS classifications</div>
+    <div class="pw-feat">SKU Library — save & track all codes</div>
+    <div class="pw-feat">Section 301/232 monitoring</div>
+    <div class="pw-feat">CBP-format classification memos</div>
+    <button class="pw-up" onclick="window.open('mailto:ori@customsai.app?subject=CustomsAI Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro — $199/mo</button>
+    <button class="pw-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">Add Gemini API key (free)</button>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════
      MAIN APP
-     ══════════════════════════════════════════════ -->
-<div class="app" id="main-app" style="display:none;">
-  <aside class="sidebar">
+══════════════════════════════════════════════ -->
+<div class="layout" id="main-app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar fade-up">
     <div class="logo">
       <div class="logo-mark">CA</div>
       <div>
@@ -287,386 +774,453 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <div class="logo-tag">Classification Engine</div>
       </div>
     </div>
-    <nav class="nav">
-      <div class="nav-item active" onclick="switchTab('classify')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
-        Classify
+
+    <div class="usage-wrap">
+      <div class="usage-top">
+        <span class="usage-lbl">Free uses</span>
+        <span class="usage-num" id="usage-num">0 / 3</span>
       </div>
-      <div class="nav-item" onclick="switchTab('history')" id="nav-history">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>
-        SKU Library <span id="sku-count" style="margin-left:auto;font-size:10px;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:20px;">0</span>
+      <div class="usage-bar"><div class="usage-fill" id="usage-fill" style="width:0%"></div></div>
+      <div class="usage-note" id="usage-note">3 classifications remaining</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Tools</div>
+      <div class="nav-item active" onclick="switchView('classify')" id="nav-classify">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+        Classify Product
+      </div>
+      <div class="nav-item" onclick="switchView('library')" id="nav-library">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>
+        SKU Library
+        <span class="nav-pill" id="nav-pill">0</span>
       </div>
     </nav>
+
     <div class="sidebar-foot">
-      <div class="api-label">Gemini API Key</div>
-      <input class="api-input" type="password" id="api-key-input" placeholder="AIza..." oninput="saveApiKey(this.value)">
-      <div class="version-tag" id="version-tag">v0.1 · customsai.app</div>
+      <div class="api-lbl">Gemini API Key</div>
+      <div class="api-input-wrap">
+        <input class="api-inp" id="api-inp" type="password" placeholder="AIza..." oninput="setApiKey(this.value)">
+        <div class="api-dot" id="api-dot"></div>
+      </div>
+      <div class="ver">CustomsAI v0.1 · customsai.vercel.app</div>
     </div>
   </aside>
 
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+  <!-- MAIN -->
+  <div class="main">
     <div class="topbar">
-      <div class="topbar-title">HTS Classification & Duty Calculator</div>
+      <div class="topbar-left">
+        <span class="tb-title">HTS Classification & Duty Calculator</span>
+        <div class="tb-sep"></div>
+        <span class="tb-sub">USITC 2026 · Section 301 Updated</span>
+      </div>
       <div class="topbar-right">
-        <div class="legal-badge" onclick="showTerms(event)" title="View Terms of Use">⚖️ Decision Support Tool</div>
-        <div class="engine-badge" id="engine-badge">Rules Engine</div>
+        <div class="tb-badge tb-legal" onclick="showTerms(event)">⚖️ Decision Support Tool</div>
+        <div class="tb-badge tb-engine" id="engine-badge">Rules Engine</div>
       </div>
     </div>
 
     <!-- CLASSIFY VIEW -->
-    <div id="view-classify" style="display:grid;grid-template-columns:420px 1fr;flex:1;overflow:hidden;">
-      <div class="left-panel">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-icon">⚡</span>
-            <div>
-              <div class="card-title">Classify a product</div>
-              <div class="card-sub">Describe in plain English — AI handles the rest</div>
+    <div id="view-classify" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-tag">AI-Powered Trade Classification</div>
+        <h1 class="fade-up">HTS Classification,<br><span class="neon">Optimized by AI.</span></h1>
+        <p class="hero-sub fade-up-1">Achieve up to 98% accuracy and discover duty savings in seconds. Powered by GRI logic and the 2026 USITC HTS Schedule.</p>
+        <div class="hero-metrics fade-up-2">
+          <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Average classification</span></div>
+          <div class="hm"><span class="hm-val">10</span><span class="hm-lbl">Countries of origin</span></div>
+          <div class="hm"><span class="hm-val">GRI</span><span class="hm-lbl">1–6 rules applied</span></div>
+          <div class="hm"><span class="hm-val">CBP</span><span class="hm-lbl">Memo format</span></div>
+        </div>
+      </div>
+
+      <div class="workspace" style="flex:1;overflow:hidden;">
+
+        <!-- INPUT COLUMN -->
+        <div class="input-col">
+
+          <div class="card fade-up-1">
+            <div class="card-head">
+              <div class="card-icon">⚡</div>
+              <div>
+                <div class="card-title">New Classification</div>
+                <div class="card-sub">Describe your product in plain English</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <textarea class="desc-ta" id="product-desc" rows="4" placeholder="e.g. Industrial brushless DC motor, 500W, for HVAC equipment, manufactured in China"></textarea>
+              <div class="input-row">
+                <select class="origin-sel" id="origin-sel">
+                  <option value="CN">🇨🇳 China (CN)</option>
+                  <option value="VN">🇻🇳 Vietnam (VN)</option>
+                  <option value="IN">🇮🇳 India (IN)</option>
+                  <option value="MX">🇲🇽 Mexico (MX)</option>
+                  <option value="DE">🇩🇪 Germany (DE)</option>
+                  <option value="KR">🇰🇷 South Korea (KR)</option>
+                  <option value="JP">🇯🇵 Japan (JP)</option>
+                  <option value="TW">🇹🇼 Taiwan (TW)</option>
+                  <option value="BD">🇧🇩 Bangladesh (BD)</option>
+                  <option value="CA">🇨🇦 Canada (CA)</option>
+                </select>
+                <button class="classify-btn" id="classify-btn" onclick="classify()">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  Classify
+                </button>
+              </div>
+              <div class="shortcut">⌘ + Enter to classify</div>
+            </div>
+            <div class="chips">
+              <span class="chips-lbl">Try:</span>
+              <span class="chip" onclick="setEx(this)">DC motor 500W HVAC</span>
+              <span class="chip" onclick="setEx(this)">Steel kitchen bowls</span>
+              <span class="chip" onclick="setEx(this)">Men's cotton jeans</span>
+              <span class="chip" onclick="setEx(this)">Laptop under 10kg</span>
             </div>
           </div>
-          <div class="card-body">
-            <textarea class="desc-input" id="product-desc" placeholder="e.g. Industrial brushless DC motor, 500W, for HVAC equipment, manufactured in China" rows="4"></textarea>
-            <div class="row">
-              <select class="origin-select" id="origin-select">
-                <option value="CN">🇨🇳 China (CN)</option>
-                <option value="VN">🇻🇳 Vietnam (VN)</option>
-                <option value="IN">🇮🇳 India (IN)</option>
-                <option value="MX">🇲🇽 Mexico (MX)</option>
-                <option value="DE">🇩🇪 Germany (DE)</option>
-                <option value="KR">🇰🇷 South Korea (KR)</option>
-                <option value="JP">🇯🇵 Japan (JP)</option>
-                <option value="TW">🇹🇼 Taiwan (TW)</option>
-                <option value="BD">🇧🇩 Bangladesh (BD)</option>
-                <option value="CA">🇨🇦 Canada (CA)</option>
-              </select>
-              <button class="classify-btn" id="classify-btn" onclick="classify()">
-                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Classify
-              </button>
+
+          <!-- RECENT TRANSACTIONS -->
+          <div class="txn-card fade-up-2">
+            <div class="txn-header">
+              <span class="txn-title">Recent Classifications</span>
+              <span class="txn-count" id="txn-count">0</span>
+            </div>
+            <div id="txn-list">
+              <div class="txn-empty">No classifications yet</div>
             </div>
           </div>
-          <div class="chips">
-            <span style="font-size:10px;color:var(--muted);margin-right:3px">Try:</span>
-            <span class="chip" onclick="setEx(this)">DC motor 500W HVAC</span>
-            <span class="chip" onclick="setEx(this)">Steel kitchen bowls</span>
-            <span class="chip" onclick="setEx(this)">Men's cotton jeans</span>
-            <span class="chip" onclick="setEx(this)">Laptop under 10kg</span>
+
+        </div>
+
+        <!-- RESULT COLUMN -->
+        <div class="result-col" id="result-col">
+          <div class="empty-wrap" id="empty-state">
+            <div class="empty-gfx">📋</div>
+            <div class="empty-title">Ready to classify</div>
+            <div class="empty-sub">Enter a product description and click Classify. Results include duty rates, GRI analysis, and a CBP-format memo.</div>
+          </div>
+          <div id="loading-state" style="display:none;">
+            <div class="loading-wrap">
+              <div class="load-ring"></div>
+              <div id="ls1" class="load-step act">Extracting product attributes...</div>
+              <div id="ls2" class="load-step">Searching HTS schedule...</div>
+              <div id="ls3" class="load-step">Applying GRI rules...</div>
+              <div id="ls4" class="load-step">Checking Section 301/232...</div>
+              <div id="ls5" class="load-step">Generating classification memo...</div>
+            </div>
+          </div>
+          <div id="result-area"></div>
+        </div>
+
+      </div>
+
+      <div class="legal-foot">
+        <div class="lf-text">⚖ CustomsAI is a classification research assistant. Outputs are informational only and not binding. HTS: USITC 2026 · §301: USTR. Verify before filing.</div>
+        <div class="lf-links">
+          <a class="lf-link" href="https://hts.usitc.gov" target="_blank">USITC ↗</a>
+          <a class="lf-link" href="https://ustr.gov" target="_blank">USTR §301 ↗</a>
+          <a class="lf-link" href="#" onclick="showTerms(event)">Terms</a>
+          <a class="lf-link" href="#" onclick="showTerms(event)">Privacy</a>
+        </div>
+      </div>
+
+    </div><!-- /view-classify -->
+
+    <!-- LIBRARY VIEW -->
+    <div id="view-library" style="display:none;flex:1;overflow-y:auto;">
+      <div class="history-view">
+        <div class="history-head">
+          <div>
+            <h2>SKU Library</h2>
+            <p id="lib-count">0 saved classifications</p>
+          </div>
+          <div class="hh-btns">
+            <button class="btn-xs" onclick="exportCSV()">Export CSV</button>
+            <button class="btn-xs neon" onclick="switchView('classify')">+ New</button>
           </div>
         </div>
-      </div>
-
-      <div class="right-panel" id="right-panel">
-        <div class="empty-state" id="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-title">Ready to classify</div>
-          <div class="empty-sub">Enter a product description and click Classify. Results include duty rates, GRI analysis, and a CBP-format memo.</div>
+        <div id="lib-table">
+          <div class="sku-empty">No saved SKUs yet.<br>Classify a product and click "Save to Library".</div>
         </div>
-        <div id="loading-state" style="display:none;height:100%;">
-          <div class="loading">
-            <div class="spinner"></div>
-            <div id="step1" class="loading-step active">Extracting product attributes...</div>
-            <div id="step2" class="loading-step">Searching HTS schedule...</div>
-            <div id="step3" class="loading-step">Applying GRI rules...</div>
-            <div id="step4" class="loading-step">Checking Section 301/232...</div>
-            <div id="step5" class="loading-step">Generating classification memo...</div>
-          </div>
-        </div>
-        <div id="result-area" style="display:none;"></div>
       </div>
     </div>
 
-    <!-- HISTORY VIEW -->
-    <div id="view-history" style="display:none;padding:20px;overflow-y:auto;flex:1;">
-      <div class="history-header">
-        <div>
-          <h2>SKU Library</h2>
-          <p style="font-size:12px;color:var(--muted);margin-top:2px;" id="sku-count-label">0 saved classifications</p>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-sm" onclick="exportCSV()">Export CSV</button>
-          <button class="btn-sm green" onclick="switchTab('classify')">+ New</button>
-        </div>
-      </div>
-      <div id="sku-table-container"><div class="empty-history">No saved SKUs yet.<br>Classify a product and click "Save to Library".</div></div>
-    </div>
-
-    <!-- STICKY LEGAL FOOTER -->
-    <div class="legal-footer">
-      <div class="lf-text">⚖ CustomsAI is a classification research assistant — outputs are informational only and not binding on any customs authority. HTS data: USITC 2026 Schedule. Section 301 data: USTR. Verify all classifications before formal entry filing.</div>
-      <div class="lf-links">
-        <a class="lf-link" href="https://hts.usitc.gov" target="_blank">USITC HTS ↗</a>
-        <a class="lf-link" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations" target="_blank">USTR §301 ↗</a>
-        <a class="lf-link" href="#" onclick="showTerms(event)">Terms</a>
-        <a class="lf-link" href="#" onclick="showTerms(event)">Privacy</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PAYWALL MODAL -->
-<div class="paywall-overlay" id="paywall" style="display:none;">
-  <div class="paywall-card">
-    <div class="paywall-icon">🛡️</div>
-    <h2>3 free uses reached</h2>
-    <p>Add your Gemini API key to continue free, or upgrade to Pro for unlimited access.</p>
-    <div class="paywall-feat">Unlimited HTS classifications</div>
-    <div class="paywall-feat">SKU Library — save & track all codes</div>
-    <div class="paywall-feat">Section 301/232 alerts</div>
-    <div class="paywall-feat">CBP-format classification memos</div>
-    <button class="btn-upgrade" onclick="window.open('mailto:ori@customsai.app?subject=CustomsAI Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro — $199/mo</button>
-    <button class="btn-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-key-input').focus()">Add Gemini API key (free)</button>
-  </div>
-</div>
+  </div><!-- /main -->
+</div><!-- /layout -->
 
 <script>
-// ── CONSENT LOGIC ────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let apiKey = localStorage.getItem('cai_key') || '';
+let usageCount = parseInt(localStorage.getItem('cai_usage') || '0');
+let skuLib = JSON.parse(localStorage.getItem('cai_sku') || '[]');
+let currentResult = null;
+const FREE_LIMIT = 3;
 let consentGiven = localStorage.getItem('cai_consent') === '1';
 let checked = false;
 
+// Init
 if (consentGiven) {
   document.getElementById('consent-modal').style.display = 'none';
   document.getElementById('main-app').style.display = 'flex';
+  initApp();
 }
 
+function initApp() {
+  document.getElementById('api-inp').value = apiKey;
+  if (apiKey) setApiKey(apiKey);
+  updateUsage();
+  updateSkuCount();
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONSENT
+// ══════════════════════════════════════════════════════════════
 function toggleConsent() {
   checked = !checked;
-  const box = document.getElementById('consent-check');
-  const btn = document.getElementById('consent-btn');
-  box.className = 'consent-checkbox' + (checked ? ' checked' : '');
-  box.textContent = checked ? '✓' : '';
-  btn.className = 'consent-btn' + (checked ? ' active' : '');
+  const cb = document.getElementById('consent-cb');
+  cb.className = 'consent-cb' + (checked ? ' on' : '');
+  cb.textContent = checked ? '✓' : '';
+  document.getElementById('consent-btn').className = 'consent-btn' + (checked ? ' on' : '');
 }
-
 function acceptConsent() {
   if (!checked) return;
   localStorage.setItem('cai_consent', '1');
   document.getElementById('consent-modal').style.display = 'none';
   document.getElementById('main-app').style.display = 'flex';
+  initApp();
 }
+function showTerms(e) { if(e) e.preventDefault(); document.getElementById('terms-modal').style.display = 'flex'; }
+function closeTerms() { document.getElementById('terms-modal').style.display = 'none'; }
 
-function showTerms(e) {
-  if (e) e.preventDefault();
-  document.getElementById('terms-modal').style.display = 'flex';
-}
-
-function closeTerms() {
-  document.getElementById('terms-modal').style.display = 'none';
-}
-
-// ── APP STATE ────────────────────────────────────────────
-let apiKey = localStorage.getItem('cai_apikey') || '';
-let usageCount = parseInt(localStorage.getItem('cai_usage') || '0');
-let skuLibrary = JSON.parse(localStorage.getItem('cai_sku') || '[]');
-let currentResult = null;
-const FREE_LIMIT = 3;
-
-document.getElementById('api-key-input').value = apiKey;
-updateSkuCount();
-if (apiKey) saveApiKey(apiKey);
-
-function saveApiKey(v) {
-  apiKey = v; localStorage.setItem('cai_apikey', v);
+// ══════════════════════════════════════════════════════════════
+// API + STATE
+// ══════════════════════════════════════════════════════════════
+function setApiKey(v) {
+  apiKey = v; localStorage.setItem('cai_key', v);
+  const dot = document.getElementById('api-dot');
   const badge = document.getElementById('engine-badge');
-  const vtag = document.getElementById('version-tag');
-  badge.textContent = v ? 'Gemini AI Active' : 'Rules Engine';
-  badge.style.color = v ? '#28a745' : '';
+  if (v && v.length > 5) {
+    dot.className = 'api-dot live';
+    badge.textContent = 'Gemini AI Active';
+    badge.style.color = 'var(--neon)';
+  } else {
+    dot.className = 'api-dot';
+    badge.textContent = 'Rules Engine';
+    badge.style.color = '';
+  }
 }
-
-function switchTab(tab) {
-  document.getElementById('view-classify').style.display = tab === 'classify' ? 'grid' : 'none';
-  document.getElementById('view-history').style.display = tab === 'history' ? 'flex' : 'none';
-  if (tab === 'history') { document.getElementById('view-history').style.flexDirection = 'column'; renderSkuTable(); }
-  document.querySelectorAll('.nav-item').forEach((el,i) => el.classList.toggle('active', (tab==='classify'&&i===0)||(tab==='history'&&i===1)));
+function updateUsage() {
+  const used = usageCount; const max = FREE_LIMIT; const rem = Math.max(0, max - used);
+  document.getElementById('usage-num').textContent = used + ' / ' + max;
+  document.getElementById('usage-fill').style.width = Math.min((used/max)*100, 100) + '%';
+  document.getElementById('usage-note').textContent = apiKey ? 'API key active — unlimited' : rem + ' classification' + (rem!==1?'s':'') + ' remaining';
 }
+function updateSkuCount() {
+  const n = skuLib.length;
+  document.getElementById('nav-pill').textContent = n;
+  document.getElementById('txn-count').textContent = n;
+  const lc = document.getElementById('lib-count');
+  if (lc) lc.textContent = n + ' saved classification' + (n!==1?'s':'');
+}
+function switchView(v) {
+  document.getElementById('view-classify').style.display = v==='classify' ? 'flex' : 'none';
+  document.getElementById('view-library').style.display = v==='library' ? 'flex' : 'none';
+  document.getElementById('nav-classify').className = 'nav-item' + (v==='classify'?' active':'');
+  document.getElementById('nav-library').className = 'nav-item' + (v==='library'?' active':'');
+  if (v==='library') renderLibrary();
+}
+function setEx(el) { document.getElementById('product-desc').value=el.textContent.trim(); document.getElementById('product-desc').focus(); }
 
-function setEx(el) { document.getElementById('product-desc').value = el.textContent.trim(); document.getElementById('product-desc').focus(); }
-function updateSkuCount() { const n = skuLibrary.length; document.getElementById('sku-count').textContent = n; const lbl = document.getElementById('sku-count-label'); if(lbl) lbl.textContent = n + ' saved classifications'; }
-
-// ── CLASSIFY ─────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// CLASSIFICATION
+// ══════════════════════════════════════════════════════════════
 async function classify() {
   const desc = document.getElementById('product-desc').value.trim();
-  const origin = document.getElementById('origin-select').value;
+  const origin = document.getElementById('origin-sel').value;
   if (!desc) return;
-  if (usageCount >= FREE_LIMIT && !apiKey) { document.getElementById('paywall').style.display = 'flex'; return; }
+  if (usageCount >= FREE_LIMIT && !apiKey) { document.getElementById('paywall').style.display='flex'; return; }
   const btn = document.getElementById('classify-btn');
-  btn.disabled = true; btn.textContent = 'Classifying...';
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Classifying...';
   document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('loading-state').style.display = 'block';
-  document.getElementById('result-area').style.display = 'none';
-  let step = 1;
-  const si = setInterval(() => { if(step<=5){for(let i=1;i<=5;i++){const el=document.getElementById('step'+i);el.className='loading-step'+(i<step?' done':i===step?' active':'');}step++;} }, 900);
+  document.getElementById('loading-state').style.display = 'flex';
+  document.getElementById('result-area').innerHTML = '';
+  // Step animation
+  let s = 1;
+  const si = setInterval(() => {
+    if (s<=5) {
+      for (let i=1;i<=5;i++) {
+        const e = document.getElementById('ls'+i);
+        if (e) e.className = 'load-step' + (i<s?' done':i===s?' act':'');
+      }
+      s++;
+    }
+  }, 900);
   try {
-    const result = apiKey ? await classifyWithGemini(desc, origin, apiKey) : classifyWithRules(desc, origin);
+    const r = apiKey ? await classifyGemini(desc, origin) : classifyRules(desc, origin);
     clearInterval(si);
-    currentResult = result;
-    const nc = usageCount + 1; usageCount = nc; localStorage.setItem('cai_usage', nc);
+    currentResult = r;
+    usageCount++; localStorage.setItem('cai_usage', usageCount);
+    updateUsage();
     document.getElementById('loading-state').style.display = 'none';
-    renderResult(result, desc, origin);
+    renderResult(r, desc, origin);
+    addToRecent(r, desc);
   } catch(e) {
     clearInterval(si);
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('empty-state').style.display = 'flex';
-    document.getElementById('empty-state').innerHTML = '<div style="color:var(--red);font-size:13px;">Classification failed: ' + e.message + '</div>';
+    document.getElementById('empty-state').innerHTML = `<div class="empty-gfx" style="animation:none">❌</div><div class="empty-title">Classification failed</div><div class="empty-sub" style="color:var(--red)">${e.message}</div>`;
   }
   btn.disabled = false;
   btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Classify';
 }
 
-// ── GEMINI API ───────────────────────────────────────────
-const SYSTEM_PROMPT = `You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown):
-{"hts_10":"10-digit code","description":"official HTS heading description","gri_rule":"GRI-1","gri_rationale":"2-3 sentences","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"code","desc":"desc","reason":"reason"}],"risk_flags":["flag"],"savings_tip":"tip if >15%"}`;
+const SYS = `You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown, no preamble):
+{"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}`;
 
-async function classifyWithGemini(desc, origin, key) {
-  const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key, {
+async function classifyGemini(desc, origin) {
+  const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey, {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:SYSTEM_PROMPT+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})
+    body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})
   });
   const d = await r.json();
-  if(d.error) throw new Error(d.error.message);
-  let t = d.candidates[0].content.parts[0].text.trim();
-  t = t.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
+  if (d.error) throw new Error(d.error.message);
+  let t = d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
   return JSON.parse(t);
 }
 
-// ── RULES ENGINE ─────────────────────────────────────────
-const HTS_RULES = [
-  {kw:['motor','dc motor','brushless','servo'],hts:'8501.32.4500',desc:'DC motors, output 750W–75kW',gri:'GRI-1',duty:2.4,s301:{applies:true,list:'List 3',rate:25}},
-  {kw:['laptop','notebook','computer','ultrabook'],hts:'8471.30.0100',desc:'Portable ADP machines, ≤10 kg',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:7.5}},
-  {kw:['steel','stainless','kitchen','bowl','cookware'],hts:'7323.93.0080',desc:'Table/kitchen articles of stainless steel',gri:'GRI-1',duty:2.0,s301:{applies:true,list:'List 3',rate:25}},
-  {kw:['jeans','denim','pants','trousers'],hts:'6203.42.4011',desc:"Men's trousers, cotton, blue denim",gri:'GRI-1',duty:16.6,s301:{applies:false}},
-  {kw:['pump','centrifugal','water pump'],hts:'8413.81.0040',desc:'Centrifugal pumps for liquids',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:25}},
-  {kw:['toy','toys','play'],hts:'9503.00.0090',desc:'Toys NES',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:7.5}},
-  {kw:['aluminum','aluminium sheet','plate'],hts:'7606.12.3090',desc:'Aluminum alloy plates, sheets',gri:'GRI-1',duty:3.0,s301:{applies:false},s232:{applies:true,rate:10}},
-  {kw:['shirt','t-shirt','tee'],hts:'6109.10.0012',desc:"T-shirts, cotton, men's",gri:'GRI-1',duty:16.5,s301:{applies:false}},
-  {kw:['sneaker','shoe','footwear','athletic'],hts:'6402.99.3165',desc:'Footwear, rubber/plastic outer soles',gri:'GRI-1',duty:20.0,s301:{applies:false}},
-  {kw:['furniture','table','chair','wood'],hts:'9403.60.8081',desc:'Other wooden furniture NES',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:25}},
+const RULES = [
+  {kw:['motor','dc motor','brushless','servo','hvac motor'],h:'8501.32.4500',d:'DC motors, output 750W–75kW',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['laptop','notebook','computer','ultrabook'],h:'8471.30.0100',d:'Portable ADP machines, ≤10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['steel','stainless','kitchen','bowl','cookware'],h:'7323.93.0080',d:'Table/kitchen articles of stainless steel',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['jeans','denim','pants','trousers'],h:'6203.42.4011',d:"Men's trousers, cotton, blue denim",g:'GRI-1',p:16.6,s301:{a:false}},
+  {kw:['pump','centrifugal','water pump'],h:'8413.81.0040',d:'Centrifugal pumps for liquids',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['toy','toys','play'],h:'9503.00.0090',d:'Toys NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['aluminum','aluminium','sheet','plate'],h:'7606.12.3090',d:'Aluminum alloy plates, sheets',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
+  {kw:['shirt','t-shirt','tee'],h:'6109.10.0012',d:"T-shirts, cotton, men's",g:'GRI-1',p:16.5,s301:{a:false}},
+  {kw:['sneaker','shoe','footwear','athletic'],h:'6402.99.3165',d:'Footwear, rubber/plastic outer soles',g:'GRI-1',p:20.0,s301:{a:false}},
+  {kw:['furniture','table','chair','wood'],h:'9403.60.8081',d:'Other wooden furniture NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
 ];
 
-function classifyWithRules(desc, origin) {
-  const d = desc.toLowerCase();
-  let best = null, bestScore = 0;
-  for(const r of HTS_RULES){ const s = r.kw.filter(k=>d.includes(k)).length; if(s>bestScore){bestScore=s;best=r;} }
-  if(!best) best = {kw:[],hts:'8479.89.9899',desc:'Machines NES',gri:'GRI-4',duty:0,s301:{applies:origin==='CN',list:'List 3',rate:25}};
-  const s301Rate = (best.s301?.applies&&origin==='CN')?(best.s301.rate||0):0;
-  const s232Rate = (best.s232?.applies&&['CN','IN','TW'].includes(origin))?(best.s232.rate||0):0;
-  const total = best.duty+s301Rate+s232Rate;
-  return {hts_10:best.hts,description:best.desc,gri_rule:best.gri,gri_rationale:'Classification by terms of the headings per '+best.gri+'. Product attributes match heading description. Result generated by rules engine.',confidence:bestScore>0?'HIGH':'MEDIUM',duty_general_pct:best.duty,duty_general_formatted:best.duty===0?'Free':best.duty+'%',section_301:{applies:s301Rate>0,list:best.s301?.list||'',rate_pct:s301Rate},section_232:{applies:s232Rate>0,rate_pct:s232Rate},total_effective_pct:total,total_formatted:total===0?'Free':total.toFixed(1)+'%',alternatives:[],risk_flags:total>20?['High effective duty — consider supplier diversification']:[]};
+function classifyRules(desc, origin) {
+  const dl = desc.toLowerCase(); let best=null, bs=0;
+  for (const r of RULES) { const s=r.kw.filter(k=>dl.includes(k)).length; if(s>bs){bs=s;best=r;} }
+  if (!best) best={kw:[],h:'8479.89.9899',d:'Machines NES',g:'GRI-4',p:0,s301:{a:origin==='CN',l:'List 3',r:25}};
+  const s301r=(best.s301?.a&&origin==='CN')?(best.s301.r||0):0;
+  const s232r=(best.s232?.a&&['CN','IN','TW'].includes(origin))?(best.s232.r||0):0;
+  const tot=best.p+s301r+s232r;
+  return {hts_10:best.h,description:best.d,gri_rule:best.g,gri_rationale:'Classification by terms of the headings per '+best.g+'. Product attributes match heading description.',confidence:bs>0?'HIGH':'MEDIUM',duty_general_pct:best.p,duty_general_formatted:best.p===0?'Free':best.p+'%',section_301:{applies:s301r>0,list:best.s301?.l||'',rate_pct:s301r},section_232:{applies:s232r>0,rate_pct:s232r},total_effective_pct:tot,total_formatted:tot===0?'Free':tot.toFixed(1)+'%',alternatives:[],risk_flags:tot>20?['High effective duty — consider supplier diversification from CN to VN or MX']:[]};
 }
 
-// ── CONFIDENCE → LEGAL CONFIDENCE SCORE ─────────────────
-function getLCS(confidence, hasApi) {
-  if(confidence==='HIGH'&&hasApi) return {score:94,label:'HIGH',cls:'high',bar:94,note:'Strong GRI-1 match. Verified against 2026 HTS Schedule.'};
-  if(confidence==='HIGH'&&!hasApi) return {score:78,label:'HIGH',cls:'high',bar:78,note:'Rules engine match. Add Gemini API key for AI-verified score.'};
-  if(confidence==='MEDIUM') return {score:62,label:'MEDIUM',cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};
-  return {score:41,label:'LOW',cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};
+// ══════════════════════════════════════════════════════════════
+// RENDER RESULT
+// ══════════════════════════════════════════════════════════════
+function dc(pct) { if(pct===0)return 'd-free'; if(pct<=5)return 'd-low'; if(pct<=20)return 'd-mid'; return 'd-high'; }
+function getLCS(conf, hasKey) {
+  if(conf==='HIGH'&&hasKey) return {score:94,cls:'high',bar:94,note:'Strong GRI-1 match. Verified against 2026 HTS Schedule.'};
+  if(conf==='HIGH') return {score:78,cls:'high',bar:78,note:'Rules engine match. Add API key for AI-verified score.'};
+  if(conf==='MEDIUM') return {score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended.'};
+  return {score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};
 }
 
-function getDutyClass(pct) {
-  if(pct===0) return 'duty-free'; if(pct<=5) return 'duty-low'; if(pct<=20) return 'duty-mid'; return 'duty-high';
-}
-
-// ── RENDER RESULT ─────────────────────────────────────────
 function renderResult(r, desc, origin) {
-  const total = r.total_effective_pct||0;
-  const s301 = r.section_301||{}, s232 = r.section_232||{};
-  const tradeActions = (s301.applies?'+'+s301.rate_pct+'% §301 '+(s301.list||''):'') + (s232.applies?' +'+s232.rate_pct+'% §232':'');
-  const flags = [...(r.risk_flags||[])];
-  if(r.savings_tip) flags.push('💡 '+r.savings_tip);
-  const lcs = getLCS(r.confidence, !!apiKey);
-  const memo = buildMemo(r, desc, origin);
+  const tot=r.total_effective_pct||0;
+  const s301=r.section_301||{}; const s232=r.section_232||{};
+  const ta=(s301.applies?'+'+s301.rate_pct+'% §301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% §232':'');
+  const flags=[...(r.risk_flags||[])]; if(r.savings_tip)flags.push('💡 '+r.savings_tip);
+  const lcs=getLCS(r.confidence,!!apiKey);
+  const memo=buildMemo(r,desc,origin);
+  const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
-  document.getElementById('result-area').innerHTML = `
-    <div>
-      <div class="result-hts">${r.hts_10||'—'}</div>
-      <div class="result-desc">${r.description||''}</div>
-      <span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'}</span>
-
-      <!-- ═══ PHASE 3: LEGAL CONFIDENCE SCORE WIDGET ═══ -->
-      <div class="lcs-widget" style="margin-top:14px;">
-        <div class="lcs-header">
-          <span class="lcs-label">⚖️ Legal Confidence Score</span>
-          <span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span>
-        </div>
-        <div class="lcs-bar-bg"><div class="lcs-bar-fill lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div>
-        <div class="lcs-note">${lcs.note}</div>
-        <div class="verify-row">
-          <a class="verify-btn" href="https://hts.usitc.gov/reststop/api/details/en/${(r.hts_10||'').replace(/\./g,'')}" target="_blank">🏛 Verify on USITC</a>
-          <a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">📋 Check §301 List</a>
-          <a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">📂 CBP Rulings</a>
-        </div>
-      </div>
-
-      <div class="tabs" style="margin-top:14px;">
-        <div class="tab active" onclick="switchResultTab(this,'tab-duty')">Duty Analysis</div>
-        <div class="tab" onclick="switchResultTab(this,'tab-gri')">Classification Logic</div>
-        <div class="tab" onclick="switchResultTab(this,'tab-memo')">CBP Memo</div>
-      </div>
-
-      <div class="tab-body active" id="tab-duty">
-        <div class="duty-grid">
-          <div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${getDutyClass(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div>
-          <div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'duty-high':'duty-free'}">${tradeActions||'None'}</div><div class="duty-sub">${s301.list||'No §301/232'}</div></div>
-          <div class="duty-cell" style="border-color:${total>20?'rgba(248,81,73,.3)':total>5?'rgba(210,153,34,.3)':'rgba(40,167,69,.3)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${getDutyClass(total)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div>
-        </div>
-        ${flags.length?'<div class="section-lbl">Risk Flags</div>'+flags.map(f=>`<div class="flag ${f.startsWith('💡')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('💡')?'dot-info':'dot-risk'}"></div><span>${f.replace('💡 ','')}</span></div>`).join(''):''}
-
-        <!-- ═══ PHASE 2: DYNAMIC RESULT DISCLAIMER ═══ -->
-        <div class="result-disclaimer">
-          <span class="rd-icon">⚠️</span>
-          <div class="rd-text"><strong>Decision Support Only.</strong> This classification is generated by AI/rules engine based on the 2026 USITC HTS Schedule and USTR Section 301 lists. It is <strong>not a binding customs determination</strong> and may differ from CBP rulings. Duty rates are subject to change. The importer of record bears full responsibility for all customs declarations. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC ↗</a> · <a href="#" onclick="showTerms(event)">Full Terms ↗</a></div>
-        </div>
-      </div>
-
-      <div class="tab-body" id="tab-gri">
-        <div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'}</div><div class="gri-text">${r.gri_rationale||''}</div></div>
-        ${r.alternatives&&r.alternatives.length?'<div class="section-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}
-      </div>
-
-      <div class="tab-body" id="tab-memo">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-          <button onclick="copyMemo()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;">Copy memo</button>
-        </div>
-        <div class="memo-box" id="memo-text">${memo}</div>
-      </div>
-
-      <button class="save-btn" id="save-btn" onclick="saveToLibrary()">+ Save to SKU Library</button>
+  document.getElementById('result-area').innerHTML=`
+<div class="result-wrap">
+  <div class="hts-hero">
+    <div class="hts-code">${r.hts_10||'—'}</div>
+    <div class="hts-desc">${r.description||''}</div>
+    <div class="hts-meta">
+      <span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span>
+      <span class="hts-timing">⚡ ${today} · ${apiKey?'Gemini AI':'Rules Engine'}</span>
     </div>
-  `;
-  document.getElementById('result-area').style.display = 'block';
+  </div>
+
+  <div class="duty-grid">
+    <div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div>
+    <div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No §301/232'}</div></div>
+    <div class="duty-cell" style="border-color:${tot>20?'rgba(255,77,77,.25)':tot>5?'rgba(255,184,0,.2)':'rgba(200,255,0,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div>
+  </div>
+
+  <div class="lcs-card">
+    <div class="lcs-header">
+      <span class="lcs-lbl">⚖️ Legal Confidence Score</span>
+      <span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span>
+    </div>
+    <div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div>
+    <div class="lcs-note">${lcs.note}</div>
+    <div class="verify-row">
+      <a class="verify-btn" href="https://hts.usitc.gov/reststop/api/details/en/${(r.hts_10||'').replace(/\./g,'')}" target="_blank">🏛 Verify USITC</a>
+      <a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">📋 Check §301</a>
+      <a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">📂 CBP Rulings</a>
+    </div>
+  </div>
+
+  <div class="result-tabs">
+    <div class="rtab active" onclick="swRTab(this,'rt-duty')">Duty Analysis</div>
+    <div class="rtab" onclick="swRTab(this,'rt-gri')">Classification Logic</div>
+    <div class="rtab" onclick="swRTab(this,'rt-memo')">CBP Memo</div>
+  </div>
+
+  <div class="rtab-body active" id="rt-duty">
+    ${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('💡')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('💡')?'dot-info':'dot-risk'}"></div><span>${f.replace('💡 ','')}</span></div>`).join('')+'</div>':''}
+    <div class="disclaimer-box">
+      <span style="font-size:14px;flex-shrink:0">⚠️</span>
+      <div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR §301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC ↗</a></div>
+    </div>
+  </div>
+
+  <div class="rtab-body" id="rt-gri">
+    <div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'} Applied</div><div class="gri-text">${r.gri_rationale||''}</div></div>
+    ${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason Not Selected</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}
+  </div>
+
+  <div class="rtab-body" id="rt-memo">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <button class="copy-btn" onclick="copyMemo()">Copy memo</button>
+    </div>
+    <div class="memo-box" id="memo-content">${memo}</div>
+  </div>
+
+  <button class="save-btn" id="save-btn" onclick="saveToLib()">+ Save to SKU Library</button>
+</div>`;
 }
 
-function switchResultTab(el, tabId) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-body').forEach(t=>t.classList.remove('active'));
+function swRTab(el, id) {
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.rtab-body').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById(tabId).classList.add('active');
+  document.getElementById(id).classList.add('active');
 }
 
 function buildMemo(r, desc, origin) {
-  const today = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   return `CUSTOMS CLASSIFICATION ANALYSIS MEMO
 CustomsAI — Classification Research Assistant
 Date: ${today}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 DISCLAIMER: This memo is prepared by an AI classification research
-assistant and is provided for INFORMATIONAL PURPOSES ONLY.
-A licensed U.S. Customs Broker must review this analysis prior to
-entry filing. The importer of record bears full responsibility for
-the accuracy of all customs declarations. This analysis does not
-constitute a CBP binding ruling under 19 CFR Part 177.
+assistant for INFORMATIONAL PURPOSES ONLY. A licensed U.S. Customs
+Broker must review prior to entry filing. Not a CBP binding ruling
+under 19 CFR Part 177.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-I. PRODUCT DESCRIPTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+I. PRODUCT
+Product:  ${desc}
+Origin:   ${origin}
 
-Product:     ${desc}
-Origin:      ${origin}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-II. CLASSIFICATION ANALYSIS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+II. CLASSIFICATION
 HTS Code:    ${r.hts_10}
 Description: ${r.description}
 GRI Rule:    ${r.gri_rule}
@@ -674,62 +1228,102 @@ Confidence:  ${r.confidence}
 
 Rationale: ${r.gri_rationale}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-III. DUTY RATE ANALYSIS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+III. DUTY RATES
 Column 1 General:  ${r.duty_general_formatted}
 Section 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}
 Section 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}
+TOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})
 
->>> TOTAL EFFECTIVE RATE (${origin}): ${r.total_formatted}
+${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  ⚠ '+f).join('\n'):''}
 
-${r.risk_flags?.length?'IV. RISK FLAGS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'+r.risk_flags.map(f=>'  ⚠ '+f).join('\n'):''}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 V. VERIFICATION SOURCES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-• USITC HTS Schedule:  https://hts.usitc.gov
-• CBP Binding Rulings: https://rulings.cbp.gov
-• USTR Section 301:    https://ustr.gov
+• USITC HTS:   https://hts.usitc.gov
+• CBP Rulings: https://rulings.cbp.gov
+• USTR §301:   https://ustr.gov
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CustomsAI · customsai.vercel.app
-For informational use only — Not a binding determination
+CustomsAI · customsai.vercel.app · Informational use only
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 }
 
 function copyMemo() {
-  const t = document.getElementById('memo-text').textContent;
+  const t=document.getElementById('memo-content').textContent;
   navigator.clipboard.writeText(t).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});
 }
 
-function saveToLibrary() {
+// ══════════════════════════════════════════════════════════════
+// SKU LIBRARY
+// ══════════════════════════════════════════════════════════════
+function getIcon(hts) {
+  const ch=parseInt((hts||'').substring(0,2));
+  if(ch>=84&&ch<=85)return '⚙️'; if(ch>=61&&ch<=64)return '👕'; if(ch>=72&&ch<=76)return '🔩';
+  if(ch>=94&&ch<=95)return '🪑'; if(ch>=84&&ch<=84)return '🔧'; return '📦';
+}
+function getDutyClass(val) {
+  if(!val||val==='Free')return 'free';
+  const n=parseFloat(val);
+  if(n>20)return 'high'; if(n>5)return 'mid'; return 'low';
+}
+
+function addToRecent(r, desc) {
+  const txl=document.getElementById('txn-list');
+  const existing=txl.querySelector('.txn-item[data-hts="'+r.hts_10+'"]');
+  if(!txl.querySelector('.txn-item')){ txl.innerHTML=''; }
+  if(!existing) {
+    const d=document.createElement('div');
+    d.className='txn-item';
+    d.setAttribute('data-hts',r.hts_10);
+    d.innerHTML=`<div class="txn-icon">${getIcon(r.hts_10)}</div><div class="txn-info"><div class="txn-hts">${r.hts_10}</div><div class="txn-desc">${desc.substring(0,40)}${desc.length>40?'…':''}</div></div><div class="txn-duty ${getDutyClass(r.total_formatted)}">${r.total_formatted}</div>`;
+    txl.insertBefore(d,txl.firstChild);
+    const items=txl.querySelectorAll('.txn-item');
+    if(items.length>6) items[items.length-1].remove();
+  }
+}
+
+function saveToLib() {
   if(!currentResult) return;
-  const e = {id:Date.now().toString(),hts:currentResult.hts_10,description:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-select').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};
-  skuLibrary.unshift(e); skuLibrary = skuLibrary.slice(0,100);
-  localStorage.setItem('cai_sku',JSON.stringify(skuLibrary)); updateSkuCount();
-  const btn = document.getElementById('save-btn'); btn.textContent='✓ Saved';btn.classList.add('saved');
-  setTimeout(()=>{btn.textContent='+ Save to SKU Library';btn.classList.remove('saved');},2000);
+  const entry={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};
+  skuLib.unshift(entry); skuLib=skuLib.slice(0,100);
+  localStorage.setItem('cai_sku',JSON.stringify(skuLib)); updateSkuCount();
+  const b=document.getElementById('save-btn');
+  b.textContent='✓ Saved to Library'; b.classList.add('saved');
+  setTimeout(()=>{b.textContent='+ Save to SKU Library';b.classList.remove('saved');},2500);
 }
 
-function renderSkuTable() {
-  const c = document.getElementById('sku-table-container');
-  if(!skuLibrary.length){c.innerHTML='<div class="empty-history">No saved SKUs yet.</div>';return;}
-  c.innerHTML=`<table class="sku-table"><tr><th>HTS</th><th>Description</th><th>Duty</th><th>Origin</th><th>Engine</th><th>Date</th><th></th></tr>${skuLibrary.map(s=>`<tr><td class="hts">${s.hts}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.description}</td><td style="font-family:var(--mono)">${s.duty}</td><td>${s.origin}</td><td><span class="engine-badge2 ${s.engine==='AI'?'badge-ai':'badge-rules'}">${s.engine}</span></td><td style="color:var(--muted)">${s.date}</td><td><button onclick="deleteSKU('${s.id}')" style="background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer">×</button></td></tr>`).join('')}</table>`;
+function renderLibrary() {
+  const el=document.getElementById('lib-table');
+  const lc=document.getElementById('lib-count');
+  const n=skuLib.length;
+  if(lc) lc.textContent=n+' saved classification'+(n!==1?'s':'');
+  if(!n){el.innerHTML='<div class="sku-empty">No saved SKUs yet.<br>Classify a product and click "Save to Library".</div>';return;}
+  el.innerHTML=`<table class="sku-table"><tr><th></th><th>HTS Code</th><th>Description</th><th>Duty</th><th>Origin</th><th>Engine</th><th>Date</th><th></th></tr>
+${skuLib.map(s=>`<tr>
+  <td style="font-size:18px">${getIcon(s.hts)}</td>
+  <td class="hts">${s.hts}</td>
+  <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">${s.desc}</td>
+  <td style="font-family:var(--mono);font-weight:700;color:${s.duty==='Free'?'var(--neon)':parseFloat(s.duty)>20?'var(--red)':parseFloat(s.duty)>5?'var(--amber)':'var(--green)'}">${s.duty}</td>
+  <td style="color:var(--muted)">${s.origin}</td>
+  <td><span class="eng-badge ${s.engine==='AI'?'eng-ai':'eng-rules'}">${s.engine}</span></td>
+  <td style="color:var(--faint);font-family:var(--mono);font-size:11px">${s.date}</td>
+  <td><button class="del-btn" onclick="delSku('${s.id}')">×</button></td>
+</tr>`).join('')}
+</table>`;
 }
 
-function deleteSKU(id){skuLibrary=skuLibrary.filter(s=>s.id!==id);localStorage.setItem('cai_sku',JSON.stringify(skuLibrary));updateSkuCount();renderSkuTable();}
+function delSku(id){skuLib=skuLib.filter(s=>s.id!==id);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();renderLibrary();}
 
 function exportCSV(){
   const nl=String.fromCharCode(10);
-  const rows=skuLibrary.map(s=>[s.hts,s.description.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));
+  const rows=skuLib.map(s=>[s.hts,s.desc.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));
   const blob=new Blob([['HTS,Description,Duty,Origin,Engine,Date',...rows].join(nl)],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='customsai-skus.csv';a.click();
 }
 
-document.getElementById('product-desc').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});
+// KEYBOARD
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta=document.getElementById('product-desc');
+  if(ta) ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});
+});
 </script>
 </body>
 </html>
