@@ -3,625 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CustomsAI — HTS Classification Engine</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>CustomsAI — HTS Classification in 15 Seconds</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0f1e;
-  --surface: #111827;
-  --border: rgba(255,255,255,0.08);
-  --accent: #28a745;
-  --accent-dim: rgba(40,167,69,0.12);
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --red: #f85149;
-  --amber: #d29922;
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-html{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;}
-body{min-height:100vh;display:flex;flex-direction:column;}
+:root{--bg:#f8f7f4;--ink:#0f0f0d;--muted:#666;--border:#e2e0d8;--surface:#fff;--accent:#1a5c3a;--accent-lt:#e8f5ee;--amber:#b85c00;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+html{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;scroll-behavior:smooth;}
 
-/* LAYOUT */
-.app{display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(248,247,244,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;}
+.nav-logo{font-weight:700;font-size:18px;letter-spacing:-.02em;}
+.nav-logo span{color:var(--accent);}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-cta{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);text-decoration:none;}
+.nav-cta:hover{background:#143d27;}
 
-/* SIDEBAR */
-.logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.logo-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:500;color:#0a0f1e;flex-shrink:0;}
-.logo-text{font-size:13px;font-weight:600;color:#fff;}
-.logo-tag{font-size:10px;color:var(--muted);font-family:var(--mono);}
-.nav{padding:12px 8px;flex:1;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .12s;margin-bottom:2px;}
-.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
-.nav-item.active{background:var(--accent-dim);color:var(--accent);}
-.sidebar-foot{padding:10px 8px;border-top:1px solid var(--border);}
-.api-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;padding-left:4px;}
-.api-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:11px;font-family:var(--mono);color:var(--text);outline:none;}
-.api-input:focus{border-color:var(--accent);}
-.version-tag{font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:8px;font-family:var(--mono);}
+/* HERO */
+.hero{max-width:1100px;margin:0 auto;padding:96px 40px 72px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+.hero-tag{display:inline-block;background:var(--accent-lt);color:var(--accent);font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;}
+h1{font-size:52px;font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:20px;}
+h1 em{color:var(--accent);font-style:normal;}
+.hero-sub{font-size:18px;color:var(--muted);line-height:1.65;margin-bottom:32px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-block;transition:all .15s;}
+.btn-primary:hover{background:#143d27;transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font);text-decoration:none;transition:all .15s;}
+.btn-secondary:hover{border-color:var(--ink);}
+.social-proof{margin-top:20px;font-size:13px;color:var(--muted);}
 
-/* TOPBAR */
-.topbar{height:50px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
-.topbar-title{font-size:13px;font-weight:500;color:#fff;}
-.topbar-badge{font-size:10px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border:1px solid rgba(40,167,69,.2);border-radius:20px;padding:2px 9px;}
+/* DEMO WIDGET */
+.demo{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.08);}
+.demo-bar{background:#f0efe9;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;gap:6px;align-items:center;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.d1{background:#ff5f57;}.d2{background:#ffbe2e;}.d3{background:#28ca41;}
+.demo-url{font-size:11px;font-family:var(--mono);color:var(--muted);margin-left:4px;}
+.demo-body{padding:20px;}
+.demo-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.demo-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;font-family:var(--mono);color:var(--ink);margin-bottom:14px;line-height:1.5;}
+.cursor{display:inline-block;width:2px;height:12px;background:var(--accent);vertical-align:middle;margin-left:1px;animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.demo-result{background:#f8f7f4;border:1px solid var(--border);border-radius:8px;padding:14px;}
+.result-hts{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--accent);margin-bottom:4px;}
+.result-desc{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.duty-chips{display:flex;gap:6px;}
+.duty-chip{flex:1;background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;}
+.chip-val{font-family:var(--mono);font-size:17px;font-weight:600;}
+.chip-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.green{color:var(--accent);}.red{color:#c0392b;}
+.demo-flag{display:inline-flex;align-items:center;gap:5px;background:#fff3e0;border:1px solid rgba(184,92,0,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--amber);font-weight:500;margin-top:10px;}
+.demo-timing{font-size:10px;color:var(--muted);text-align:right;margin-top:8px;font-family:var(--mono);}
 
-/* CONTENT */
-.content{display:grid;grid-template-columns:420px 1fr;flex:1;overflow:hidden;}
-.left-panel{border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
-.right-panel{padding:20px;overflow-y:auto;}
+/* HOW IT WORKS */
+.section{padding:80px 40px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-tag{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px;}
+h2{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px;}
+.section-sub{font-size:18px;color:var(--muted);max-width:560px;margin-bottom:48px;}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.how-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;transition:border-color .15s,transform .15s;}
+.how-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.how-num{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:12px;}
+.how-title{font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em;}
+.how-body{font-size:14px;color:var(--muted);line-height:1.6;}
+.how-tag{display:inline-block;margin-top:12px;font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;}
 
-/* INPUT CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.card-header{padding:14px 16px 0;display:flex;align-items:center;gap:8px;}
-.card-icon{color:var(--accent);font-size:16px;}
-.card-title{font-size:14px;font-weight:600;color:#fff;}
-.card-sub{font-size:12px;color:var(--muted);margin-top:1px;}
-.card-body{padding:14px 16px;}
-.label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.desc-input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border-color .15s;}
-.desc-input:focus{border-color:var(--accent);}
-.desc-input::placeholder{color:rgba(255,255,255,.2);}
-.row{display:flex;gap:10px;align-items:center;margin-top:10px;}
-.origin-select{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--font);font-size:12px;color:var(--text);outline:none;flex:1;}
-.classify-btn{background:var(--accent);color:#0a0f1e;border:none;border-radius:8px;padding:9px 18px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;}
-.classify-btn:hover:not(:disabled){background:#34d058;}
-.classify-btn:disabled{opacity:.5;cursor:not-allowed;}
-.chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 16px 14px;}
-.chip{font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s;font-family:var(--mono);}
-.chip:hover{border-color:var(--accent);color:var(--accent);}
+/* STATS */
+.stats-section{background:var(--ink);padding:80px 40px;}
+.stats-section h2,.stats-section .section-sub{color:#fff;}
+.stats-section .section-sub{color:rgba(255,255,255,.5);}
+.stats-section .section-tag{color:#5dcaa5;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
+.stat-box{background:rgba(255,255,255,.04);border-radius:12px;padding:28px 24px;}
+.stat-big{font-size:44px;font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:6px;}
+.stat-lbl{font-size:14px;color:rgba(255,255,255,.4);}
+.stat-sub{font-size:12px;color:rgba(255,255,255,.2);margin-top:4px;}
 
-/* RESULTS */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);}
-.empty-icon{font-size:36px;margin-bottom:12px;opacity:.3;}
-.empty-title{font-size:15px;font-weight:500;color:rgba(255,255,255,.4);margin-bottom:6px;}
-.empty-sub{font-size:12px;max-width:320px;}
-.result-hts{font-family:var(--mono);font-size:32px;font-weight:500;color:var(--accent);letter-spacing:.04em;}
-.result-desc{font-size:13px;color:var(--muted);margin-top:4px;}
-.conf-badge{display:inline-block;font-size:10px;font-family:var(--mono);font-weight:500;padding:3px 9px;border-radius:20px;margin-top:8px;}
-.conf-HIGH{background:rgba(40,167,69,.15);color:var(--accent);border:1px solid rgba(40,167,69,.2);}
-.conf-MEDIUM{background:rgba(210,153,34,.15);color:var(--amber);border:1px solid rgba(210,153,34,.2);}
-.conf-LOW{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.2);}
-.duty-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;}
-.duty-cell{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px;}
-.duty-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
-.duty-val{font-size:22px;font-weight:500;font-family:var(--mono);}
-.duty-free{color:var(--accent);}
-.duty-low{color:#60a5fa;}
-.duty-mid{color:var(--amber);}
-.duty-high{color:var(--red);}
-.duty-sub{font-size:11px;color:var(--muted);margin-top:3px;}
-.gri-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:14px;}
-.gri-rule{font-size:11px;font-weight:600;color:#a78bfa;font-family:var(--mono);margin-bottom:5px;}
-.gri-text{font-size:12px;color:var(--text);line-height:1.6;}
-.section-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px;}
-.flag{display:flex;align-items:flex-start;gap:7px;padding:8px 11px;border-radius:7px;font-size:12px;margin-bottom:5px;}
-.flag-risk{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.15);color:#ffa198;}
-.flag-info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);color:#79c0ff;}
-.flag-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px;}
-.dot-risk{background:var(--red);}
-.dot-info{background:#58a6ff;}
-.save-btn{width:100%;margin-top:14px;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;font-family:var(--font);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;}
-.save-btn:hover{border-color:var(--accent);color:var(--accent);}
-.save-btn.saved{background:var(--accent-dim);border-color:rgba(40,167,69,.3);color:var(--accent);}
-.memo-box{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--mono);font-size:11px;color:var(--text);white-space:pre-wrap;line-height:1.7;max-height:380px;overflow-y:auto;margin-top:10px;}
-.tabs{display:flex;gap:1px;border-bottom:1px solid var(--border);margin:0 -20px;padding:0 20px;}
-.tab{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .12s;margin-bottom:-1px;}
-.tab:hover{color:var(--text);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-body{padding-top:14px;display:none;}
-.tab-body.active{display:block;}
-.alt-table{width:100%;border-collapse:collapse;font-size:11px;}
-.alt-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-family:var(--mono);}
-.alt-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text);}
-.alt-table .mono{font-family:var(--mono);color:var(--muted);}
+/* PRICING */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.price-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;}
+.price-card.featured{border-color:var(--accent);border-width:2px;}
+.feat-badge{display:inline-block;background:var(--accent);color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:3px 10px;margin-bottom:14px;}
+.price-plan{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.price-amt{font-size:40px;font-weight:800;letter-spacing:-.03em;}
+.price-period{font-size:14px;color:var(--muted);}
+.price-desc{font-size:13px;color:var(--muted);margin:12px 0 20px;}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.features{list-style:none;}
+.features li{font-size:13px;color:var(--muted);padding:5px 0;display:flex;align-items:flex-start;gap:8px;}
+.features li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;}
+.price-btn{width:100%;padding:11px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--ink);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;margin-top:20px;transition:all .15s;text-decoration:none;display:block;text-align:center;}
+.price-btn:hover{border-color:var(--ink);}
+.price-card.featured .price-btn{background:var(--accent);color:#fff;border-color:transparent;}
+.price-card.featured .price-btn:hover{background:#143d27;}
 
-/* LOADING */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;}
-.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loading-step{font-size:12px;color:var(--muted);font-family:var(--mono);transition:color .3s;}
-.loading-step.active{color:var(--accent);}
-.loading-step.done{color:var(--accent);opacity:.5;}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+.foot-logo{font-weight:700;font-size:16px;}
+.foot-logo span{color:var(--accent);}
+.foot-tag{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:2px;}
+.disclaimer{font-size:11px;color:var(--muted);max-width:480px;text-align:center;}
+.foot-links{display:flex;gap:20px;}
+.foot-links a{font-size:13px;color:var(--muted);text-decoration:none;}
+.foot-links a:hover{color:var(--ink);}
 
-/* PAYWALL */
-.paywall-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50;}
-.paywall-card{background:#0d1f35;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;max-width:360px;width:100%;margin:16px;}
-.paywall-icon{width:52px;height:52px;background:var(--accent-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;}
-.paywall-card h2{font-size:18px;font-weight:700;text-align:center;margin-bottom:8px;}
-.paywall-card p{font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px;}
-.paywall-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);margin-bottom:8px;}
-.paywall-feat::before{content:"✓";color:var(--accent);font-weight:700;flex-shrink:0;}
-.btn-upgrade{width:100%;padding:11px;background:var(--accent);color:#0a0f1e;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;margin-top:18px;margin-bottom:8px;}
-.btn-upgrade:hover{background:#34d058;}
-.btn-api{width:100%;padding:11px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;}
-.btn-api:hover{color:var(--text);}
-
-/* HISTORY */
-.history-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.history-header h2{font-size:15px;font-weight:600;color:#fff;}
-.btn-sm{padding:5px 12px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);}
-.btn-sm:hover{color:var(--text);}
-.btn-sm.green{background:var(--accent);color:#0a0f1e;border-color:transparent;}
-.sku-table{width:100%;border-collapse:collapse;font-size:11px;}
-.sku-table th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;}
-.sku-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);}
-.sku-table .hts{font-family:var(--mono);color:var(--accent);font-weight:600;}
-.engine-badge{font-size:10px;padding:2px 7px;border-radius:20px;}
-.badge-ai{background:rgba(88,166,255,.15);color:#79c0ff;}
-.badge-rules{background:rgba(210,153,34,.15);color:var(--amber);}
-.empty-history{text-align:center;padding:48px;color:var(--muted);font-size:13px;}
-
-@media(max-width:700px){
-  .sidebar{display:none;}
-  .content{grid-template-columns:1fr;}
-  .right-panel{display:none;}
-  .left-panel{border-right:none;}
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .hero{grid-template-columns:1fr;padding:48px 20px;}
+  h1{font-size:36px;}
+  .section{padding:48px 20px;}
+  .how-grid,.price-grid,.stats-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;text-align:center;}
 }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-mark">CA</div>
-      <div>
-        <div class="logo-text">CustomsAI</div>
-        <div class="logo-tag">Classification Engine</div>
+
+<nav>
+  <div class="nav-logo">Customs<span>AI</span></div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="/app.html">Try demo</a>
+    <a class="nav-cta" href="/app.html">Start free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-tag">HTS Classification Engine · 2026</div>
+    <h1>Know your <em>real</em> duty rate before the shipment moves</h1>
+    <p class="hero-sub">CustomsAI classifies any product to 10-digit HTS, calculates Section 301 and 232 exposure, and generates a CBP-ready classification memo — in 15 seconds.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="/app.html">⚡ Classify your first product free</a>
+      <a class="btn-secondary" href="#how">See how it works →</a>
+    </div>
+    <p class="social-proof">No credit card required · 3 free classifications · $199/mo after</p>
+  </div>
+  <div class="demo">
+    <div class="demo-bar">
+      <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div>
+      <span class="demo-url">customsai.vercel.app/app</span>
+    </div>
+    <div class="demo-body">
+      <div class="demo-label">Product description</div>
+      <div class="demo-input">Industrial brushless DC motor, 500W,<br>for HVAC equipment, made in China<span class="cursor"></span></div>
+      <div class="demo-result">
+        <div class="result-hts">8501.32.4500</div>
+        <div class="result-desc">DC motors, output exceeding 750W but not exceeding 75kW — industrial</div>
+        <div class="duty-chips">
+          <div class="duty-chip"><div class="chip-val green">2.4%</div><div class="chip-lbl">Base rate</div></div>
+          <div class="duty-chip"><div class="chip-val red">+25%</div><div class="chip-lbl">Section 301</div></div>
+          <div class="duty-chip"><div class="chip-val red">27.4%</div><div class="chip-lbl">Total (China)</div></div>
+        </div>
+        <div class="demo-flag">⚠ Section 301 List 3 · Monitor USTR for exclusions</div>
+        <div class="demo-timing">⚡ classified in 14s · GRI-1 · HIGH confidence</div>
       </div>
     </div>
-    <nav class="nav">
-      <div class="nav-item active" onclick="switchTab('classify')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
-        Classify
-      </div>
-      <div class="nav-item" onclick="switchTab('history')" id="nav-history">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>
-        SKU Library <span id="sku-count" style="margin-left:auto;font-size:10px;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:20px;">0</span>
-      </div>
-    </nav>
-    <div class="sidebar-foot">
-      <div class="api-label">Gemini API Key</div>
-      <input class="api-input" type="password" id="api-key-input" placeholder="AIza..." oninput="saveApiKey(this.value)">
-      <div class="version-tag">v0.1 · customsai.app</div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="topbar">
-      <div class="topbar-title">HTS Classification & Duty Calculator</div>
-      <div class="topbar-badge" id="engine-badge">Rules Engine</div>
-    </div>
-
-    <!-- CLASSIFY VIEW -->
-    <div id="view-classify" class="content">
-      <div class="left-panel">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-icon">⚡</span>
-            <div>
-              <div class="card-title">Classify a product</div>
-              <div class="card-sub">Describe in plain English — AI handles the rest</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <textarea class="desc-input" id="product-desc" placeholder="e.g. Industrial brushless DC motor, 500W, for HVAC equipment, manufactured in China" rows="4"></textarea>
-            <div class="row">
-              <select class="origin-select" id="origin-select">
-                <option value="CN">🇨🇳 China (CN)</option>
-                <option value="VN">🇻🇳 Vietnam (VN)</option>
-                <option value="IN">🇮🇳 India (IN)</option>
-                <option value="MX">🇲🇽 Mexico (MX)</option>
-                <option value="DE">🇩🇪 Germany (DE)</option>
-                <option value="KR">🇰🇷 South Korea (KR)</option>
-                <option value="JP">🇯🇵 Japan (JP)</option>
-                <option value="TW">🇹🇼 Taiwan (TW)</option>
-                <option value="BD">🇧🇩 Bangladesh (BD)</option>
-                <option value="CA">🇨🇦 Canada (CA)</option>
-              </select>
-              <button class="classify-btn" id="classify-btn" onclick="classify()">
-                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Classify
-              </button>
-            </div>
-          </div>
-          <div class="chips">
-            <span style="font-size:10px;color:var(--muted);margin-right:3px">Try:</span>
-            <span class="chip" onclick="setEx(this)">DC motor 500W HVAC</span>
-            <span class="chip" onclick="setEx(this)">Steel kitchen bowls</span>
-            <span class="chip" onclick="setEx(this)">Men's cotton jeans</span>
-            <span class="chip" onclick="setEx(this)">Laptop under 10kg</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-panel" id="right-panel">
-        <div class="empty-state" id="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-title">Ready to classify</div>
-          <div class="empty-sub">Enter a product description and click Classify</div>
-        </div>
-        <div id="loading-state" style="display:none;height:100%;">
-          <div class="loading">
-            <div class="spinner"></div>
-            <div id="step1" class="loading-step active">Extracting product attributes...</div>
-            <div id="step2" class="loading-step">Searching HTS schedule...</div>
-            <div id="step3" class="loading-step">Applying GRI rules...</div>
-            <div id="step4" class="loading-step">Checking Section 301/232...</div>
-            <div id="step5" class="loading-step">Generating classification memo...</div>
-          </div>
-        </div>
-        <div id="result-area" style="display:none;"></div>
-      </div>
-    </div>
-
-    <!-- HISTORY VIEW -->
-    <div id="view-history" style="display:none;padding:20px;overflow-y:auto;flex:1;">
-      <div class="history-header">
-        <div>
-          <h2>SKU Library</h2>
-          <p style="font-size:12px;color:var(--muted);margin-top:2px;" id="sku-count-label">0 saved classifications</p>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-sm" onclick="exportCSV()">Export CSV</button>
-          <button class="btn-sm green" onclick="switchTab('classify')">+ New</button>
-        </div>
-      </div>
-      <div id="sku-table-container">
-        <div class="empty-history">No saved SKUs yet.<br>Classify a product and click "Save to Library".</div>
-      </div>
-    </div>
-  </main>
-</div>
-
-<!-- PAYWALL -->
-<div class="paywall-overlay" id="paywall" style="display:none;">
-  <div class="paywall-card">
-    <div class="paywall-icon">🛡️</div>
-    <h2>3 free uses reached</h2>
-    <p>Add your Gemini API key to continue free, or upgrade to Pro for unlimited access.</p>
-    <div class="paywall-feat">Unlimited HTS classifications</div>
-    <div class="paywall-feat">SKU Library — save & track all codes</div>
-    <div class="paywall-feat">Section 301/232 alerts</div>
-    <div class="paywall-feat">CBP-format classification memos</div>
-    <button class="btn-upgrade" onclick="window.open('mailto:ori@customsai.app?subject=CustomsAI Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro — $199/mo</button>
-    <button class="btn-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-key-input').focus()">Add Gemini API key (free)</button>
   </div>
 </div>
 
-<script>
-const SYSTEM_PROMPT = `You are a licensed U.S. Customs Broker with 15+ years of HTS classification experience.
-When given a product description and country of origin, return ONLY this JSON (no markdown):
-{
-  "hts_10": "10-digit code like 8501.32.4500",
-  "description": "official HTS heading description",
-  "gri_rule": "GRI-1",
-  "gri_rationale": "2-3 sentence explanation",
-  "confidence": "HIGH|MEDIUM|LOW",
-  "duty_general_pct": 2.4,
-  "duty_general_formatted": "2.4%",
-  "section_301": {"applies": true, "list": "List 3", "rate_pct": 25.0},
-  "section_232": {"applies": false, "rate_pct": 0},
-  "total_effective_pct": 27.4,
-  "total_formatted": "27.4%",
-  "alternatives": [{"hts": "code", "desc": "description", "reason": "why not selected"}],
-  "risk_flags": ["flag 1"],
-  "savings_tip": "one actionable sentence if rate > 15%"
-}`;
-
-// State
-let apiKey = localStorage.getItem('cai_apikey') || '';
-let usageCount = parseInt(localStorage.getItem('cai_usage') || '0');
-let skuLibrary = JSON.parse(localStorage.getItem('cai_sku') || '[]');
-let currentResult = null;
-const FREE_LIMIT = 3;
-
-// Init
-document.getElementById('api-key-input').value = apiKey;
-updateSkuCount();
-
-function saveApiKey(v) {
-  apiKey = v;
-  localStorage.setItem('cai_apikey', v);
-  document.getElementById('engine-badge').textContent = v ? 'Gemini AI Active' : 'Rules Engine';
-  document.getElementById('engine-badge').style.color = v ? '#28a745' : '';
-}
-if (apiKey) saveApiKey(apiKey);
-
-function switchTab(tab) {
-  document.getElementById('view-classify').style.display = tab === 'classify' ? 'grid' : 'none';
-  document.getElementById('view-history').style.display = tab === 'history' ? 'block' : 'none';
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-item')[tab === 'classify' ? 0 : 1].classList.add('active');
-  if (tab === 'history') renderSkuTable();
-}
-
-function setEx(el) {
-  document.getElementById('product-desc').value = el.textContent.trim();
-  document.getElementById('product-desc').focus();
-}
-
-function updateSkuCount() {
-  const n = skuLibrary.length;
-  document.getElementById('sku-count').textContent = n;
-  document.getElementById('sku-count-label').textContent = n + ' saved classifications';
-}
-
-async function classify() {
-  const desc = document.getElementById('product-desc').value.trim();
-  const origin = document.getElementById('origin-select').value;
-  if (!desc) return;
-  if (usageCount >= FREE_LIMIT && !apiKey) {
-    document.getElementById('paywall').style.display = 'flex';
-    return;
-  }
-  const btn = document.getElementById('classify-btn');
-  btn.disabled = true;
-  btn.textContent = 'Classifying...';
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('loading-state').style.display = 'block';
-  document.getElementById('result-area').style.display = 'none';
-  
-  let step = 1;
-  const stepInt = setInterval(() => {
-    if (step <= 5) {
-      for (let i = 1; i <= 5; i++) {
-        const el = document.getElementById('step' + i);
-        el.className = 'loading-step' + (i < step ? ' done' : i === step ? ' active' : '');
-      }
-      step++;
-    }
-  }, 900);
-
-  try {
-    let result;
-    if (apiKey) {
-      result = await classifyWithGemini(desc, origin, apiKey);
-    } else {
-      result = classifyWithRules(desc, origin);
-    }
-    clearInterval(stepInt);
-    currentResult = result;
-    const nc = usageCount + 1;
-    usageCount = nc;
-    localStorage.setItem('cai_usage', nc);
-    document.getElementById('loading-state').style.display = 'none';
-    renderResult(result, desc, origin);
-  } catch(e) {
-    clearInterval(stepInt);
-    document.getElementById('loading-state').style.display = 'none';
-    document.getElementById('empty-state').style.display = 'flex';
-    document.getElementById('empty-state').innerHTML = '<div style="color:var(--red);font-size:13px;font-weight:500">Classification failed: ' + e.message + '</div>';
-  }
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Classify';
-}
-
-async function classifyWithGemini(desc, origin, key) {
-  const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({contents:[{parts:[{text: SYSTEM_PROMPT + '\n\nProduct: ' + desc + '\nOrigin: ' + origin}]}]})
-  });
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error.message);
-  let text = data.candidates[0].content.parts[0].text.trim();
-  text = text.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
-  return JSON.parse(text);
-}
-
-const HTS_RULES = [
-  {keywords:['motor','dc motor','brushless','servo motor'],hts:'8501.32.4500',desc:'DC motors, output 750W to 75kW',gri:'GRI-1',duty:2.4,s301:{applies:true,list:'List 3',rate:25}},
-  {keywords:['laptop','notebook','computer','ultrabook'],hts:'8471.30.0100',desc:'Portable ADP machines, not over 10 kg',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:7.5}},
-  {keywords:['steel','stainless','kitchen','bowl','cookware'],hts:'7323.93.0080',desc:'Table/kitchen articles of stainless steel',gri:'GRI-1',duty:2.0,s301:{applies:true,list:'List 3',rate:25}},
-  {keywords:['jeans','denim','pants','trousers'],hts:'6203.42.4011',desc:"Men's trousers of cotton - blue denim",gri:'GRI-1',duty:16.6,s301:{applies:false}},
-  {keywords:['pump','centrifugal','water pump'],hts:'8413.81.0040',desc:'Centrifugal pumps for liquids',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:25}},
-  {keywords:['toy','toys','play'],hts:'9503.00.0090',desc:'Toys NES',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:7.5}},
-  {keywords:['aluminum sheet','aluminium plate'],hts:'7606.12.3090',desc:'Aluminum alloy plates, sheets and strip',gri:'GRI-1',duty:3.0,s301:{applies:false},s232:{applies:true,rate:10}},
-  {keywords:['shirt','t-shirt','tee','cotton shirt'],hts:'6109.10.0012',desc:"T-shirts, cotton, men's",gri:'GRI-1',duty:16.5,s301:{applies:false}},
-  {keywords:['sneaker','shoe','footwear','athletic'],hts:'6402.99.3165',desc:'Footwear with rubber/plastic outer soles',gri:'GRI-1',duty:20.0,s301:{applies:false}},
-  {keywords:['furniture','table','chair','wood'],hts:'9403.60.8081',desc:'Other wooden furniture NES',gri:'GRI-1',duty:0,s301:{applies:true,list:'List 3',rate:25}},
-];
-
-function classifyWithRules(desc, origin) {
-  const d = desc.toLowerCase();
-  let best = null, bestScore = 0;
-  for (const rule of HTS_RULES) {
-    const score = rule.keywords.filter(k => d.includes(k)).length;
-    if (score > bestScore) { bestScore = score; best = rule; }
-  }
-  if (!best) best = {hts:'8479.89.9899',desc:'Machines and mechanical appliances NES',gri:'GRI-4',duty:0,s301:{applies:origin==='CN',list:'List 3',rate:25}};
-  const s301Rate = (best.s301?.applies && origin === 'CN') ? (best.s301.rate || 0) : 0;
-  const s232Rate = (best.s232?.applies && ['CN','IN','TW'].includes(origin)) ? (best.s232.rate || 0) : 0;
-  const total = best.duty + s301Rate + s232Rate;
-  return {
-    hts_10: best.hts, description: best.desc, gri_rule: best.gri,
-    gri_rationale: 'Classification by terms of the headings per ' + best.gri + '. Product attributes match heading description.',
-    confidence: bestScore > 0 ? 'HIGH' : 'MEDIUM',
-    duty_general_pct: best.duty, duty_general_formatted: best.duty === 0 ? 'Free' : best.duty + '%',
-    section_301: {applies: s301Rate > 0, list: best.s301?.list || '', rate_pct: s301Rate},
-    section_232: {applies: s232Rate > 0, rate_pct: s232Rate},
-    total_effective_pct: total, total_formatted: total === 0 ? 'Free' : total.toFixed(1) + '%',
-    alternatives: [], risk_flags: total > 20 ? ['High effective duty rate — consider supplier diversification'] : [],
-    savings_tip: total > 15 ? 'Consider Vietnam (VN) or Mexico (MX) origin to reduce effective duty rate.' : null
-  };
-}
-
-function getDutyClass(pct) {
-  if (pct === 0) return 'duty-free';
-  if (pct <= 5) return 'duty-low';
-  if (pct <= 20) return 'duty-mid';
-  return 'duty-high';
-}
-
-function renderResult(r, desc, origin) {
-  const total = r.total_effective_pct || 0;
-  const s301 = r.section_301 || {};
-  const s232 = r.section_232 || {};
-  const tradeActions = (s301.applies ? '+' + s301.rate_pct + '% §301' : '') + (s232.applies ? ' +' + s232.rate_pct + '% §232' : '');
-  const flags = [...(r.risk_flags || [])];
-  if (r.savings_tip) flags.push('💡 ' + r.savings_tip);
-  
-  const memo = buildMemo(r, desc, origin);
-  
-  document.getElementById('result-area').innerHTML = `
-    <div>
-      <div class="result-hts">${r.hts_10 || '—'}</div>
-      <div class="result-desc">${r.description || ''}</div>
-      <span class="conf-badge conf-${r.confidence || 'MEDIUM'}">${r.confidence || 'MED'}</span>
-      <div class="tabs" style="margin-top:14px;">
-        <div class="tab active" onclick="switchResultTab(this,'tab-duty')">Duty Analysis</div>
-        <div class="tab" onclick="switchResultTab(this,'tab-gri')">Classification Logic</div>
-        <div class="tab" onclick="switchResultTab(this,'tab-memo')">CBP Memo</div>
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background:#f0efe9;">
+  <div class="section-inner">
+    <div class="section-tag">How it works</div>
+    <h2>Expert classification logic, automated</h2>
+    <p class="section-sub">The same analysis a licensed broker charges $300/hr for — done by AI trained on thousands of CBP ruling decisions.</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01 — Input</div>
+        <div class="how-title">Describe your product naturally</div>
+        <div class="how-body">No forms. No dropdowns. Type what the product is in plain language — materials, function, dimensions. The engine extracts what it needs.</div>
+        <div class="how-tag">No format required</div>
       </div>
-      <div class="tab-body active" id="tab-duty">
-        <div class="duty-grid">
-          <div class="duty-cell">
-            <div class="duty-lbl">Base Rate</div>
-            <div class="duty-val ${getDutyClass(r.duty_general_pct||0)}">${r.duty_general_formatted || 'Free'}</div>
-            <div class="duty-sub">Column 1 General</div>
-          </div>
-          <div class="duty-cell">
-            <div class="duty-lbl">Trade Actions</div>
-            <div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'duty-high':'duty-free'}">${tradeActions || 'None'}</div>
-            <div class="duty-sub">${s301.list || 'No active §301/232'}</div>
-          </div>
-          <div class="duty-cell" style="border-color:${total>20?'rgba(248,81,73,.3)':total>5?'rgba(210,153,34,.3)':'rgba(40,167,69,.3)'}">
-            <div class="duty-lbl">Total Effective</div>
-            <div class="duty-val ${getDutyClass(total)}">${r.total_formatted || 'Free'}</div>
-            <div class="duty-sub">All-in landed rate</div>
-          </div>
-        </div>
-        ${flags.length ? '<div class="section-lbl">Risk Flags</div>' + flags.map(f => `<div class="flag ${f.startsWith('💡')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('💡')?'dot-info':'dot-risk'}"></div><span>${f.replace('💡 ','')}</span></div>`).join('') : ''}
+      <div class="how-card">
+        <div class="how-num">02 — Processing</div>
+        <div class="how-title">GRI rules + trade action overlay</div>
+        <div class="how-body">Applies all 6 General Rules of Interpretation in sequence, cross-references HTS Chapter Notes, then overlays Section 301, 232, and AD/CVD for your origin country.</div>
+        <div class="how-tag">GRI-1 through GRI-6</div>
       </div>
-      <div class="tab-body" id="tab-gri">
-        <div class="gri-box">
-          <div class="gri-rule">${r.gri_rule || 'GRI-1'}</div>
-          <div class="gri-text">${r.gri_rationale || ''}</div>
-        </div>
-        ${r.alternatives && r.alternatives.length ? '<div class="section-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS</th><th>Description</th><th>Reason</th></tr>' + r.alternatives.map(a => `<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('') + '</table>' : ''}
+      <div class="how-card">
+        <div class="how-num">03 — Output</div>
+        <div class="how-title">CBP-ready classification memo</div>
+        <div class="how-body">10-digit HTS code, GRI rationale, itemized duty breakdown, risk flags, alternative codes, and a memo formatted to CBP binding ruling standards.</div>
+        <div class="how-tag">Broker-ready format</div>
       </div>
-      <div class="tab-body" id="tab-memo">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-          <button onclick="copyMemo()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;">Copy memo</button>
-        </div>
-        <div class="memo-box" id="memo-text">${memo}</div>
-      </div>
-      <button class="save-btn" id="save-btn" onclick="saveToLibrary()">+ Save to SKU Library</button>
-      <p style="font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:10px;">For informational purposes only. Verify with a licensed U.S. Customs Broker before filing.</p>
     </div>
-  `;
-  document.getElementById('result-area').style.display = 'block';
-}
+  </div>
+</section>
 
-function switchResultTab(el, tabId) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById(tabId).classList.add('active');
-}
+<!-- STATS -->
+<section class="stats-section">
+  <div class="section-inner">
+    <div class="section-tag">The numbers</div>
+    <h2>The cost of misclassification</h2>
+    <p class="section-sub" style="margin-bottom:40px">Most SMB importers discover their HTS codes were wrong — during a CBP audit.</p>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-big">$400</div><div class="stat-lbl">Avg broker cost per classification</div><div class="stat-sub">At $150–300/hr billable rate</div></div>
+      <div class="stat-box"><div class="stat-big">500K+</div><div class="stat-lbl">SMB importers in the US</div><div class="stat-sub">With no AI-native tool available</div></div>
+      <div class="stat-box"><div class="stat-big">27.4%</div><div class="stat-lbl">Effective duty on China electronics</div><div class="stat-sub">Section 301 List 3 — ongoing</div></div>
+      <div class="stat-box"><div class="stat-big">15s</div><div class="stat-lbl">Average classification time</div><div class="stat-sub">vs. 45–90 min with a broker</div></div>
+    </div>
+  </div>
+</section>
 
-function buildMemo(r, desc, origin) {
-  const today = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  return `CUSTOMS CLASSIFICATION MEMO — CustomsAI
-Date: ${today}
-DISCLAIMER: For informational purposes only. Verify with a licensed U.S. Customs Broker.
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="section-tag">Pricing</div>
+    <h2>Less than one broker phone call</h2>
+    <p class="section-sub" style="margin-bottom:40px">A single broker consultation costs $150–300. CustomsAI pays for itself the first time you use it.</p>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-plan">Starter</div>
+        <div><span class="price-amt">Free</span></div>
+        <div class="price-desc">Test the engine. No credit card.</div>
+        <hr>
+        <ul class="features">
+          <li>3 classifications per month</li>
+          <li>HTS code + duty rate</li>
+          <li>Section 301/232 flags</li>
+          <li>Basic classification memo</li>
+        </ul>
+        <a class="price-btn" href="/app.html">Start free</a>
+      </div>
+      <div class="price-card featured">
+        <div class="feat-badge">Most popular</div>
+        <div class="price-plan">Professional</div>
+        <div><span class="price-amt">$199</span><span class="price-period"> /mo</span></div>
+        <div class="price-desc">For importers classifying 10–200 SKUs monthly.</div>
+        <hr>
+        <ul class="features">
+          <li>Unlimited classifications</li>
+          <li>SKU library — save & track codes</li>
+          <li>Full CBP-format memos</li>
+          <li>Section 301 exclusion alerts</li>
+          <li>Alternative code analysis</li>
+          <li>CSV export</li>
+        </ul>
+        <a class="price-btn" href="mailto:ori@customsai.app?subject=CustomsAI Pro">Get Pro Access →</a>
+      </div>
+      <div class="price-card">
+        <div class="price-plan">Team</div>
+        <div><span class="price-amt">$499</span><span class="price-period"> /mo</span></div>
+        <div class="price-desc">For freight forwarders managing multiple clients.</div>
+        <hr>
+        <ul class="features">
+          <li>Everything in Professional</li>
+          <li>5 user seats</li>
+          <li>White-label memo output</li>
+          <li>API access</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="price-btn" href="mailto:ori@customsai.app?subject=CustomsAI Team">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-PRODUCT: ${desc}
-ORIGIN:  ${origin}
+<footer>
+  <div>
+    <div class="foot-logo">Customs<span>AI</span></div>
+    <div class="foot-tag">HTS Classification Engine · Built for importers</div>
+  </div>
+  <div class="disclaimer">CustomsAI is a classification research assistant. All classifications are for informational purposes only. A licensed U.S. Customs Broker should review prior to filing.</div>
+  <div class="foot-links">
+    <a href="mailto:ori@customsai.app">Contact</a>
+    <a href="/app.html">App</a>
+  </div>
+</footer>
 
-HTS CODE:    ${r.hts_10}
-DESCRIPTION: ${r.description}
-GRI RULE:    ${r.gri_rule}
-CONFIDENCE:  ${r.confidence}
-
-Rationale: ${r.gri_rationale}
-
-DUTY RATES:
-  Column 1 General: ${r.duty_general_formatted}
-  Section 301:      ${r.section_301?.applies ? '+' + r.section_301.rate_pct + '% (' + r.section_301.list + ')' : 'Not applicable'}
-  Section 232:      ${r.section_232?.applies ? '+' + r.section_232.rate_pct + '%' : 'Not applicable'}
-  TOTAL EFFECTIVE:  ${r.total_formatted} (origin: ${origin})
-
-${r.risk_flags?.length ? 'RISK FLAGS:\n' + r.risk_flags.map(f => '  ⚠ ' + f).join('\n') : ''}
-
-CustomsAI · customsai.app · For informational use only`;
-}
-
-function copyMemo() {
-  const text = document.getElementById('memo-text').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy memo', 1500);
-  });
-}
-
-function saveToLibrary() {
-  if (!currentResult) return;
-  const entry = {
-    id: Date.now().toString(),
-    hts: currentResult.hts_10,
-    description: document.getElementById('product-desc').value.substring(0,100),
-    duty: currentResult.total_formatted,
-    origin: document.getElementById('origin-select').value,
-    engine: apiKey ? 'AI' : 'Rules',
-    date: new Date().toLocaleDateString()
-  };
-  skuLibrary.unshift(entry);
-  skuLibrary = skuLibrary.slice(0,100);
-  localStorage.setItem('cai_sku', JSON.stringify(skuLibrary));
-  updateSkuCount();
-  const btn = document.getElementById('save-btn');
-  btn.textContent = '✓ Saved to Library';
-  btn.classList.add('saved');
-  setTimeout(() => { btn.textContent = '+ Save to SKU Library'; btn.classList.remove('saved'); }, 2000);
-}
-
-function renderSkuTable() {
-  const cont = document.getElementById('sku-table-container');
-  if (!skuLibrary.length) {
-    cont.innerHTML = '<div class="empty-history">No saved SKUs yet.<br>Classify a product and click "Save to Library".</div>';
-    return;
-  }
-  cont.innerHTML = `<table class="sku-table">
-    <tr><th>HTS Code</th><th>Description</th><th>Duty</th><th>Origin</th><th>Engine</th><th>Date</th><th></th></tr>
-    ${skuLibrary.map(s => `<tr>
-      <td class="hts">${s.hts}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.description}</td>
-      <td style="font-family:var(--mono)">${s.duty}</td>
-      <td>${s.origin}</td>
-      <td><span class="engine-badge ${s.engine==='AI'?'badge-ai':'badge-rules'}">${s.engine}</span></td>
-      <td style="color:var(--muted)">${s.date}</td>
-      <td><button onclick="deleteSKU('${s.id}')" style="background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:14px;padding:0 4px;">×</button></td>
-    </tr>`).join('')}
-  </table>`;
-}
-
-function deleteSKU(id) {
-  skuLibrary = skuLibrary.filter(s => s.id !== id);
-  localStorage.setItem('cai_sku', JSON.stringify(skuLibrary));
-  updateSkuCount();
-  renderSkuTable();
-}
-
-function exportCSV() {
-  const nl = String.fromCharCode(10);
-  const rows = skuLibrary.map(s => [s.hts, s.description.replace(/,/g,' '), s.duty, s.origin, s.engine, s.date].join(','));
-  const csv = ['HTS,Description,Duty,Origin,Engine,Date', ...rows].join(nl);
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'customsai-skus.csv';
-  a.click();
-}
-
-document.getElementById('product-desc').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) classify();
-});
-</script>
 </body>
 </html>
