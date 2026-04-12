@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CustomsAI &mdash; HTS Classification Engine</title>
+<title>Tariffly &mdash; HTS Classification Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 <style>
@@ -337,8 +337,8 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <div class="gate-container">
     <div class="gate-left">
       <div class="gate-brand">
-        <div class="gate-brand-mark">CA</div>
-        <span class="gate-brand-name">CustomsAI</span>
+        <div class="gate-brand-mark">TF</div>
+        <span class="gate-brand-name">Tariffly</span>
       </div>
       <div class="gate-left-content">
         <div class="gate-left-tag">HTS Classification Engine</div>
@@ -403,7 +403,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
             <input class="form-input" id="company" name="company" type="text" placeholder="Your company">
           </div>
           <input type="hidden" name="signup_source" value="email_form">
-          <input type="hidden" name="product" value="CustomsAI">
+          <input type="hidden" name="product" value="Tariffly">
           <button class="gate-submit" id="submit-btn" type="submit">Create free account</button>
         </form>
       </div>
@@ -414,7 +414,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
         </div>
         <h3>Account created!</h3>
-        <p>Welcome to CustomsAI. You have 3 free classifications to start. No credit card needed.</p>
+        <p>Welcome to Tariffly. You have 3 free classifications to start. No credit card needed.</p>
         <button class="form-success-btn" onclick="proceedToApp()">Start Classifying</button>
       </div>
 
@@ -430,20 +430,20 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <div class="consent-overlay" id="consent-modal" style="display:none;">
   <div class="consent-card">
     <div class="consent-logo">
-      <div class="consent-logo-mark">CA</div>
-      <div class="consent-logo-text">CustomsAI</div>
+      <div class="consent-logo-mark">TF</div>
+      <div class="consent-logo-text">Tariffly</div>
     </div>
     <div class="consent-badge">Decision Support Tool &mdash; Not Legal Advice</div>
     <h2>One quick disclosure</h2>
-    <p>CustomsAI uses AI and GRI rules to assist with HTS tariff classification. Please confirm you understand the following.</p>
+    <p>Tariffly uses AI and GRI rules to assist with HTS tariff classification. Please confirm you understand the following.</p>
     <div class="consent-items">
-      <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>CustomsAI generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions rest with CBP.</span></div>
+      <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>Tariffly generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions rest with CBP.</span></div>
       <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>Duty rates and Section 301/232 data are updated periodically but may not reflect real-time changes. Always verify before filing.</span></div>
       <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>A licensed U.S. Customs Broker should review all classifications prior to formal entry filing.</span></div>
     </div>
     <div class="consent-cb-row" onclick="toggleConsent()">
       <div class="consent-cb" id="consent-cb"></div>
-      <div class="consent-cb-label">I understand CustomsAI is a <strong>decision support tool</strong>, not a substitute for professional customs advice. I agree to the <a href="#" onclick="showTerms(event)">Terms of Use</a> and <a href="#" onclick="showTerms(event)">Privacy Policy</a>.</div>
+      <div class="consent-cb-label">I understand Tariffly is a <strong>decision support tool</strong>, not a substitute for professional customs advice. I agree to the <a href="#" onclick="showTerms(event)">Terms of Use</a> and <a href="#" onclick="showTerms(event)">Privacy Policy</a>.</div>
     </div>
     <button class="consent-btn" id="consent-btn" onclick="acceptConsent()">Start Classifying</button>
     <div class="consent-foot">Stored locally &middot; Reset anytime</div>
@@ -455,11 +455,11 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <div class="terms-card">
     <h2>Terms of Use &amp; Privacy Policy</h2>
     <h3>1. Nature of Service</h3>
-    <p>CustomsAI provides automated HTS tariff classification suggestions using AI. <strong>All outputs are informational only</strong> and do not constitute legal advice, binding customs rulings, or professional customs brokerage services under 19 U.S.C. &sect; 1641.</p>
+    <p>Tariffly provides automated HTS tariff classification suggestions using AI. <strong>All outputs are informational only</strong> and do not constitute legal advice, binding customs rulings, or professional customs brokerage services under 19 U.S.C. &sect; 1641.</p>
     <h3>2. Non-Binding Nature of AI Outputs</h3>
     <p>Classification results: (a) are not binding on any customs authority; (b) do not constitute a CBP binding ruling under 19 CFR Part 177; (c) should be independently verified by a licensed customs broker before formal entry filing.</p>
     <h3>3. Limitation of Liability</h3>
-    <p>CustomsAI&rsquo;s total aggregate liability shall not exceed the greater of $100 USD or fees paid in the prior 30 days. CustomsAI shall not be liable for customs penalties, back-duties, or seizure of goods.</p>
+    <p>Tariffly&rsquo;s total aggregate liability shall not exceed the greater of $100 USD or fees paid in the prior 30 days. Tariffly shall not be liable for customs penalties, back-duties, or seizure of goods.</p>
     <h3>4. User Responsibilities</h3>
     <ul>
       <li>The importer of record bears full legal responsibility for all customs declarations</li>
@@ -484,7 +484,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     <div class="pw-feat">SKU Library &mdash; save and track all codes</div>
     <div class="pw-feat">Section 301 &amp; 232 alerts</div>
     <div class="pw-feat">CBP-format classification memos</div>
-    <button class="pw-up" onclick="window.open('mailto:ori@customsai.app?subject=CustomsAI Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro &mdash; $199/mo</button>
+    <button class="pw-up" onclick="window.open('mailto:ori@customsai.app?subject=Tariffly Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro &mdash; $199/mo</button>
     <button class="pw-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">Add Gemini API key (free)</button>
   </div>
 </div>
@@ -493,8 +493,8 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <div class="app" id="main-app" style="display:none;">
   <aside class="sidebar">
     <div class="logo">
-      <div class="logo-mark">CA</div>
-      <div><div class="logo-text">CustomsAI</div><div class="logo-tag">Classification Engine</div></div>
+      <div class="logo-mark">TF</div>
+      <div><div class="logo-text">Tariffly</div><div class="logo-tag">Classification Engine</div></div>
     </div>
     <div id="user-info-bar" class="user-info">
       <div class="user-avatar" id="user-av">?</div>
@@ -523,7 +523,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <input class="api-inp" id="api-inp" type="password" placeholder="AIza..." oninput="setApiKey(this.value)">
         <div class="api-dot" id="api-dot"></div>
       </div>
-      <div class="ver">CustomsAI v0.1 &middot; customsai.vercel.app</div>
+      <div class="ver">Tariffly v0.1 &middot; tariffly.vercel.app</div>
     </div>
   </aside>
 
@@ -605,7 +605,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         </div>
       </div>
       <div class="legal-foot">
-        <div class="lf-text">CustomsAI is a classification research assistant. Outputs are informational only and not binding. HTS: USITC 2026 &middot; Section 301: USTR. Verify before filing.</div>
+        <div class="lf-text">Tariffly is a classification research assistant. Outputs are informational only and not binding. HTS: USITC 2026 &middot; Section 301: USTR. Verify before filing.</div>
         <div class="lf-links">
           <a class="lf-link" href="https://hts.usitc.gov" target="_blank">USITC</a>
           <a class="lf-link" href="https://ustr.gov" target="_blank">USTR Section 301</a>
@@ -693,7 +693,7 @@ async function socialSignIn(provider) {
       email: pendingUser.email,
       company: '',
       signup_source: provider + '_signin',
-      product: 'CustomsAI',
+      product: 'Tariffly',
       signed_in_at: pendingUser.signedInAt
     });
   } catch(e) { console.warn('Formspree error:', e.message); } // non-blocking
@@ -726,7 +726,7 @@ async function emailSignIn(e) {
       email: email,
       company: company,
       signup_source: 'email_form',
-      product: 'CustomsAI',
+      product: 'Tariffly',
       signed_in_at: pendingUser.signedInAt
     });
     // Show success state
@@ -835,7 +835,7 @@ function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return '
 function getLCS(c,k){if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Rules engine match. Add Gemini API key for AI-verified score.'};if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};return{score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};}
 function renderResult(r,desc,origin){const tot=r.total_effective_pct||0;const s301=r.section_301||{},s232=r.section_232||{};const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings tip: '+r.savings_tip);const lcs=getLCS(r.confidence,!!apiKey);const memo=buildMemo(r,desc,origin);const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('result-area').innerHTML=`<div class="result-wrap"><div class="hts-hero"><div class="hts-code">${r.hts_10||'-'}</div><div class="hts-desc">${r.description||''}</div><div class="hts-meta"><span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span><span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span></div></div><div class="duty-grid"><div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div><div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No Section 301/232'}</div></div><div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div></div><div class="lcs-card"><div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div><div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div><div class="lcs-note">${lcs.note}</div><div class="verify-row"><a class="verify-btn" href="https://hts.usitc.gov" target="_blank">Verify on USITC</a><a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">Check Section 301</a><a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">CBP Rulings</a></div></div><div class="result-tabs"><div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div><div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div><div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div></div><div class="rtab-body active" id="rt-duty">${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}<div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR Section 301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div></div><div class="rtab-body" id="rt-gri"><div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'} Applied</div><div class="gri-text">${r.gri_rationale||''}</div></div>${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}</div><div class="rtab-body" id="rt-memo"><div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button></div><div class="memo-box" id="memo-content">${memo}</div></div><button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button></div>`;}
 function swR(el,id){document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.rtab-body').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById(id).classList.add('active');}
-function buildMemo(r,desc,origin){const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});return `CUSTOMS CLASSIFICATION ANALYSIS MEMO\nCustomsAI - Classification Research Assistant\nDate: ${today}\n=========================================\n\nDISCLAIMER: Informational purposes only. Not a CBP binding ruling.\nA licensed U.S. Customs Broker must review prior to entry filing.\n\nI. PRODUCT\nProduct:  ${desc}\nOrigin:   ${origin}\n\nII. CLASSIFICATION\nHTS Code:    ${r.hts_10}\nDescription: ${r.description}\nGRI Rule:    ${r.gri_rule}\nConfidence:  ${r.confidence}\nRationale:   ${r.gri_rationale}\n\nIII. DUTY RATES\nColumn 1 General:  ${r.duty_general_formatted}\nSection 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}\nSection 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}\nTOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})\n\n${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  Warning: '+f).join('\n')+'\n\n':''}V. VERIFICATION SOURCES\nUSITC HTS:   https://hts.usitc.gov\nCBP Rulings: https://rulings.cbp.gov\nUSTR 301:    https://ustr.gov\n\n=========================================\nCustomsAI - Informational use only\n=========================================`;}
+function buildMemo(r,desc,origin){const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});return `CUSTOMS CLASSIFICATION ANALYSIS MEMO\nTariffly - Classification Research Assistant\nDate: ${today}\n=========================================\n\nDISCLAIMER: Informational purposes only. Not a CBP binding ruling.\nA licensed U.S. Customs Broker must review prior to entry filing.\n\nI. PRODUCT\nProduct:  ${desc}\nOrigin:   ${origin}\n\nII. CLASSIFICATION\nHTS Code:    ${r.hts_10}\nDescription: ${r.description}\nGRI Rule:    ${r.gri_rule}\nConfidence:  ${r.confidence}\nRationale:   ${r.gri_rationale}\n\nIII. DUTY RATES\nColumn 1 General:  ${r.duty_general_formatted}\nSection 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}\nSection 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}\nTOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})\n\n${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  Warning: '+f).join('\n')+'\n\n':''}V. VERIFICATION SOURCES\nUSITC HTS:   https://hts.usitc.gov\nCBP Rulings: https://rulings.cbp.gov\nUSTR 301:    https://ustr.gov\n\n=========================================\nTariffly - Informational use only\n=========================================`;}
 function copyMemo(){const t=document.getElementById('memo-content').textContent;navigator.clipboard.writeText(t).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});}
 function addToRecent(r,desc){const txl=document.getElementById('txn-list');if(txl.querySelector('.txn-empty'))txl.innerHTML='';const d=document.createElement('div');d.className='txn-item';d.innerHTML=`<div class="txn-icon"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="txn-info"><div class="txn-hts">${r.hts_10}</div><div class="txn-desc">${desc.substring(0,42)}${desc.length>42?'...':''}</div></div><div class="txn-duty ${r.total_formatted==='Free'?'free':parseFloat(r.total_formatted)>20?'high':parseFloat(r.total_formatted)>5?'mid':'low'}">${r.total_formatted}</div>`;txl.insertBefore(d,txl.firstChild);const items=txl.querySelectorAll('.txn-item');if(items.length>6)items[items.length-1].remove();}
 function saveToLib(){if(!currentResult)return;const e={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};skuLib.unshift(e);skuLib=skuLib.slice(0,100);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();const b=document.getElementById('save-btn');b.textContent='Saved to Library';b.classList.add('saved');setTimeout(()=>{b.textContent='Save to SKU Library';b.classList.remove('saved');},2500);}
