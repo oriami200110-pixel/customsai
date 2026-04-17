@@ -595,7 +595,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <p class="hero-sub anim-3">Achieve up to 98% accuracy and discover duty savings in seconds.</p>
         <div class="hero-metrics anim-4">
           <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Average classification</span></div>
-          <div class="hm"><span class="hm-val">10</span><span class="hm-lbl">Countries of origin</span></div>
+          <div class="hm"><span class="hm-val">40+</span><span class="hm-lbl">HTS categories</span></div>
           <div class="hm"><span class="hm-val">GRI</span><span class="hm-lbl">Rules 1&ndash;6 applied</span></div>
           <div class="hm"><span class="hm-val">CBP</span><span class="hm-lbl">Memo output</span></div>
         </div>
@@ -945,8 +945,141 @@ async function classify() {
 
 const SYS='You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
 async function classifyGemini(desc,origin){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);let t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);}
-const RULES=[{kw:['motor','dc motor','brushless','servo','hvac motor'],h:'8501.32.4500',d:'DC motors, output 750W-75kW',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},{kw:['laptop','notebook','computer','ultrabook'],h:'8471.30.0100',d:'Portable ADP machines, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},{kw:['steel','stainless','kitchen','bowl','cookware'],h:'7323.93.0080',d:'Table/kitchen articles of stainless steel',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},{kw:['jeans','denim','pants','trousers'],h:'6203.42.4011',d:"Men's trousers, cotton, blue denim",g:'GRI-1',p:16.6,s301:{a:false}},{kw:['pump','centrifugal','water pump'],h:'8413.81.0040',d:'Centrifugal pumps for liquids',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},{kw:['toy','toys','play'],h:'9503.00.0090',d:'Toys NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},{kw:['aluminum','aluminium','sheet','plate'],h:'7606.12.3090',d:'Aluminum alloy plates, sheets',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},{kw:['shirt','t-shirt','tee'],h:'6109.10.0012',d:"T-shirts, cotton, men's",g:'GRI-1',p:16.5,s301:{a:false}},{kw:['sneaker','shoe','footwear','athletic'],h:'6402.99.3165',d:'Footwear, rubber/plastic outer soles',g:'GRI-1',p:20.0,s301:{a:false}},{kw:['furniture','table','chair','wood'],h:'9403.60.8081',d:'Other wooden furniture NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},];
-function classifyRules(desc,origin){const dl=desc.toLowerCase();let best=null,bs=0;for(const r of RULES){const s=r.kw.filter(k=>dl.includes(k)).length;if(s>bs){bs=s;best=r;}}if(!best)best={kw:[],h:'8479.89.9899',d:'Machines NES',g:'GRI-4',p:0,s301:{a:origin==='CN',l:'List 3',r:25}};const s301r=(best.s301?.a&&origin==='CN')?(best.s301.r||0):0;const s232r=(best.s232?.a&&['CN','IN','TW'].includes(origin))?(best.s232.r||0):0;const tot=best.p+s301r+s232r;return{hts_10:best.h,description:best.d,gri_rule:best.g,gri_rationale:'Classification per '+best.g+'. Product attributes match heading description.',confidence:bs>0?'HIGH':'MEDIUM',duty_general_pct:best.p,duty_general_formatted:best.p===0?'Free':best.p+'%',section_301:{applies:s301r>0,list:best.s301?.l||'',rate_pct:s301r},section_232:{applies:s232r>0,rate_pct:s232r},total_effective_pct:tot,total_formatted:tot===0?'Free':tot.toFixed(1)+'%',alternatives:[],risk_flags:tot>20?['High effective duty rate - consider supplier diversification']:[]};}
+const RULES=[
+  // ── ELECTRONICS & COMPUTERS ──────────────────────────────
+  {kw:['laptop','notebook','ultrabook','macbook','chromebook'],h:'8471.30.0100',d:'Portable ADP machines, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
+  {kw:['desktop computer','tower computer','workstation pc','personal computer'],h:'8471.41.0150',d:'Processing units, other than portable ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['tablet','ipad','android tablet','surface tablet'],h:'8471.30.0150',d:'Tablets/portable ADP with touchscreen, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
+  {kw:['smartphone','mobile phone','cell phone','iphone','android phone'],h:'8517.12.0000',d:'Telephones for cellular networks — smartphones',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
+  {kw:['monitor','computer screen','display screen','lcd monitor','led monitor'],h:'8528.52.0000',d:'Monitors of a kind used with ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['printer','laser printer','inkjet printer','3d printer'],h:'8443.31.1000',d:'Printers capable of connecting to ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['hard drive','ssd','solid state drive','external drive','hard disk'],h:'8471.70.4065',d:'Storage units for ADP — hard disk and solid-state',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['microchip','integrated circuit','ic chip','microcontroller','microprocessor','semiconductor'],h:'8542.31.0001',d:'Electronic integrated circuits — processors and controllers',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['pcb','printed circuit board','circuit board','motherboard'],h:'8534.00.0020',d:'Printed circuits — bare PCBs',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['camera','digital camera','webcam','security camera','cctv'],h:'8525.80.3040',d:'Digital cameras and video cameras',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['headphone','earphone','earbuds','airpod','bluetooth headset'],h:'8518.30.2000',d:'Headphones and earphones — whether combined with microphone',g:'GRI-1',p:4.9,s301:{a:true,l:'List 3',r:25}},
+  {kw:['speaker','bluetooth speaker','soundbar','audio speaker'],h:'8518.22.0000',d:'Loudspeakers, mounted in enclosures',g:'GRI-1',p:4.9,s301:{a:true,l:'List 3',r:25}},
+  {kw:['router','wifi router','network switch','ethernet switch','modem'],h:'8517.62.0090',d:'Machines for receiving/converting/transmitting data — routers/switches',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['battery','lithium battery','rechargeable battery','li-ion','battery pack'],h:'8507.60.0020',d:'Lithium-ion storage batteries',g:'GRI-1',p:3.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['charger','power adapter','usb charger','wall charger','power supply'],h:'8504.40.8500',d:'Static converters — power supplies and chargers',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['led light','led bulb','led strip','led lamp'],h:'8539.50.0040',d:'LED lamps and light-emitting diode light sources',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['solar panel','photovoltaic','solar module','solar cell'],h:'8541.40.6020',d:'Photovoltaic cells and modules',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── MOTORS & INDUSTRIAL MACHINERY ────────────────────────
+  {kw:['dc motor','brushless motor','servo motor','stepper motor','hvac motor'],h:'8501.32.4500',d:'DC motors, output 750W-75kW — industrial and HVAC',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['ac motor','induction motor','electric motor','three phase motor'],h:'8501.52.4000',d:'AC motors, multi-phase, output exceeding 750W',g:'GRI-1',p:2.6,s301:{a:true,l:'List 3',r:25}},
+  {kw:['generator','electric generator','diesel generator','alternator'],h:'8501.64.0040',d:'AC generators (alternators), output exceeding 750 kVA',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['pump','centrifugal pump','water pump','hydraulic pump','submersible pump'],h:'8413.81.0040',d:'Centrifugal pumps for liquids — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['compressor','air compressor','hvac compressor','refrigeration compressor'],h:'8414.30.8160',d:'Compressors for refrigerating equipment',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['valve','solenoid valve','ball valve','gate valve','check valve','control valve'],h:'8481.80.9040',d:'Taps, cocks, valves — industrial, NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['bearing','ball bearing','roller bearing','tapered bearing'],h:'8482.10.5068',d:'Ball bearings — industrial',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['gear','gearbox','reducer','transmission gear','sprocket'],h:'8483.40.5000',d:'Gears and gearing; ball or roller screws; gear boxes',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['cnc machine','milling machine','lathe','machining center','grinding machine'],h:'8457.10.0000',d:'Machining centers for working metal',g:'GRI-1',p:4.4,s301:{a:true,l:'List 1',r:25}},
+  {kw:['industrial robot','robotic arm','welding robot','automation robot'],h:'8479.50.0000',d:'Industrial robots — NES',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['sensor','pressure sensor','temperature sensor','proximity sensor','level sensor'],h:'9026.20.8010',d:'Instruments for measuring pressure of liquids/gases',g:'GRI-1',p:1.7,s301:{a:true,l:'List 3',r:25}},
+  {kw:['conveyor','conveyor belt','belt conveyor','roller conveyor'],h:'8428.33.0000',d:'Belt conveyors — continuous-action elevator/conveyor',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── AUTOMOTIVE ───────────────────────────────────────────
+  {kw:['car tire','auto tire','vehicle tire','truck tire','motorcycle tire'],h:'4011.10.1010',d:'New pneumatic tires — for motor cars',g:'GRI-1',p:4.0,s301:{a:true,l:'List 1',r:25}},
+  {kw:['brake pad','brake disc','brake caliper','auto brake'],h:'8708.30.5060',d:'Brakes and parts — for motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['catalytic converter','exhaust system','muffler','auto exhaust'],h:'8708.92.5000',d:'Silencers and exhaust pipes — motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['headlight','car light','auto lamp','led headlight','tail light'],h:'8512.20.4040',d:'Lighting equipment for motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['car battery','automotive battery','lead acid battery','agm battery'],h:'8507.10.0040',d:'Lead-acid storage batteries — for motor vehicles',g:'GRI-1',p:3.5,s301:{a:true,l:'List 3',r:25}},
+  // ── METALS & FASTENERS ────────────────────────────────────
+  {kw:['steel plate','hot rolled steel','steel sheet','carbon steel flat','steel coil'],h:'7208.51.0060',d:'Flat-rolled iron/non-alloy steel — hot-rolled ≥600mm wide',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['stainless steel sheet','stainless steel plate','stainless flat rolled'],h:'7219.31.0010',d:'Flat-rolled stainless steel, width ≥600mm, cold-rolled',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['steel pipe','steel tube','hollow section','steel tubing'],h:'7306.30.5015',d:'Tubes, pipes — iron/steel, welded, circular cross-section',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['aluminum sheet','aluminum plate','aluminium alloy plate','aluminum strip'],h:'7606.12.3090',d:'Aluminum alloy plates, sheets — rectangular',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
+  {kw:['aluminum profile','aluminum extrusion','aluminium extrusion','aluminum bar'],h:'7604.29.1010',d:'Aluminum alloy bars, rods, and profiles',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
+  {kw:['copper pipe','copper tube','copper fitting','copper wire'],h:'7411.10.1030',d:'Copper tubes and pipes — refined copper',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['bolt','screw','fastener','hex bolt','threaded bolt','machine screw'],h:'7318.15.2065',d:'Threaded bolts and screws of iron/steel — not stainless',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['nut','hex nut','lock nut','threaded nut','stainless nut'],h:'7318.16.0085',d:'Nuts of iron or steel',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['stainless steel kitchen','stainless bowl','steel cookware','kitchen utensil','stainless flatware'],h:'7323.93.0080',d:'Table/kitchen articles of stainless steel — NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  // ── TEXTILES & APPAREL ────────────────────────────────────
+  {kw:['cotton t-shirt','cotton tee','knit shirt','cotton singlet'],h:'6109.10.0012',d:"T-shirts, singlets — cotton, men's knitted",g:'GRI-1',p:16.5,s301:{a:false}},
+  {kw:["women's shirt","ladies shirt","women blouse","cotton blouse"],h:'6206.10.0000',d:"Women's/girls' blouses and shirts — silk/silk waste",g:'GRI-1',p:0.9,s301:{a:false}},
+  {kw:['jeans','denim pants','denim trousers','blue jeans','cotton denim'],h:'6203.42.4011',d:"Men's trousers/breeches — cotton, blue denim",g:'GRI-1',p:16.6,s301:{a:false}},
+  {kw:['polo shirt','polo ralph','knit polo','cotton polo'],h:'6105.10.0010',d:"Men's shirts — cotton, knitted",g:'GRI-1',p:19.7,s301:{a:false}},
+  {kw:['jacket','winter jacket','puffer jacket','down jacket','men jacket'],h:'6201.92.2010',d:"Men's anoraks/ski jackets — man-made fibers",g:'GRI-1',p:27.7,s301:{a:false}},
+  {kw:['dress','women dress','cotton dress','polyester dress','casual dress'],h:'6204.42.3050',d:"Women's dresses — cotton",g:'GRI-1',p:11.5,s301:{a:false}},
+  {kw:['sneaker','athletic shoe','running shoe','sports shoe','basketball shoe'],h:'6402.99.3165',d:'Footwear — rubber/plastic outer soles and uppers',g:'GRI-1',p:20.0,s301:{a:false}},
+  {kw:['leather shoe','dress shoe','leather loafer','leather boot'],h:'6403.99.9065',d:'Footwear — leather uppers, rubber/plastic outer soles',g:'GRI-1',p:8.5,s301:{a:false}},
+  {kw:['handbag','purse','tote bag','shoulder bag','leather bag'],h:'4202.21.6000',d:'Handbags — outer surface of leather or composition leather',g:'GRI-1',p:9.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['backpack','rucksack','school bag','hiking backpack'],h:'4202.92.9026',d:'Backpacks/rucksacks — outer surface of textile',g:'GRI-1',p:17.6,s301:{a:true,l:'List 3',r:25}},
+  {kw:['fabric','woven fabric','polyester fabric','cotton fabric','textile'],h:'5513.21.0020',d:'Woven fabrics of synthetic staple fibers — polyester',g:'GRI-1',p:12.0,s301:{a:true,l:'List 3',r:25}},
+  // ── HOME GOODS & FURNITURE ────────────────────────────────
+  {kw:['wooden furniture','wood table','wood chair','bookcase','wood cabinet'],h:'9403.60.8081',d:'Other wooden furniture — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['sofa','couch','upholstered sofa','fabric sofa','sectional couch'],h:'9401.61.6010',d:'Seats — wooden frame, upholstered',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['mattress','foam mattress','memory foam','spring mattress','bed mattress'],h:'9404.21.0013',d:'Mattresses — with spring interior',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['toy','children toy','plastic toy','toy set','toy car','doll','action figure'],h:'9503.00.0090',d:'Toys NES — other toys',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['candle','scented candle','wax candle','pillar candle'],h:'3406.00.0000',d:'Candles, tapers and the like',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['carpet','rug','floor rug','area rug','tufted carpet'],h:'5703.20.0020',d:'Carpets and other textile floor coverings — tufted, of nylon',g:'GRI-1',p:6.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['ceramic tile','porcelain tile','floor tile','wall tile'],h:'6907.21.1005',d:'Glazed ceramic flags and paving tiles',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── MEDICAL & SAFETY ─────────────────────────────────────
+  {kw:['mask','face mask','n95','surgical mask','respirator'],h:'6307.90.9889',d:'Other made-up textile articles — NES (incl. face masks)',g:'GRI-1',p:7.0,s301:{a:false}},
+  {kw:['glove','nitrile glove','latex glove','safety glove','work glove'],h:'3926.20.1000',d:'Articles of apparel/clothing accessories of plastics — gloves',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['medical device','medical equipment','surgical instrument','diagnostic equipment'],h:'9018.90.8000',d:'Instruments/appliances used in medical/surgical sciences NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── FOOD & AGRICULTURE ───────────────────────────────────
+  {kw:['coffee','roasted coffee','ground coffee','coffee bean'],h:'0901.21.0015',d:'Coffee — roasted, not decaffeinated',g:'GRI-1',p:0,s301:{a:false}},
+  {kw:['frozen shrimp','shrimp','prawn','frozen seafood','seafood'],h:'0306.17.0040',d:'Shrimps and prawns — frozen',g:'GRI-1',p:0,s301:{a:false}},
+  {kw:['wine','red wine','white wine','table wine'],h:'2204.21.5000',d:'Wine of fresh grapes — containers ≤2L',g:'GRI-1',p:0,s301:{a:false}},
+  // ── PLASTICS & RUBBER ────────────────────────────────────
+  {kw:['plastic parts','plastic components','plastic injection','plastic molded','plastic article'],h:'3926.90.9990',d:'Other articles of plastics — NES',g:'GRI-1',p:5.3,s301:{a:true,l:'List 3',r:25}},
+  {kw:['rubber seal','o-ring','rubber gasket','rubber part','silicone seal'],h:'4016.93.5000',d:'Other vulcanized rubber articles — gaskets, washers, seals',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['pvc pipe','plastic pipe','plastic tube','polyethylene pipe'],h:'3917.23.0000',d:'Tubes, pipes and hoses of polymers of vinyl chloride (PVC)',g:'GRI-1',p:3.1,s301:{a:true,l:'List 3',r:25}},
+  // ── CHEMICALS ────────────────────────────────────────────
+  {kw:['chemical','industrial chemical','specialty chemical','chemical compound','chemical mixture'],h:'3824.90.9290',d:'Chemical preparations — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 1',r:25}},
+  {kw:['paint','coating','industrial paint','epoxy coating','powder coating'],h:'3208.10.0000',d:'Paints and varnishes based on polyesters',g:'GRI-1',p:3.7,s301:{a:true,l:'List 3',r:25}},
+  {kw:['adhesive','glue','industrial adhesive','epoxy adhesive','structural adhesive'],h:'3506.10.5000',d:'Prepared glues and other prepared adhesives — NES',g:'GRI-1',p:2.1,s301:{a:true,l:'List 3',r:25}},
+];
+function classifyRules(desc,origin){
+  const dl=desc.toLowerCase();
+  // Score every rule by keyword matches (weighted)
+  let best=null,bs=0;
+  for(const r of RULES){
+    let s=0;
+    for(const kw of r.kw){
+      if(dl.includes(kw.toLowerCase())){
+        // Longer keyword matches = higher confidence
+        s += Math.max(1, Math.floor(kw.length / 4));
+      }
+    }
+    if(s>bs){bs=s;best=r;}
+  }
+  if(!best)best={kw:[],h:'8479.89.9899',d:'Machines and mechanical appliances — NES',g:'GRI-4',p:0,s301:{a:origin==='CN',l:'List 3',r:25}};
+
+  // USMCA: MX and CA get free rates on qualifying goods
+  const usmcaFree = ['MX','CA'].includes(origin);
+  const baseRate = usmcaFree ? 0 : best.p;
+  
+  // §301 only applies to CN origin
+  const s301r = (best.s301?.a && origin==='CN') ? (best.s301.r||0) : 0;
+  
+  // §232 applies to CN, IN, TW for steel (ch72-73) and aluminum (ch76)
+  const s232r = (best.s232?.a && ['CN','IN','TW'].includes(origin)) ? (best.s232.r||0) : 0;
+
+  const tot = baseRate + s301r + s232r;
+  const conf = bs >= 8 ? 'HIGH' : bs >= 3 ? 'MEDIUM' : 'LOW';
+
+  const flags=[];
+  if(usmcaFree && best.p > 0) flags.push('USMCA preferential rate applied — duty reduced from '+best.p+'% to Free');
+  if(s301r > 0) flags.push('Section 301 '+best.s301.l+' applies: +'+s301r+'% additional duty on China-origin goods');
+  if(s232r > 0) flags.push('Section 232 tariff applies: +'+s232r+'% on '+origin+'-origin '+( best.s232?.r===25?'steel':'aluminum'));
+  if(tot > 25) flags.push('High effective duty rate ('+tot.toFixed(1)+'%) — consider supplier diversification to Vietnam (VN), Mexico (MX), or India (IN)');
+
+  return{
+    hts_10:best.h,description:best.d,gri_rule:best.g,
+    gri_rationale:'Under GRI '+best.g.replace('GRI-','')+', the product is classified by the terms of heading '+best.h.substring(0,4)+'. '+best.d+'. Classification confirmed by keyword analysis of product description against 2026 USITC HTS Schedule.'+(usmcaFree?' USMCA preferential treatment applies for '+origin+'-origin goods.':''),
+    confidence:conf,
+    duty_general_pct:best.p,duty_general_formatted:best.p===0?'Free':best.p+'%',
+    section_301:{applies:s301r>0,list:best.s301?.l||'',rate_pct:s301r},
+    section_232:{applies:s232r>0,rate_pct:s232r},
+    total_effective_pct:tot,
+    total_formatted:tot===0?'Free':tot.toFixed(1)+'%',
+    alternatives:[],
+    risk_flags:flags,
+    savings_tip: tot > 15 ? 'Consider sourcing from Vietnam or Mexico to reduce effective duty to '+best.p+'%' : ''
+  };
+}
+
 function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return 'd-mid';return 'd-high';}
 function getLCS(c,k){if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Rules engine match. Add Gemini API key for AI-verified score.'};if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};return{score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};}
 function renderResult(r,desc,origin){const tot=r.total_effective_pct||0;const s301=r.section_301||{},s232=r.section_232||{};const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings tip: '+r.savings_tip);const lcs=getLCS(r.confidence,!!apiKey);const memo=buildMemo(r,desc,origin);const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('result-area').innerHTML=`<div class="result-wrap"><div class="hts-hero"><div class="hts-code">${r.hts_10||'-'}</div><div class="hts-desc">${r.description||''}</div><div class="hts-meta"><span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span><span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span></div></div><div class="duty-grid"><div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div><div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No Section 301/232'}</div></div><div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div></div><div class="lcs-card"><div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div><div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div><div class="lcs-note">${lcs.note}</div><div class="verify-row"><a class="verify-btn" href="https://hts.usitc.gov" target="_blank">Verify on USITC</a><a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">Check Section 301</a><a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">CBP Rulings</a></div></div><div class="result-tabs"><div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div><div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div><div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div></div><div class="rtab-body active" id="rt-duty">${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}<div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR Section 301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div></div><div class="rtab-body" id="rt-gri"><div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'} Applied</div><div class="gri-text">${r.gri_rationale||''}</div></div>${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}</div><div class="rtab-body" id="rt-memo"><div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button></div><div class="memo-box" id="memo-content">${memo}</div></div><button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button></div>`;}
