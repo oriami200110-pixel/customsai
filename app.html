@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <meta name="description" content="Tariffly HTS Classification Engine — classify any product to 10-digit HTS code with Section 301/232 duty analysis and CBP memo in 15 seconds.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="Tariffly — HTS Classification Engine">
+  <meta property="og:description" content="AI-powered HTS tariff classification with Section 301/232 flags and CBP-ready memos.">
+  <meta property="og:url" content="https://customsai.vercel.app/app.html">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tariffly &mdash; HTS Classification Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -124,6 +129,52 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .terms-close:hover{background:rgba(0,71,255,0.12);}
 
 /* PAYWALL */
+
+.pw-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;
+  padding:0;max-width:420px;width:100%;box-shadow:var(--sh-xl);
+  position:relative;overflow:hidden;animation:popIn .4s ease;}
+.pw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),#6366F1);}
+.pw-card-top{padding:32px 32px 0;text-align:center;}
+.pw-icon{width:56px;height:56px;background:var(--accent-lt);
+  border:1.5px solid rgba(0,71,255,.15);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  box-shadow:0 4px 12px var(--accent-glow);}
+.pw-icon svg{color:var(--accent);}
+.pw-tag{display:inline-block;background:var(--accent);color:#fff;
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:var(--mono);}
+.pw-h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+.pw-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.pw-price-row{display:flex;align-items:baseline;gap:4px;justify-content:center;
+  background:#F9FAFB;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:16px 32px;}
+.pw-price{font-size:40px;font-weight:800;color:var(--ink);font-family:var(--mono);letter-spacing:-.03em;}
+.pw-per{font-size:14px;color:var(--muted);}
+.pw-save{font-size:11px;color:var(--green);background:var(--green-lt);
+  padding:3px 8px;border-radius:20px;font-weight:600;margin-left:8px;}
+.pw-feats{padding:20px 32px 0;display:flex;flex-direction:column;gap:9px;}
+.pw-feat{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink2);}
+.pw-feat svg{color:var(--green);flex-shrink:0;stroke-width:3;}
+.pw-stripe-btn{width:calc(100% - 64px);margin:20px 32px 0;padding:14px;
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
+.pw-stripe-btn:hover{background:#0035CC;transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(0,71,255,.35);}
+.pw-divider{text-align:center;padding:12px 32px 0;position:relative;}
+.pw-divider::before{content:'';position:absolute;left:32px;right:32px;
+  top:50%;height:1px;background:var(--border);}
+.pw-divider span{background:#fff;padding:0 10px;font-size:11px;color:var(--faint);
+  position:relative;z-index:1;}
+.pw-api-btn{width:calc(100% - 64px);margin:12px 32px 0;padding:11px;
+  background:transparent;color:var(--muted);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;
+  transition:all .2s;}
+.pw-api-btn:hover{color:var(--ink);border-color:var(--border);}
+.pw-guarantee{text-align:center;padding:12px 32px 24px;font-size:10px;
+  color:var(--faint);font-family:var(--mono);}
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px;}
 .pw-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:40px;max-width:380px;width:100%;box-shadow:var(--shadow-lg);text-align:center;position:relative;overflow:hidden;}
 .pw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#6366F1);}
@@ -525,19 +576,38 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <!-- PAYWALL -->
 <div class="pw-overlay" id="paywall" style="display:none;">
   <div class="pw-card">
-    <div class="pw-icon"><svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div>
-    <h2>3 free uses reached</h2>
-    <p>Add your Gemini API key to continue free, or upgrade to Pro for unlimited access.</p>
-    <div class="pw-feat">Unlimited HTS classifications</div>
-    <div class="pw-feat">SKU Library &mdash; save and track all codes</div>
-    <div class="pw-feat">Section 301 &amp; 232 alerts</div>
-    <div class="pw-feat">CBP-format classification memos</div>
-    <button class="pw-up" onclick="window.open('mailto:ori@customsai.app?subject=Tariffly Pro','_blank');document.getElementById('paywall').style.display='none'">Upgrade to Pro &mdash; $199/mo</button>
-    <button class="pw-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">Add Gemini API key (free)</button>
+    <div class="pw-card-top">
+      <div class="pw-icon"><svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+      <div class="pw-tag">Upgrade to Pro</div>
+      <h2 class="pw-h2">You've used your 3 free classifications</h2>
+      <p class="pw-sub">Upgrade to Pro for unlimited access — or add your own Gemini API key to continue free.</p>
+    </div>
+    <div class="pw-price-row">
+      <span class="pw-price">$199</span>
+      <span class="pw-per">/month</span>
+      <span class="pw-save">Save $200 vs. one broker call</span>
+    </div>
+    <div class="pw-feats">
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Unlimited HTS classifications</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>SKU Library — save and track all codes</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Full CBP-format classification memos</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Section 301 &amp; 232 alerts + USMCA logic</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Batch CSV import (up to 500 SKUs)</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>API access (coming soon)</div>
+    </div>
+    <button class="pw-stripe-btn" onclick="openStripeCheckout()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      Upgrade to Pro — $199/mo
+    </button>
+    <div class="pw-divider"><span>or</span></div>
+    <button class="pw-api-btn" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">
+      Add my Gemini API key (continue free)
+    </button>
+    <div class="pw-guarantee">14-day money-back guarantee &middot; Cancel anytime</div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- MAIN APP --><!-- MAIN APP -->
 <div class="app" id="main-app" style="display:none;">
   <aside class="sidebar">
     <div class="logo">
@@ -806,6 +876,22 @@ function handleGoogleCredential(response) {
   }).catch(e => console.warn('Formspree:', e.message));
   document.getElementById('gate').style.display = 'none';
   consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
+}
+
+function openStripeCheckout() {
+  // STRIPE_PAYMENT_LINK — replace with your Stripe payment link when ready
+  const STRIPE_LINK = 'https://buy.stripe.com/REPLACE_ME';
+  if (STRIPE_LINK.includes('REPLACE_ME')) {
+    // Fallback until Stripe is connected
+    window.open('mailto:ori@customsai.app?subject=Tariffly Pro Upgrade&body=Hi, I would like to upgrade to Tariffly Pro ($199/month). My email is: ' + (currentUser?.email || ''), '_blank');
+  } else {
+    // Real Stripe checkout with prefilled email
+    const url = currentUser?.email
+      ? STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(currentUser.email)
+      : STRIPE_LINK;
+    window.open(url, '_blank');
+  }
+  document.getElementById('paywall').style.display = 'none';
 }
 async function socialSignIn(provider) {
   const name = prompt('Enter your full name:');
