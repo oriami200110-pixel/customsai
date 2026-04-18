@@ -738,7 +738,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <span class="gate-brand-name">Tariffly</span>
       </div>
       <div class="gate-left-content">
-        <div class="gate-left-tag">HTS Classification Engine</div>
+        <div class="gate-left-tag">HTS Trade Intelligence</div>
         <h2 class="gate-left-h2">HTS Classification,<br>Optimized by AI.</h2>
         <p class="gate-left-sub">Achieve up to 98% classification accuracy and discover duty savings in seconds. Powered by GRI logic and the 2026 USITC HTS Schedule.</p>
       </div>
@@ -750,7 +750,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     </div>
     <div class="gate-right">
       <div class="gate-right-title">Create your account</div>
-      <div class="gate-right-sub">Start classifying for free. No credit card required.</div>
+      <div class="gate-right-sub">3 free classifications. Audit-ready results. No credit card.</div>
       <div class="form-error-msg" id="form-error">Something went wrong. Please try again.</div>
       <div id="google-signin-btn"></div>
       <button class="social-btn btn-apple" onclick="socialSignIn('apple')">
@@ -782,7 +782,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
           </div>
           <input type="hidden" name="signup_source" value="email_form">
           <input type="hidden" name="product" value="Tariffly">
-          <button class="gate-submit" id="submit-btn" type="submit">Create free account</button>
+          <button class="gate-submit" id="submit-btn" type="submit">Get instant access →</button>
         </form>
       </div>
       <div class="form-success" id="form-success">
@@ -891,7 +891,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
       </div>
     </nav>
     <div class="sidebar-foot">
-      <div class="api-lbl">Gemini API Key</div>
+      <div class="api-lbl" style="display:none">ENGINE STATUS</div><div class="backend-status" id="backend-status" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);color:var(--faint);margin-bottom:6px"><div class="status-dot" id="status-dot" style="width:5px;height:5px;border-radius:50%;background:var(--faint)"></div><span id="status-label">Rules engine active</span></div>
       <div class="api-wrap">
         <input class="api-inp" id="api-inp" type="password" placeholder="AIza..." oninput="setApiKey(this.value)">
         <div class="api-dot" id="api-dot"></div>
@@ -904,9 +904,9 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="tb-title">HTS Classification &amp; Duty Calculator</span>
+        <span class="tb-title">Global Trade Intelligence</span>
         <div class="tb-sep"></div>
-        <span class="tb-sub">USITC 2026 &middot; Section 301 Updated</span>
+        <span class="tb-sub">USITC 2026 &middot; §301 Current &middot; USMCA Active</span>
       </div>
       <div class="topbar-right">
         <div class="tb-badge tb-legal" onclick="showTerms(event)">Decision Support Tool</div>
@@ -917,9 +917,9 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     <!-- CLASSIFY VIEW -->
     <div id="view-classify" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
       <div class="hero-bar">
-        <div class="hero-badge anim-1">AI-Powered Trade Classification</div>
-        <h1 class="hero-h1 anim-2">HTS Classification, <span class="accent">Optimized by AI.</span></h1>
-        <p class="hero-sub anim-3">Achieve up to 98% accuracy and discover duty savings in seconds.</p>
+        <div class="hero-badge anim-1">Audit-Ready HTS Classification</div>
+        <h1 class="hero-h1 anim-2">Compliance Intelligence,<br><span class="accent">Automated.</span></h1>
+        <p class="hero-sub anim-3">Global trade intelligence in 15 seconds. §301/232 exposure, USMCA analysis, and CBP-standard memos — zero broker fees.</p>
         <div class="hero-metrics anim-4">
           <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Avg classification</span></div>
           <div class="hm"><span class="hm-val">40+</span><span class="hm-lbl">HTS categories</span></div>
@@ -988,17 +988,18 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <div class="result-col" id="result-col">
           <div class="empty-wrap" id="empty-state">
             <div class="empty-gfx"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-            <div class="empty-title">Ready to classify</div>
-            <div class="empty-sub">Enter a product description and click Classify. Results include duty rates, GRI analysis, and a CBP-format memo.</div>
+            <div class="empty-title">Ready for Classification</div>
+            <div class="empty-sub">Enter a product description for your HTS code, §301/232 duty exposure, USMCA analysis, and a CBP-standard memo.</div>
           </div>
           <div id="loading-state" style="display:none;">
             <div class="loading-wrap">
               <div class="load-ring"></div>
-              <div id="ls1" class="load-step act">Extracting product attributes...</div>
-              <div id="ls2" class="load-step">Searching HTS schedule...</div>
-              <div id="ls3" class="load-step">Applying GRI rules...</div>
-              <div id="ls4" class="load-step">Checking Section 301/232...</div>
-              <div id="ls5" class="load-step">Generating classification memo...</div>
+              <div id="ls1" class="load-step act">Parsing product attributes...</div>
+              <div id="ls2" class="load-step">Traversing GRI rule hierarchy...</div>
+              <div id="ls3" class="load-step">Calculating duty thresholds...</div>
+              <div id="ls4" class="load-step">Overlaying §301 &amp; §232 exposure...</div>
+              <div id="ls5" class="load-step">Generating CBP classification memo...</div>
+              <div id="ls6" class="load-step">Building verification deep links...</div>
             </div>
           </div>
           <div id="result-area"></div>
@@ -1055,6 +1056,21 @@ if(currentUser){
   consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
 }
 
+
+const API_BASE = '';
+let backendOnline = false;
+async function checkBackendHealth() {
+  if (!API_BASE) return;
+  try {
+    const r = await fetch(API_BASE+'/health', {signal:AbortSignal.timeout(4000)});
+    if(r.ok){ const d=await r.json(); backendOnline=true;
+      const dot=document.getElementById('status-dot');
+      const lbl=document.getElementById('status-label');
+      if(dot) dot.style.background='#16A34A';
+      if(lbl) lbl.textContent='AI engine active';
+    }
+  } catch(e) {}
+}
 function showApp(){
   document.getElementById('main-app').style.display='flex';
   document.getElementById('api-inp').value=apiKey;
@@ -1341,6 +1357,19 @@ function classifyRules(desc,origin){
     alternatives:[],risk_flags:flags,
     savings_tip:tot>15?'Consider sourcing from Vietnam or Mexico to reduce effective duty to '+best.p+'%':''};}
 
+
+function buildVerifyLinks(hts) {
+  const raw=(hts||'').replace(/\./g,'').replace(/\s/g,'');
+  const hs6=raw.substring(0,6), h4=raw.substring(0,4);
+  return [
+    {l:'USITC',u:'https://hts.usitc.gov/?query='+raw},
+    {l:'CBP Rulings',u:'https://rulings.cbp.gov/search?query='+encodeURIComponent(hts)+'&collection=ALL'},
+    {l:'§301 USTR',u:'https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs?search_api_views_fulltext='+raw},
+    {l:'EU TARIC',u:'https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en&Taric='+hs6+'&LangDescr=en'},
+    {l:'UK Tariff',u:'https://www.trade-tariff.service.gov.uk/headings/'+h4},
+  ].map(x=>'<a class="verify-btn" href="'+x.u+'" target="_blank" rel="noopener">'+x.l+' ↗</a>').join('');
+}
+
 function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return 'd-mid';return 'd-high';}
 function getLCS(c,k){
   if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};
@@ -1377,9 +1406,9 @@ function renderResult(r,desc,origin){
     <div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div>
     <div class="lcs-note">${lcs.note}</div>
     <div class="verify-row">
-      <a class="verify-btn" href="https://hts.usitc.gov" target="_blank">Verify USITC</a>
-      <a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">Check &sect;301</a>
-      <a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">CBP Rulings</a>
+      ${buildVerifyLinks(r.hts_10)}
+      
+      
     </div>
   </div>
   <div class="result-tabs">
