@@ -1040,34 +1040,34 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 
 <script>
 
-const API_BASE = window.location.hostname==='localhost' ? 'http://localhost:8000' : '';
-let backendOnline = false;
+var API_BASE = window.location.hostname==='localhost' ? 'http://localhost:8000' : '';
+var backendOnline = false;
 
-async function checkBackendHealth() {
-  const dot=document.getElementById('status-dot'), lbl=document.getElementById('status-label');
+function checkBackendHealth() {
+  var dot=document.getElementById('status-dot'), lbl=document.getElementById('status-label');
   if (!API_BASE){ dot.className='status-dot offline'; lbl.textContent='Rules engine active'; return; }
   try {
-    const r=await fetch(API_BASE+'/health',{signal:AbortSignal.timeout(4000)});
-    if(r.ok){ const d=await r.json(); backendOnline=true; dot.className='status-dot online';
-      const eng=d.engines?.anthropic==='configured'?'Anthropic AI':d.engines?.gemini==='configured'?'Gemini AI':'Rules Engine';
+    var r=fetch(API_BASE+'/health',{signal:AbortSignal.timeout(4000)});
+    if(r.ok){ var d=r.json(); backendOnline=true; dot.className='status-dot online';
+      var eng=d.engines?.anthropic==='configured'?'Anthropic AI':d.engines?.gemini==='configured'?'Gemini AI':'Rules Engine';
       lbl.textContent=eng+' · Online';
-      const ep=document.getElementById('engine-badge'); if(ep){ep.textContent=eng+' Active'; ep.style.cssText='background:#EDFBF3;border:1px solid rgba(22,163,74,.2);color:#0D7A3E;';}
+      var ep=document.getElementById('engine-badge'); if(ep){ep.textContent=eng+' Active'; ep.style.cssText='background:#EDFBF3;border:1px solid rgba(22,163,74,.2);color:#0D7A3E;';}
     }
   } catch { dot.className='status-dot offline'; lbl.textContent='Rules engine active'; }
 }
 
-const FORMSPREE='https://formspree.io/f/mjgpnokp';
-const CLIENT_ID='301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com';
+var FORMSPREE='https://formspree.io/f/mjgpnokp';
+var CLIENT_ID='301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com';
 
 // API keys are server-side only
-let usageCount=parseInt(localStorage.getItem('cai_usage')||'0');
-let skuLib=JSON.parse(localStorage.getItem('cai_sku')||'[]');
-let currentResult=null;
-let currentUser=JSON.parse(localStorage.getItem('cai_user')||'null');
-const FREE_LIMIT=3;
-let consentGiven=localStorage.getItem('cai_consent')==='1';
-let cbChecked=false;
-let pendingUser=null;
+var usageCount=parseInt(localStorage.getItem('cai_usage')||'0');
+var skuLib=JSON.parse(localStorage.getItem('cai_sku')||'[]');
+var currentResult=null;
+var currentUser=JSON.parse(localStorage.getItem('cai_user')||'null');
+var FREE_LIMIT=3;
+var consentGiven=localStorage.getItem('cai_consent')==='1';
+var cbChecked=false;
+var pendingUser=null;
 
 if(currentUser){
   document.getElementById('gate').style.display='none';
@@ -1081,8 +1081,8 @@ function showApp(){
 }
 function updateUserDisplay(){
   if(!currentUser)return;
-  const n=(currentUser.firstName||currentUser.name||'User').trim();
-  const e=currentUser.email||'';
+  var n=(currentUser.firstName||currentUser.name||'User').trim();
+  var e=currentUser.email||'';
   document.getElementById('user-name-disp').textContent=n+(currentUser.lastName?' '+currentUser.lastName:'');
   document.getElementById('user-email-disp').textContent=e;
   document.getElementById('user-av').textContent=n.charAt(0).toUpperCase();
@@ -1094,7 +1094,7 @@ function toggleSidebar(){
 // ── GOOGLE SIGN-IN ────────────────────────────────────────────
 function initGoogleSignIn(){
   if(!window.google||!window.google.accounts){setTimeout(initGoogleSignIn,200);return;}
-  const el=document.getElementById('google-signin-btn');
+  var el=document.getElementById('google-signin-btn');
   if(!el){setTimeout(initGoogleSignIn,200);return;}
   google.accounts.id.initialize({
     client_id:CLIENT_ID,callback:handleGoogleCredential,
@@ -1106,11 +1106,11 @@ function initGoogleSignIn(){
   });
 }
 function handleGoogleCredential(response){
-  const p=JSON.parse(atob(response.credential.split('.')[1]));
-  const firstName=p.given_name||(p.name||'').split(' ')[0]||'';
-  const lastName=p.family_name||(p.name||'').split(' ').slice(1).join(' ')||'';
-  const email=p.email||'';
-  const now=new Date().toISOString();
+  var p=JSON.parse(atob(response.credential.split('.')[1]));
+  var firstName=p.given_name||(p.name||'').split(' ')[0]||'';
+  var lastName=p.family_name||(p.name||'').split(' ').slice(1).join(' ')||'';
+  var email=p.email||'';
+  var now=new Date().toISOString();
   currentUser={firstName,lastName,email,company:'',provider:'google',signedInAt:now};
   localStorage.setItem('cai_user',JSON.stringify(currentUser));
   submitToFormspree({first_name:firstName,last_name:lastName,email,
@@ -1128,38 +1128,38 @@ function openStripeCheckout() {
   if (pw) pw.style.display = 'none';
 }
 
-async function socialSignIn(provider){
-  const name=prompt('Enter your full name:');if(!name)return;
-  const email=prompt('Enter your work email:');
+function socialSignIn(provider){
+  var name=prompt('Enter your full name:');if(!name)return;
+  var email=prompt('Enter your work email:');
   if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
-  const parts=name.trim().split(' ');
+  var parts=name.trim().split(' ');
   currentUser={firstName:parts[0],lastName:parts.slice(1).join(' '),email,company:'',provider,signedInAt:new Date().toISOString()};
-  try{await submitToFormspree({first_name:parts[0],last_name:parts.slice(1).join(' '),email,company:'',signup_source:provider+'_signin',product:'Tariffly',signed_in_at:currentUser.signedInAt});}catch(e){}
+  try{submitToFormspree({first_name:parts[0],last_name:parts.slice(1).join(' '),email,company:'',signup_source:provider+'_signin',product:'Tariffly',signed_in_at:currentUser.signedInAt});}catch(e){}
   localStorage.setItem('cai_user',JSON.stringify(currentUser));
   document.getElementById('gate').style.display='none';
   consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
 }
-async function submitToFormspree(data){
-  const res=await fetch(FORMSPREE,{method:'POST',
+function submitToFormspree(data){
+  var res=fetch(FORMSPREE,{method:'POST',
     headers:{'Content-Type':'application/json','Accept':'application/json'},
     body:JSON.stringify(data)});
-  const json=await res.json();
+  var json=res.json();
   if(!res.ok)throw new Error(json.error||'Submission failed');
   return json;
 }
-async function emailSignIn(e){
+function emailSignIn(e){
   e.preventDefault();
-  const fname=document.getElementById('fname').value.trim();
-  const lname=document.getElementById('lname').value.trim();
-  const email=document.getElementById('email').value.trim();
-  const company=document.getElementById('company').value.trim();
+  var fname=document.getElementById('fname').value.trim();
+  var lname=document.getElementById('lname').value.trim();
+  var email=document.getElementById('email').value.trim();
+  var company=document.getElementById('company').value.trim();
   if(!email)return;
-  const btn=document.getElementById('submit-btn');
+  var btn=document.getElementById('submit-btn');
   btn.disabled=true;btn.innerHTML='<span class="btn-spinner"></span> Creating account...';
   document.getElementById('form-error').style.display='none';
   currentUser={firstName:fname,lastName:lname,email,company,provider:'email',signedInAt:new Date().toISOString()};
   try{
-    await submitToFormspree({first_name:fname,last_name:lname,email,company,signup_source:'email_form',product:'Tariffly',signed_in_at:currentUser.signedInAt});
+    submitToFormspree({first_name:fname,last_name:lname,email,company,signup_source:'email_form',product:'Tariffly',signed_in_at:currentUser.signedInAt});
     localStorage.setItem('cai_user',JSON.stringify(currentUser));
     document.getElementById('email-form-wrap').style.display='none';
     document.getElementById('gate-terms-txt').style.display='none';
@@ -1176,7 +1176,7 @@ function proceedToApp(){
   consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
 }
 function quickAccess(){
-  const email=prompt('Enter your email to sign in:');if(!email)return;
+  var email=prompt('Enter your email to sign in:');if(!email)return;
   currentUser={email,firstName:email.split('@')[0],provider:'email',signedInAt:new Date().toISOString()};
   localStorage.setItem('cai_user',JSON.stringify(currentUser));
   document.getElementById('gate').style.display='none';
@@ -1201,16 +1201,16 @@ function showTerms(e){if(e)e.preventDefault();document.getElementById('terms-mod
   else{dot.className='api-dot';badge.textContent='Rules Engine';badge.style.cssText='';}
 }
 function updateUsage(){
-  const used=usageCount,rem=Math.max(0,FREE_LIMIT-used);
+  var used=usageCount,rem=Math.max(0,FREE_LIMIT-used);
   document.getElementById('usage-num').textContent=used+' / '+FREE_LIMIT;
   document.getElementById('usage-fill').style.width=Math.min((used/FREE_LIMIT)*100,100)+'%';
   document.getElementById('usage-note').textContent=backendOnline?'AI engine active \u2014 unlimited':rem+' classification'+(rem!==1?'s':'')+' remaining';
 }
 function updateSkuCount(){
-  const n=skuLib.length;
+  var n=skuLib.length;
   document.getElementById('nav-pill').textContent=n;
   document.getElementById('txn-count').textContent=n;
-  const lc=document.getElementById('lib-count');if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
+  var lc=document.getElementById('lib-count');if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
 }
 function switchView(v){
   document.getElementById('view-classify').style.display=v==='classify'?'flex':'none';
@@ -1224,8 +1224,8 @@ function setEx(el){document.getElementById('product-desc').value=el.textContent.
 // ── CLASSIFY ──────────────────────────────────────────────────
 
 function buildVerifyLinks(hts) {
-  const raw = (hts||'').replace(/\./g,'').replace(/\s/g,'');
-  const hs6 = raw.substring(0,6), heading = raw.substring(0,4);
+  var raw = (hts||'').replace(/\./g,'').replace(/\s/g,'');
+  var hs6 = raw.substring(0,6), heading = raw.substring(0,4);
   return [
     {l:'USITC',u:`https://hts.usitc.gov/?query=${raw}`},
     {l:'CBP Rulings',u:`https://rulings.cbp.gov/search?query=${hts}&collection=ALL`},
@@ -1235,24 +1235,24 @@ function buildVerifyLinks(hts) {
   ].map(x=>`<a class="verify-btn" href="${x.u}" target="_blank" rel="noopener">${x.l} ↗</a>`).join('');
 }
 
-async function classify(){
-  const desc=document.getElementById('product-desc').value.trim();
-  const origin=document.getElementById('origin-sel').value;
+function classify(){
+  var desc=document.getElementById('product-desc').value.trim();
+  var origin=document.getElementById('origin-sel').value;
   if(!desc)return;
   if(usageCount>=FREE_LIMIT&&!apiKey){document.getElementById('paywall').style.display='flex';return;}
-  const btn=document.getElementById('classify-btn');
+  var btn=document.getElementById('classify-btn');
   btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Classifying...';
   document.getElementById('empty-state').style.display='none';
   document.getElementById('loading-state').style.display='flex';
   document.getElementById('result-area').innerHTML='';
-  let s=1;
-  const si=setInterval(()=>{if(s<=5){for(let i=1;i<=6;i++){const e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},800);
+  var s=1;
+  var si=setInterval(()=>{if(s<=5){for(var i=1;i<=6;i++){var e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},800);
   try{
-    let r;
+    var r;
     if(backendOnline&&API_BASE){
       try{
-        const resp=await fetch(API_BASE+'/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,country_of_origin:origin,include_memo:true}),signal:AbortSignal.timeout(25000)});
-        if(resp.ok){const d=await resp.json();r={hts_10:d.hts_code,description:d.description,gri_rule:d.gri_rule,gri_rationale:d.gri_rationale,confidence:d.confidence,duty_general_pct:d.duties.general_rate_pct,duty_general_formatted:d.duties.general_rate_formatted,usmca_applies:d.duties.usmca_applies,section_301:{applies:d.duties.section_301_applies,list:d.duties.section_301_list,rate_pct:d.duties.section_301_rate_pct},section_232:{applies:d.duties.section_232_applies,rate_pct:d.duties.section_232_rate_pct},total_effective_pct:d.duties.total_effective_pct,total_formatted:d.duties.total_effective_formatted,alternatives:d.alternative_codes||[],risk_flags:d.risk_flags||[],savings_tip:d.savings_tip,cbp_ruling:d.cbp_ruling,memo:d.memo,_engine:d.engine};}
+        var resp=fetch(API_BASE+'/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,country_of_origin:origin,include_memo:true}),signal:AbortSignal.timeout(25000)});
+        if(resp.ok){var d=resp.json();r={hts_10:d.hts_code,description:d.description,gri_rule:d.gri_rule,gri_rationale:d.gri_rationale,confidence:d.confidence,duty_general_pct:d.duties.general_rate_pct,duty_general_formatted:d.duties.general_rate_formatted,usmca_applies:d.duties.usmca_applies,section_301:{applies:d.duties.section_301_applies,list:d.duties.section_301_list,rate_pct:d.duties.section_301_rate_pct},section_232:{applies:d.duties.section_232_applies,rate_pct:d.duties.section_232_rate_pct},total_effective_pct:d.duties.total_effective_pct,total_formatted:d.duties.total_effective_formatted,alternatives:d.alternative_codes||[],risk_flags:d.risk_flags||[],savings_tip:d.savings_tip,cbp_ruling:d.cbp_ruling,memo:d.memo,_engine:d.engine};}
       }catch(err){console.warn('Backend unavailable, using rules engine:',err.message);}
     }
     if(!r) r=classifyRules(desc,origin);
@@ -1267,13 +1267,13 @@ async function classify(){
   btn.disabled=false;btn.innerHTML='<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Classify';
 }
 
-const SYS='You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
-async function classifyGemini(desc,origin){
-  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});
-  const d=await r.json();if(d.error)throw new Error(d.error.message);
-  let t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);
+var SYS='You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
+function classifyGemini(desc,origin){
+  var r=fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});
+  var d=r.json();if(d.error)throw new Error(d.error.message);
+  var t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);
 }
-const RULES=[
+var RULES=[
   {kw:['laptop','notebook','ultrabook','macbook','chromebook'],h:'8471.30.0100',d:'Portable ADP machines, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
   {kw:['desktop computer','tower computer','workstation pc'],h:'8471.41.0150',d:'Processing units, other than portable ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['tablet','ipad','android tablet','surface tablet'],h:'8471.30.0150',d:'Tablets/portable ADP with touchscreen, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
@@ -1347,21 +1347,21 @@ const RULES=[
   {kw:['adhesive','glue','industrial adhesive','epoxy adhesive'],h:'3506.10.5000',d:'Prepared glues and other prepared adhesives — NES',g:'GRI-1',p:2.1,s301:{a:true,l:'List 3',r:25}},
 ];
 function classifyRules(desc,origin){
-  const dl=desc.toLowerCase();
-  let best=null,bs=0;
-  for(const r of RULES){
-    let s=0;
-    for(const kw of r.kw){if(dl.includes(kw.toLowerCase()))s+=Math.max(1,Math.floor(kw.length/4));}
+  var dl=desc.toLowerCase();
+  var best=null,bs=0;
+  for(var r of RULES){
+    var s=0;
+    for(var kw of r.kw){if(dl.includes(kw.toLowerCase()))s+=Math.max(1,Math.floor(kw.length/4));}
     if(s>bs){bs=s;best=r;}
   }
   if(!best)best={kw:[],h:'8479.89.9899',d:'Machines and mechanical appliances — NES',g:'GRI-4',p:0,s301:{a:origin==='CN',l:'List 3',r:25}};
-  const usmcaFree=['MX','CA'].includes(origin);
-  const baseRate=usmcaFree?0:best.p;
-  const s301r=(best.s301?.a&&origin==='CN')?(best.s301.r||0):0;
-  const s232r=(best.s232?.a&&['CN','IN','TW'].includes(origin))?(best.s232.r||0):0;
-  const tot=baseRate+s301r+s232r;
-  const conf=bs>=4?'HIGH':bs>=1?'MEDIUM':'LOW';
-  const flags=[];
+  var usmcaFree=['MX','CA'].includes(origin);
+  var baseRate=usmcaFree?0:best.p;
+  var s301r=(best.s301?.a&&origin==='CN')?(best.s301.r||0):0;
+  var s232r=(best.s232?.a&&['CN','IN','TW'].includes(origin))?(best.s232.r||0):0;
+  var tot=baseRate+s301r+s232r;
+  var conf=bs>=4?'HIGH':bs>=1?'MEDIUM':'LOW';
+  var flags=[];
   if(usmcaFree&&best.p>0)flags.push('USMCA preferential rate applied — duty reduced from '+best.p+'% to Free for '+origin+'-origin goods');
   if(s301r>0)flags.push('Section 301 '+best.s301.l+' applies: +'+s301r+'% additional duty on China-origin goods');
   if(s232r>0)flags.push('Section 232 tariff: +'+s232r+'% on '+origin+'-origin '+(best.s232?.r===25?'steel':'aluminum'));
@@ -1384,13 +1384,13 @@ function getLCS(c,engine){
 }
 
 function renderResult(r,desc,origin){
-  const tot=r.total_effective_pct||0;
-  const s301=r.section_301||{},s232=r.section_232||{};
-  const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');
-  const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings: '+r.savings_tip);
-  const lcs=getLCS(r.confidence,r._engine);
-  const memo=buildMemo(r,desc,origin);
-  const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var tot=r.total_effective_pct||0;
+  var s301=r.section_301||{},s232=r.section_232||{};
+  var ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');
+  var flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings: '+r.savings_tip);
+  var lcs=getLCS(r.confidence,r._engine);
+  var memo=buildMemo(r,desc,origin);
+  var today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('result-area').innerHTML=`
 <div class="result-wrap">
   <div class="hts-hero">
@@ -1447,43 +1447,43 @@ function swR(el,id){
   el.classList.add('active');document.getElementById(id).classList.add('active');
 }
 function buildMemo(r,desc,origin){
-  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   return `CUSTOMS CLASSIFICATION ANALYSIS MEMO\nTariffly - Classification Research Assistant\nDate: ${today}\n=========================================\n\nDISCLAIMER: Informational purposes only. Not a CBP binding ruling.\nA licensed U.S. Customs Broker must review prior to entry filing.\n\nI. PRODUCT\nProduct:  ${desc}\nOrigin:   ${origin}\n\nII. CLASSIFICATION\nHTS Code:    ${r.hts_10}\nDescription: ${r.description}\nGRI Rule:    ${r.gri_rule}\nConfidence:  ${r.confidence}\nRationale:   ${r.gri_rationale}\n\nIII. DUTY RATES\nColumn 1 General:  ${r.duty_general_formatted}\nSection 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}\nSection 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}\nTOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})\n\n${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  Warning: '+f).join('\n')+'\n\n':''}V. VERIFICATION\nUSITC HTS:   https://hts.usitc.gov\nCBP Rulings: https://rulings.cbp.gov\nUSTR 301:    https://ustr.gov\n\n=========================================\nTariffly - Informational use only\n=========================================`;
 }
 function copyMemo(){
-  const t=document.getElementById('memo-content').textContent;
-  navigator.clipboard.writeText(t).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});
+  var t=document.getElementById('memo-content').textContent;
+  navigator.clipboard.writeText(t).then(()=>{var b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});
 }
 function getIcon(hts){
-  const ch=parseInt((hts||'').substring(0,2));
+  var ch=parseInt((hts||'').substring(0,2));
   if(ch>=84&&ch<=85)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
   if(ch>=61&&ch<=64)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>';
   if(ch>=72&&ch<=76)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>';
   return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
 }
-function dutyBadgeClass(duty){if(!duty||duty==='Free')return'free';const n=parseFloat(duty);if(n>20)return'high';if(n>5)return'mid';return'low';}
+function dutyBadgeClass(duty){if(!duty||duty==='Free')return'free';var n=parseFloat(duty);if(n>20)return'high';if(n>5)return'mid';return'low';}
 
 function addToRecent(r,desc){
-  const txl=document.getElementById('txn-list');
+  var txl=document.getElementById('txn-list');
   if(txl.querySelector('.txn-empty'))txl.innerHTML='';
-  const d=document.createElement('div');d.className='txn-item';
-  const cls=dutyBadgeClass(r.total_formatted);
+  var d=document.createElement('div');d.className='txn-item';
+  var cls=dutyBadgeClass(r.total_formatted);
   d.innerHTML=`<div class="txn-icon">${getIcon(r.hts_10)}</div><div class="txn-info"><div class="txn-hts">${r.hts_10}</div><div class="txn-desc">${desc.substring(0,42)}${desc.length>42?'...':''}</div></div><div class="txn-duty ${cls}">${r.total_formatted}</div>`;
   txl.insertBefore(d,txl.firstChild);
-  const items=txl.querySelectorAll('.txn-item');if(items.length>6)items[items.length-1].remove();
+  var items=txl.querySelectorAll('.txn-item');if(items.length>6)items[items.length-1].remove();
 }
 function saveToLib(){
   if(!currentResult)return;
-  const e={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};
+  var e={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};
   skuLib.unshift(e);skuLib=skuLib.slice(0,100);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();
-  const b=document.getElementById('save-btn');b.textContent='Saved to Library';b.classList.add('saved');
+  var b=document.getElementById('save-btn');b.textContent='Saved to Library';b.classList.add('saved');
   setTimeout(()=>{b.textContent='Save to SKU Library';b.classList.remove('saved');},2500);
 }
 
 function renderLibrary(){
-  const el=document.getElementById('lib-table');
-  const lc=document.getElementById('lib-count');
-  const n=skuLib.length;if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
+  var el=document.getElementById('lib-table');
+  var lc=document.getElementById('lib-count');
+  var n=skuLib.length;if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
   if(!n){el.innerHTML='<div class="sku-empty">No saved SKUs yet.<br>Classify a product and click Save to Library.</div>';return;}
   el.innerHTML='<div class="sku-list">'+skuLib.map(s=>`
     <div class="sku-row">
@@ -1496,14 +1496,14 @@ function renderLibrary(){
 }
 function delSku(id){skuLib=skuLib.filter(s=>s.id!==id);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();renderLibrary();}
 function exportCSV(){
-  const nl=String.fromCharCode(10);
-  const rows=skuLib.map(s=>[s.hts,s.desc.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));
-  const blob=new Blob([['HTS,Description,Duty,Origin,Engine,Date',...rows].join(nl)],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tariffly-skus.csv';a.click();
+  var nl=String.fromCharCode(10);
+  var rows=skuLib.map(s=>[s.hts,s.desc.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));
+  var blob=new Blob([['HTS,Description,Duty,Origin,Engine,Date',...rows].join(nl)],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tariffly-skus.csv';a.click();
 }
 
 // ── SCROLL REVEAL ──────────────────────────────────────────────
-const observer=new IntersectionObserver(entries=>{
+var observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
 },{threshold:0.12});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
@@ -1511,7 +1511,7 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 // ── KEYBOARD + INIT ───────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   initGoogleSignIn();
-  const ta=document.getElementById('product-desc');
+  var ta=document.getElementById('product-desc');
   if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});
 });
 </script>
