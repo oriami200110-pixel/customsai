@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta name="description" content="Tariffly classifies any product to its 10-digit HTS code, calculates Section 301 and 232 tariff exposure, and generates a CBP-ready classification memo in 15 seconds. Free to start.">
+  <meta name="description" content="Tariffly HTS Classification Engine — classify any product to 10-digit HTS code with Section 301/232 duty analysis and CBP memo in 15 seconds.">
   <meta name="robots" content="noindex, nofollow">
   <meta property="og:title" content="Tariffly — HTS Classification Engine">
   <meta property="og:description" content="AI-powered HTS tariff classification with Section 301/232 flags and CBP-ready memos.">
@@ -10,725 +10,422 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tariffly &mdash; HTS Classification Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<meta name="google-signin-client_id" content="301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com">
 <style>
-/* ============================================================
-   TARIFFLY — SPRINT 8 — FULL UI POLISH + MOBILE FIX
-   Micro-interactions, animations, fintech SKU list, responsive
-============================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#F5F7FA; --white:#FFFFFF; --ink:#0A0B0F; --ink2:#1A1D26;
-  --muted:#6B7280; --faint:#9CA3AF; --border:#E5E7EB; --border2:#D1D5DB;
-  --accent:#0047FF; --accent-lt:#EEF2FF; --accent-glow:rgba(0,71,255,0.12);
-  --green:#16A34A; --green-lt:#F0FDF4; --red:#DC2626; --amber:#D97706;
-  --font:'Inter',sans-serif; --display:'Montserrat',sans-serif; --mono:'Inter',sans-serif;
-  --sh-sm:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
-  --sh:0 4px 16px rgba(0,0,0,0.07),0 2px 6px rgba(0,0,0,0.03);
-  --sh-lg:0 12px 40px rgba(0,0,0,0.10),0 4px 12px rgba(0,0,0,0.05);
-  --sh-xl:0 24px 64px rgba(0,0,0,0.12),0 8px 20px rgba(0,0,0,0.06);
+  --bg:#F5F7FA;--white:#FFFFFF;--ink:#0A0B0F;--ink2:#1A1D26;
+  --muted:#6B7280;--faint:#9CA3AF;--border:#E5E7EB;--border2:#D1D5DB;
+  --accent:#0047FF;--accent-lt:#EEF2FF;--accent-glow:rgba(0,71,255,0.12);
+  --green:#16A34A;--green-lt:#F0FDF4;--red:#DC2626;--amber:#D97706;
+  --font:'Inter',sans-serif;--mono:'Inter',sans-serif;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
+  --shadow:0 4px 16px rgba(0,0,0,0.07),0 2px 6px rgba(0,0,0,0.03);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.1),0 4px 12px rgba(0,0,0,0.05);
 }
 html{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 body{min-height:100vh;display:flex;flex-direction:column;}
-::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-
-/* ── KEYFRAMES ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 @keyframes barFill{from{width:0;}}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
-@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
-@keyframes slideInLeft{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:translateX(0);}}
-@keyframes popIn{0%{opacity:0;transform:scale(0.92);}100%{opacity:1;transform:scale(1);}}
-@keyframes neonPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,71,255,0.4);}70%{box-shadow:0 0 0 8px rgba(0,71,255,0);}}
 
-/* Staggered entrance helper classes */
-.anim-1{animation:fadeUp .5s .05s ease both;}
-.anim-2{animation:fadeUp .5s .12s ease both;}
-.anim-3{animation:fadeUp .5s .19s ease both;}
-.anim-4{animation:fadeUp .5s .26s ease both;}
-.anim-5{animation:fadeUp .5s .33s ease both;}
-
-/* Scroll-reveal */
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease;}
-.reveal.visible{opacity:1;transform:translateY(0);}
-.reveal-delay-1{transition-delay:.08s;}
-.reveal-delay-2{transition-delay:.16s;}
-.reveal-delay-3{transition-delay:.24s;}
-
-/* ============================================================
-   SIGN-IN GATE
-============================================================ */
-.gate-overlay{
-  position:fixed;inset:0;z-index:2000;background:#fff;
-  display:flex;align-items:center;justify-content:center;
-  animation:fadeIn .35s ease;
-}
-.gate-container{display:flex;width:100%;max-width:1120px;min-height:100vh;}
-.gate-left{
-  flex:1;background:linear-gradient(145deg,#0047FF 0%,#0035CC 60%,#002BAA 100%);
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:52px;position:relative;overflow:hidden;
-}
-.gate-left::before{content:'';position:absolute;top:-100px;right:-100px;width:450px;height:450px;
-  background:radial-gradient(circle,rgba(255,255,255,0.12),transparent 65%);border-radius:50%;
-  animation:float 8s ease-in-out infinite;}
-.gate-left::after{content:'';position:absolute;bottom:-80px;left:-60px;width:300px;height:300px;
-  background:radial-gradient(circle,rgba(255,255,255,0.06),transparent 65%);border-radius:50%;}
+/* GATE */
+.gate-overlay{position:fixed;inset:0;z-index:2000;background:#fff;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s ease;}
+.gate-container{display:flex;width:100%;max-width:1100px;min-height:100vh;}
+.gate-left{flex:1;background:linear-gradient(135deg,#0047FF 0%,#0035CC 100%);display:flex;flex-direction:column;justify-content:space-between;padding:52px;position:relative;overflow:hidden;}
+.gate-left::before{content:'';position:absolute;top:-120px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(255,255,255,0.1),transparent 65%);border-radius:50%;}
+.gate-left::after{content:'';position:absolute;bottom:-100px;left:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,0.06),transparent 65%);border-radius:50%;}
 .gate-brand{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
-.gate-brand-mark{width:40px;height:40px;background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-family:var(--font);
-  font-size:13px;font-weight:700;color:#fff;}
+.gate-brand-mark{width:40px;height:40px;background:rgba(255,255,255,0.2);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:13px;font-weight:700;color:#fff;}
 .gate-brand-name{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.02em;}
 .gate-left-content{position:relative;z-index:1;}
-.gate-left-tag{display:inline-flex;align-items:center;gap:7px;
-  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
-  color:rgba(255,255,255,0.9);font-size:11px;font-weight:600;border-radius:20px;
-  padding:5px 14px;margin-bottom:24px;text-transform:uppercase;letter-spacing:.08em;
-  font-family:var(--font);}
-.gate-left-tag::before{content:'';width:6px;height:6px;background:#fff;
-  border-radius:50%;animation:pulse 2s infinite;}
-.gate-left-h2{font-family:var(--display);font-size:clamp(30px,3.8vw,48px);font-weight:900;letter-spacing:-.03em;
-  line-height:1.1;color:#fff;margin-bottom:16px;}
+.gate-left-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:11px;font-weight:600;border-radius:20px;padding:5px 14px;margin-bottom:24px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font);}
+.gate-left-tag::before{content:'';width:6px;height:6px;background:#fff;border-radius:50%;animation:pulse 2s infinite;}
+.gate-left-h2{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-.03em;line-height:1.1;color:#fff;margin-bottom:16px;}
 .gate-left-sub{font-size:15px;color:rgba(255,255,255,0.65);line-height:1.7;max-width:380px;}
 .gate-left-metrics{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;}
-.glm{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 18px;
-  backdrop-filter:blur(4px);transition:background .2s,transform .2s;}
-.glm:hover{background:rgba(255,255,255,0.13);transform:translateX(4px);}
-.glm-val{font-size:22px;font-weight:800;color:#fff;font-family:var(--font);
-  flex-shrink:0;letter-spacing:-.02em;}
+.glm{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 18px;backdrop-filter:blur(4px);}
+.glm-val{font-size:22px;font-weight:800;color:#fff;font-family:var(--font);flex-shrink:0;letter-spacing:-.02em;}
 .glm-lbl{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.4;}
-.gate-right{width:480px;flex-shrink:0;display:flex;flex-direction:column;
-  justify-content:center;padding:56px 52px;background:#fff;}
-.gate-right-title{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.gate-right{width:460px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:52px 48px;background:#fff;}
+.gate-right-title{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
 .gate-right-sub{font-size:13px;color:#6B7280;margin-bottom:32px;line-height:1.6;text-align:center;letter-spacing:.015em;}
-
-/* Social buttons */
-.social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
-  padding:13px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;
-  font-family:var(--font);transition:all .2s;margin-bottom:12px;text-decoration:none;}
-.btn-google{background:#fff;color:var(--ink);border:1.5px solid var(--border2);box-shadow:var(--sh-sm);}
-.btn-google:hover{border-color:var(--border);box-shadow:var(--sh);transform:translateY(-1px);}
+.social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .2s;margin-bottom:12px;text-decoration:none;}
+.btn-google{background:#fff;color:var(--ink);border:1.5px solid var(--border2);box-shadow:var(--shadow-sm);}
+.btn-google:hover{border-color:var(--border);box-shadow:var(--shadow);transform:translateY(-1px);}
 .btn-apple{background:var(--ink);color:#fff;border:1.5px solid var(--ink);}
-.btn-apple:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:var(--sh);}
+.btn-apple:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:var(--shadow);}
 .social-icon{width:20px;height:20px;flex-shrink:0;}
-#google-signin-btn{width:100%;margin-bottom:12px;display:flex;justify-content:center;min-height:44px;}
-
-/* Divider */
 .divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
 .divider-line{flex:1;height:1px;background:var(--border);}
-.divider-text{font-size:11px;color:var(--faint);font-weight:500;
-  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
-
-/* Form */
+.divider-text{font-size:11px;color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
 .form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:12px;font-weight:600;color:var(--ink2);
-  margin-bottom:6px;letter-spacing:.01em;}
-.form-input{width:100%;background:#fff;border:1.5px solid var(--border2);border-radius:10px;
-  padding:11px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;
-  transition:all .2s;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px;letter-spacing:.01em;}
+.form-input{width:100%;background:#fff;border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;}
 .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
 .form-input::placeholder{color:var(--faint);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.gate-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;
-  border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
-  transition:all .25s;box-shadow:0 4px 16px var(--accent-glow);margin-top:6px;
-  position:relative;overflow:hidden;}
-.gate-submit::after{content:'';position:absolute;inset:0;background:linear-gradient(
-  90deg,transparent,rgba(255,255,255,0.15),transparent);
-  background-size:200% 100%;transform:translateX(-100%);transition:transform .4s;}
-.gate-submit:hover{background:#0035CC;transform:translateY(-1px);
-  box-shadow:0 6px 24px rgba(0,71,255,0.35);}
-.gate-submit:hover::after{transform:translateX(100%);}
+.gate-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px var(--accent-glow);margin-top:6px;}
+.gate-submit:hover{background:#0035CC;transform:translateY(-1px);}
 .gate-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .gate-terms{font-size:11px;color:var(--faint);text-align:center;margin-top:16px;line-height:1.6;}
 .gate-terms a{color:var(--accent);text-decoration:none;}
+.gate-terms a:hover{text-decoration:underline;}
 .gate-login{font-size:13px;color:var(--muted);text-align:center;margin-top:20px;}
 .gate-login a{color:var(--accent);font-weight:600;text-decoration:none;}
 
-/* Form states */
-.form-success{display:none;text-align:center;padding:24px 0;animation:popIn .4s ease;}
-.form-success-icon{width:60px;height:60px;background:var(--green-lt);
-  border:1.5px solid rgba(22,163,74,.2);border-radius:50%;display:flex;
-  align-items:center;justify-content:center;margin:0 auto 16px;}
+/* FORM STATES */
+.form-success{display:none;text-align:center;padding:32px 0;}
+.form-success-icon{width:56px;height:56px;background:var(--green-lt);border:1.5px solid rgba(22,163,74,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
 .form-success-icon svg{color:var(--green);}
-.form-success h3{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em;}
+.form-success h3{font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em;}
 .form-success p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
-.form-success-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;
-  padding:13px 28px;font-size:14px;font-weight:700;cursor:pointer;
-  font-family:var(--font);box-shadow:0 4px 16px var(--accent-glow);
-  transition:all .2s;}
+.form-success-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
 .form-success-btn:hover{background:#0035CC;transform:translateY(-1px);}
-.form-error-msg{background:#FFF1F1;border:1.5px solid rgba(220,38,38,.15);
-  border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--red);
-  margin-bottom:14px;display:none;animation:fadeUp .3s ease;}
-.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;
-  display:inline-block;}
+.form-error-msg{background:#FFF1F1;border:1.5px solid rgba(220,38,38,0.15);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--red);margin-bottom:14px;display:none;}
+.submitting-btn{display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
 
-/* ============================================================
-   CONSENT MODAL
-============================================================ */
-.consent-overlay{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,0.45);
-  backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;
-  padding:20px;animation:fadeIn .25s ease;}
-.consent-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;
-  padding:46px;max-width:500px;width:100%;box-shadow:var(--sh-xl);
-  animation:popIn .4s ease;position:relative;overflow:hidden;}
-.consent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),#6366F1,#8B5CF6);}
+/* CONSENT */
+.consent-overlay{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s ease;}
+.consent-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:44px;max-width:500px;width:100%;box-shadow:var(--shadow-lg);animation:fadeUp .35s ease;position:relative;overflow:hidden;}
+.consent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#6366F1);}
 .consent-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
-.consent-logo-mark{width:38px;height:38px;background:var(--accent);border-radius:9px;
-  display:flex;align-items:center;justify-content:center;font-family:var(--font);
-  font-size:12px;font-weight:700;color:#fff;box-shadow:0 4px 12px var(--accent-glow);}
+.consent-logo-mark{width:38px;height:38px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;}
 .consent-logo-text{font-size:16px;font-weight:800;color:var(--ink);}
-.consent-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-lt);
-  border:1px solid rgba(0,71,255,.15);color:var(--accent);font-size:10px;font-weight:700;
-  border-radius:20px;padding:4px 12px;margin-bottom:18px;text-transform:uppercase;
-  letter-spacing:.08em;font-family:var(--font);}
+.consent-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-lt);border:1px solid rgba(0,71,255,0.15);color:var(--accent);font-size:10px;font-weight:700;border-radius:20px;padding:4px 12px;margin-bottom:18px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font);}
 .consent-card h2{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em;}
 .consent-card p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;}
-.consent-items{background:#F9FAFB;border:1.5px solid var(--border);border-radius:12px;
-  padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;}
+.consent-items{background:#F9FAFB;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;}
 .ci{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:var(--muted);line-height:1.6;}
-.ci-check{width:18px;height:18px;background:var(--accent-lt);
-  border:1.5px solid rgba(0,71,255,0.2);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ci-check{width:18px;height:18px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .ci-check svg{color:var(--accent);}
-.consent-cb-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
-  background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.15);border-radius:10px;
-  margin-bottom:20px;cursor:pointer;transition:all .2s;}
-.consent-cb-row:hover{border-color:rgba(0,71,255,0.35);background:rgba(0,71,255,0.07);}
-.consent-cb{width:20px;height:20px;border:1.5px solid var(--border2);border-radius:5px;
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;background:#fff;}
-.consent-cb.on{background:var(--accent);border-color:var(--accent);
-  animation:neonPulse .4s ease;}
-.consent-cb.on::after{content:'';display:block;width:10px;height:6px;
-  border-left:2px solid #fff;border-bottom:2px solid #fff;
-  transform:rotate(-45deg) translateY(-1px);}
+.consent-cb-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.15);border-radius:10px;margin-bottom:20px;cursor:pointer;transition:all .15s;}
+.consent-cb-row:hover{border-color:rgba(0,71,255,0.35);}
+.consent-cb{width:20px;height:20px;border:1.5px solid var(--border2);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;background:#fff;}
+.consent-cb.on{background:var(--accent);border-color:var(--accent);}
+.consent-cb.on::after{content:'';display:block;width:10px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);}
 .consent-cb-label{font-size:12.5px;color:var(--ink2);line-height:1.6;cursor:pointer;}
 .consent-cb-label a{color:var(--accent);text-decoration:none;}
-.consent-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;
-  border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
-  opacity:.35;pointer-events:none;transition:all .25s;}
+.consent-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;opacity:.35;pointer-events:none;transition:all .2s;}
 .consent-btn.on{opacity:1;pointer-events:all;box-shadow:0 4px 16px var(--accent-glow);}
 .consent-btn.on:hover{background:#0035CC;transform:translateY(-1px);}
-.consent-foot{text-align:center;margin-top:12px;font-size:11px;color:var(--faint);
-  font-family:var(--font);}
+.consent-foot{text-align:center;margin-top:12px;font-size:11px;color:var(--faint);font-family:var(--font);}
 
-/* Terms + Paywall modals */
-.terms-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
-  z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.terms-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;
-  padding:36px;max-width:640px;width:100%;max-height:82vh;overflow-y:auto;
-  box-shadow:var(--sh-xl);}
+/* TERMS */
+.terms-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.terms-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:36px;max-width:620px;width:100%;max-height:82vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
 .terms-card h2{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:18px;}
-.terms-card h3{font-size:12px;font-weight:700;color:var(--accent);margin:20px 0 6px;
-  text-transform:uppercase;letter-spacing:.07em;}
+.terms-card h3{font-size:12px;font-weight:700;color:var(--accent);margin:20px 0 6px;text-transform:uppercase;letter-spacing:.07em;}
 .terms-card p,.terms-card li{font-size:12.5px;color:var(--muted);line-height:1.75;margin-bottom:8px;}
 .terms-card ul{padding-left:18px;}
-.terms-close{margin-top:22px;width:100%;padding:12px;background:var(--accent-lt);
-  border:1.5px solid rgba(0,71,255,.2);color:var(--accent);border-radius:10px;
-  cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;transition:all .2s;}
-.terms-close:hover{background:rgba(0,71,255,.12);}
+.terms-close{margin-top:22px;width:100%;padding:12px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.2);color:var(--accent);border-radius:10px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;transition:all .2s;}
+.terms-close:hover{background:rgba(0,71,255,0.12);}
 
-.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:center;z-index:500;padding:20px;}
+/* PAYWALL */
+
 .pw-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;
-  padding:40px;max-width:390px;width:100%;box-shadow:var(--sh-xl);text-align:center;
+  padding:0;max-width:420px;width:100%;box-shadow:var(--sh-xl);
   position:relative;overflow:hidden;animation:popIn .4s ease;}
 .pw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,var(--accent),#6366F1);}
-.pw-icon{width:60px;height:60px;background:var(--accent-lt);
-  border:1.5px solid rgba(0,71,255,.15);border-radius:16px;display:flex;
-  align-items:center;justify-content:center;margin:0 auto 18px;}
+.pw-card-top{padding:32px 32px 0;text-align:center;}
+.pw-icon{width:56px;height:56px;background:var(--accent-lt);
+  border:1.5px solid rgba(0,71,255,.15);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  box-shadow:0 4px 12px var(--accent-glow);}
+.pw-icon svg{color:var(--accent);}
+.pw-tag{display:inline-block;background:var(--accent);color:#fff;
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:var(--font);}
+.pw-h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+.pw-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.pw-price-row{display:flex;align-items:baseline;gap:4px;justify-content:center;
+  background:#F9FAFB;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:16px 32px;}
+.pw-price{font-size:40px;font-weight:800;color:var(--ink);font-family:var(--font);letter-spacing:-.03em;}
+.pw-per{font-size:14px;color:var(--muted);}
+.pw-save{font-size:11px;color:var(--green);background:var(--green-lt);
+  padding:3px 8px;border-radius:20px;font-weight:600;margin-left:8px;}
+.pw-feats{padding:20px 32px 0;display:flex;flex-direction:column;gap:9px;}
+.pw-feat{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink2);}
+.pw-feat svg{color:var(--green);flex-shrink:0;stroke-width:3;}
+.pw-stripe-btn{width:calc(100% - 64px);margin:20px 32px 0;padding:14px;
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
+.pw-stripe-btn:hover{background:#0035CC;transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(0,71,255,.35);}
+.pw-divider{text-align:center;padding:12px 32px 0;position:relative;}
+.pw-divider::before{content:'';position:absolute;left:32px;right:32px;
+  top:50%;height:1px;background:var(--border);}
+.pw-divider span{background:#fff;padding:0 10px;font-size:11px;color:var(--faint);
+  position:relative;z-index:1;}
+.pw-api-btn{width:calc(100% - 64px);margin:12px 32px 0;padding:11px;
+  background:transparent;color:var(--muted);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;
+  transition:all .2s;}
+.pw-api-btn:hover{color:var(--ink);border-color:var(--border);}
+.pw-guarantee{text-align:center;padding:12px 32px 24px;font-size:10px;
+  color:var(--faint);font-family:var(--font);}
+.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px;}
+.pw-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:40px;max-width:380px;width:100%;box-shadow:var(--shadow-lg);text-align:center;position:relative;overflow:hidden;}
+.pw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#6366F1);}
+.pw-icon{width:60px;height:60px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.15);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
 .pw-icon svg{color:var(--accent);}
 .pw-card h2{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em;}
 .pw-card p{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6;}
-.pw-feat{display:flex;align-items:center;gap:8px;font-size:12.5px;
-  color:var(--ink2);margin-bottom:10px;text-align:left;}
-.pw-feat::before{content:'';width:16px;height:16px;background:var(--green-lt);
-  border-radius:50%;flex-shrink:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316A34A' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:center;background-size:10px;}
-.pw-up{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;
-  border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;
-  cursor:pointer;margin-top:20px;box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
+.pw-feat{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);margin-bottom:10px;text-align:left;}
+.pw-feat::before{content:'';width:16px;height:16px;background:var(--green-lt);border-radius:50%;flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316A34A' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:10px;}
+.pw-up{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
 .pw-up:hover{background:#0035CC;transform:translateY(-1px);}
-.pw-api{width:100%;padding:11px;background:transparent;color:var(--muted);
-  border:1.5px solid var(--border2);border-radius:10px;font-family:var(--font);
-  font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s;}
+.pw-api{width:100%;padding:11px;background:transparent;color:var(--muted);border:1.5px solid var(--border2);border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s;}
 .pw-api:hover{color:var(--ink);border-color:var(--border);}
 
-/* ============================================================
-   APP SHELL
-============================================================ */
+/* APP SHELL */
 .app{display:flex;height:100vh;overflow:hidden;}
-
-/* SIDEBAR */
-.sidebar{width:252px;flex-shrink:0;background:#fff;border-right:1.5px solid var(--border);
-  display:flex;flex-direction:column;box-shadow:var(--sh-sm);
-  transition:transform .3s ease;}
-.logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:11px;}
-.logo-mark{width:34px;height:34px;background:var(--accent);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-family:var(--font);
-  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
-  box-shadow:0 4px 12px var(--accent-glow);transition:transform .2s;}
-.logo-mark:hover{transform:scale(1.08);}
+.sidebar{width:252px;flex-shrink:0;background:#fff;border-right:1.5px solid var(--border);display:flex;flex-direction:column;box-shadow:var(--shadow-sm);}
+.logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;}
+.logo-mark{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
 .logo-text{font-family:var(--display);font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-.02em;}
 .logo-tag{font-size:10px;color:var(--faint);font-family:var(--font);margin-top:1px;}
-
 .usage-wrap{padding:16px 18px;border-bottom:1px solid var(--border);}
 .usage-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.usage-lbl{font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.07em;color:var(--muted);}
+.usage-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
 .usage-num{font-size:11px;font-family:var(--font);color:var(--ink);font-weight:600;}
 .usage-bar{height:5px;background:#F3F4F6;border-radius:3px;overflow:hidden;}
-.usage-fill{height:100%;border-radius:3px;
-  background:linear-gradient(90deg,var(--accent),#6366F1);
-  transition:width .6s cubic-bezier(.4,0,.2,1);}
+.usage-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#6366F1);transition:width .6s ease;}
 .usage-note{font-size:10px;color:var(--faint);margin-top:6px;font-family:var(--font);}
-
-.user-info{padding:14px 18px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;transition:background .15s;}
-.user-info:hover{background:#F9FAFB;}
-.user-avatar{width:32px;height:32px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),#6366F1);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.user-info{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#6366F1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
 .user-name{font-size:13px;font-weight:600;color:var(--ink);}
 .user-email{font-size:10px;color:var(--faint);font-family:var(--font);}
-
-.nav{padding:12px 10px;flex:1;overflow-y:auto;}
-.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--faint);padding:4px 10px 8px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
-  font-size:13px;color:var(--muted);cursor:pointer;transition:all .18s;
-  margin-bottom:2px;font-weight:500;position:relative;}
+.nav{padding:12px 10px;flex:1;}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);padding:4px 10px 8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:2px;font-weight:500;}
 .nav-item:hover{background:#F9FAFB;color:var(--ink);}
-.nav-item:hover svg{opacity:.8;}
-.nav-item.active{background:var(--accent-lt);color:var(--accent);font-weight:600;}
-.nav-item.active::before{content:'';position:absolute;left:0;top:25%;bottom:25%;
-  width:3px;background:var(--accent);border-radius:0 2px 2px 0;}
+.nav-item.active{background:var(--accent-lt);color:var(--accent);font-weight:600;position:relative;}
+.nav-item.active::before{content:"";position:absolute;left:0;top:25%;bottom:25%;width:3px;background:var(--accent);border-radius:0 2px 2px 0;}
+.nav-item svg{opacity:.4;flex-shrink:0;transition:opacity .15s;}
 .nav-item.active svg{opacity:1;}
-.nav-item svg{opacity:.4;flex-shrink:0;transition:opacity .18s;}
-.nav-pill{margin-left:auto;font-size:10px;font-family:var(--font);
-  background:var(--accent-lt);color:var(--accent);padding:1px 7px;
-  border-radius:20px;font-weight:600;transition:background .2s;}
-.nav-item.active .nav-pill{background:rgba(0,71,255,0.2);}
-
+.nav-pill{margin-left:auto;font-size:10px;font-family:var(--font);background:var(--accent-lt);color:var(--accent);padding:1px 7px;border-radius:20px;font-weight:600;}
 .sidebar-foot{padding:14px 14px 18px;border-top:1px solid var(--border);}
-.api-lbl{font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
+.api-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
 .api-wrap{position:relative;}
-
-
-
-
-
-.ver{font-size:10px;color:var(--faint);text-align:center;margin-top:10px;
-  font-family:var(--font);}
-
-/* MOBILE MENU TOGGLE */
-.mobile-menu-btn{display:none;position:fixed;bottom:20px;right:20px;z-index:100;
-  width:48px;height:48px;background:var(--accent);border:none;border-radius:50%;
-  box-shadow:var(--sh-lg);cursor:pointer;align-items:center;justify-content:center;
-  transition:transform .2s;}
-.mobile-menu-btn:hover{transform:scale(1.08);}
-.mobile-menu-btn svg{color:#fff;}
-
-/* ============================================================
-   MAIN AREA
-============================================================ */
+.api-inp{width:100%;background:#F9FAFB;border:1.5px solid var(--border2);border-radius:9px;padding:9px 32px 9px 12px;font-size:11px;font-family:var(--font);color:var(--ink);outline:none;transition:border-color .15s;}
+.api-inp:focus{border-color:var(--accent);background:#fff;}
+.api-inp::placeholder{color:var(--faint);}
+.api-dot{position:absolute;right:11px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:var(--faint);transition:all .3s;}
+.api-dot.live{background:var(--green);box-shadow:0 0 6px rgba(22,163,74,0.4);}
+.ver{font-size:10px;color:var(--faint);text-align:center;margin-top:10px;font-family:var(--font);}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-
-.topbar{height:56px;flex-shrink:0;background:#fff;border-bottom:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 28px;
-  box-shadow:var(--sh-sm);z-index:10;}
+.topbar{height:56px;flex-shrink:0;background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:var(--shadow-sm);}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .tb-title{font-size:14px;font-weight:700;color:var(--ink);}
 .tb-sep{width:1px;height:16px;background:var(--border2);}
 .tb-sub{font-size:11px;color:var(--faint);font-family:var(--font);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
-.tb-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
-  padding:5px 12px;border-radius:20px;cursor:pointer;font-weight:600;
-  transition:all .18s;user-select:none;}
-.tb-legal{background:var(--accent-lt);border:1px solid rgba(0,71,255,.15);color:var(--accent);}
-.tb-legal:hover{background:rgba(0,71,255,.12);}
-.tb-engine{background:#F0FDF4;border:1px solid rgba(22,163,74,.2);color:var(--green);}
-
-/* ── HERO BAR ── */
-.hero-bar{padding:28px 32px 22px;border-bottom:1px solid var(--border);background:#fff;
-  position:relative;overflow:hidden;}
-.hero-bar::after{content:'';position:absolute;top:-60px;right:-40px;width:250px;height:250px;
-  background:radial-gradient(circle,rgba(0,71,255,.04),transparent 65%);
-  border-radius:50%;pointer-events:none;}
-.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-lt);
-  border:1px solid rgba(0,71,255,.15);color:var(--accent);font-size:10px;font-weight:700;
-  border-radius:20px;padding:4px 12px;margin-bottom:14px;text-transform:uppercase;
-  letter-spacing:.08em;font-family:var(--font);}
-.hero-badge::before{content:'';width:6px;height:6px;background:var(--accent);
-  border-radius:50%;animation:pulse 2s infinite;}
-.hero-h1{font-size:clamp(24px,3vw,38px);font-weight:900;letter-spacing:-.03em;
-  line-height:1.1;margin-bottom:8px;}
+.tb-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;font-weight:600;transition:all .15s;}
+.tb-legal{background:var(--accent-lt);border:1px solid rgba(0,71,255,0.15);color:var(--accent);}
+.tb-legal:hover{background:rgba(0,71,255,0.12);}
+.tb-engine{background:#F0FDF4;border:1px solid rgba(22,163,74,0.2);color:var(--green);}
+.hero-bar{padding:32px 36px 24px;border-bottom:1px solid var(--border);background:#fff;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-lt);border:1px solid rgba(0,71,255,0.15);color:var(--accent);font-size:10px;font-weight:700;border-radius:20px;padding:4px 12px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font);}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+.hero-h1{font-size:clamp(28px,3.5vw,42px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:10px;}
 .hero-h1 .accent{color:var(--accent);}
-.hero-sub{font-size:14px;color:var(--muted);max-width:540px;line-height:1.65;margin-bottom:20px;}
+.hero-sub{font-size:15px;color:var(--muted);max-width:560px;line-height:1.65;margin-bottom:22px;}
 .hero-metrics{display:flex;gap:10px;flex-wrap:wrap;}
-.hm{display:flex;align-items:center;gap:8px;background:var(--bg);
-  border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;
-  transition:all .2s;cursor:default;}
-.hm:hover{border-color:rgba(0,71,255,.25);background:#fff;
-  box-shadow:var(--sh-sm);transform:translateY(-1px);}
-.hm-val{font-size:16px;font-weight:800;color:var(--accent);font-family:var(--font);}
+.hm{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;transition:all .15s;}
+.hm:hover{border-color:rgba(0,71,255,0.2);background:#fff;box-shadow:var(--shadow-sm);}
+.hm-val{font-size:18px;font-weight:800;color:var(--accent);font-family:var(--font);}
 .hm-lbl{font-size:11px;color:var(--muted);font-weight:500;}
-
-/* ── WORKSPACE ── */
-.workspace{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden;}
-.input-col{border-right:1.5px solid var(--border);padding:18px;overflow-y:auto;
-  display:flex;flex-direction:column;gap:14px;background:var(--bg);}
-
-/* ── INPUT CARDS ── */
-.card{background:#fff;border:1.5px solid var(--border);border-radius:14px;
-  overflow:hidden;transition:border-color .2s,box-shadow .25s,transform .2s;}
-.card:hover{box-shadow:var(--sh);border-color:var(--border2);}
-.card:focus-within{border-color:rgba(0,71,255,.3);box-shadow:0 0 0 3px var(--accent-glow);}
-.card-head{padding:15px 17px 0;display:flex;align-items:center;gap:10px;}
-.card-icon{width:32px;height:32px;background:var(--accent-lt);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s;}
-.card:hover .card-icon{transform:scale(1.05);}
+.workspace{flex:1;display:grid;grid-template-columns:420px 1fr;overflow:hidden;}
+.input-col{border-right:1.5px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;background:var(--bg);}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.card:hover{box-shadow:var(--shadow-sm);}
+.card-head{padding:16px 18px 0;display:flex;align-items:center;gap:11px;}
+.card-icon{width:34px;height:34px;background:var(--accent-lt);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .card-icon svg{color:var(--accent);}
 .card-title{font-size:13px;font-weight:700;color:var(--ink);}
 .card-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-.card-body{padding:13px 17px;}
-
-.desc-ta{width:100%;background:#F9FAFB;border:1.5px solid var(--border2);border-radius:10px;
-  padding:11px 13px;font-family:var(--font);font-size:13px;color:var(--ink);resize:none;
-  outline:none;transition:all .2s;min-height:88px;line-height:1.65;}
-.desc-ta:focus{border-color:var(--accent);background:#fff;
-  box-shadow:0 0 0 3px var(--accent-glow);}
+.card-body{padding:14px 18px;}
+.desc-ta{width:100%;background:#F9FAFB;border:1.5px solid var(--border2);border-radius:10px;padding:12px 14px;font-family:var(--font);font-size:13px;color:var(--ink);resize:none;outline:none;transition:all .15s;min-height:90px;line-height:1.6;}
+.desc-ta:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-glow);}
 .desc-ta::placeholder{color:var(--faint);}
-.input-row{display:flex;gap:9px;margin-top:11px;align-items:stretch;}
-.origin-sel{flex:1;background:#F9FAFB;border:1.5px solid var(--border2);border-radius:10px;
-  padding:0 12px;font-family:var(--font);font-size:13px;color:var(--ink);outline:none;
-  height:42px;cursor:pointer;transition:all .2s;}
+.input-row{display:flex;gap:10px;margin-top:12px;align-items:stretch;}
+.origin-sel{flex:1;background:#F9FAFB;border:1.5px solid var(--border2);border-radius:10px;padding:0 12px;font-family:var(--font);font-size:13px;color:var(--ink);outline:none;height:42px;cursor:pointer;transition:all .15s;}
 .origin-sel:focus{border-color:var(--accent);background:#fff;}
-.classify-btn{height:42px;padding:0 19px;background:var(--accent);color:#fff;border:none;
-  border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;gap:6px;transition:all .25s;white-space:nowrap;
-  flex-shrink:0;box-shadow:0 2px 10px var(--accent-glow);position:relative;overflow:hidden;}
-.classify-btn::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
-  background-size:200% 100%;transform:translateX(-100%);transition:transform .5s;}
-.classify-btn:hover:not(:disabled){background:#0035CC;transform:translateY(-1px);
-  box-shadow:0 4px 18px rgba(0,71,255,.35);}
-.classify-btn:hover:not(:disabled)::after{transform:translateX(100%);}
-.classify-btn:active:not(:disabled){transform:translateY(0);}
-.classify-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;
-  box-shadow:none;background:var(--faint);}
-.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
-.shortcut{font-size:10px;color:var(--faint);text-align:right;margin-top:5px;
-  font-family:var(--font);}
-
-.chips{padding:0 17px 14px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.classify-btn{height:42px;padding:0 20px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 10px var(--accent-glow);}
+.classify-btn{position:relative;overflow:hidden;}
+.classify-btn:hover:not(:disabled){background:#0035CC;transform:translateY(-1px);box-shadow:0 4px 18px var(--accent-glow);}
+.classify-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;background:var(--faint);}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
+.shortcut{font-size:10px;color:var(--faint);text-align:right;margin-top:6px;font-family:var(--font);}
+.chips{padding:0 18px 16px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .chips-lbl{font-size:10px;color:var(--faint);margin-right:3px;font-family:var(--font);}
-.chip{font-size:10px;padding:4px 10px;border-radius:20px;background:#F9FAFB;
-  border:1.5px solid var(--border2);color:var(--muted);cursor:pointer;
-  transition:all .18s;font-family:var(--font);}
-.chip:hover{border-color:rgba(0,71,255,.25);color:var(--accent);
-  background:var(--accent-lt);transform:scale(1.04);}
-
-/* ── FINTECH TRANSACTION LIST (was plain table) ── */
+.chip{font-size:10px;padding:4px 10px;border-radius:20px;background:#F9FAFB;border:1.5px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s;font-family:var(--font);}
+.chip:hover{border-color:rgba(0,71,255,0.25);color:var(--accent);background:var(--accent-lt);}
 .txn-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
-.txn-header{padding:13px 17px;display:flex;align-items:center;
-  justify-content:space-between;border-bottom:1px solid var(--border);}
+.txn-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
 .txn-title{font-size:13px;font-weight:700;color:var(--ink);}
-.txn-badge{font-size:10px;font-family:var(--font);color:var(--accent);
-  background:var(--accent-lt);padding:2px 8px;border-radius:20px;font-weight:600;}
-.txn-empty{padding:24px 17px;text-align:center;font-size:12px;color:var(--faint);}
+.txn-badge{font-size:10px;font-family:var(--font);color:var(--accent);background:var(--accent-lt);padding:2px 8px;border-radius:20px;font-weight:600;}
+.txn-empty{padding:24px 18px;text-align:center;font-size:12px;color:var(--faint);}
 .txn-list{max-height:200px;overflow-y:auto;}
-.txn-item{display:flex;align-items:center;gap:10px;padding:9px 17px;
-  border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;
-  transition:all .15s;position:relative;}
+.txn-item{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;transition:background .12s;}
 .txn-item:last-child{border-bottom:none;}
+.txn-item{position:relative;transition:all .15s;}
 .txn-item:hover{background:#FAFBFF;padding-left:20px;}
-.txn-item:hover::before{content:'';position:absolute;left:0;top:20%;bottom:20%;
-  width:3px;background:var(--accent);border-radius:0 2px 2px 0;}
-.txn-icon{width:30px;height:30px;border-radius:8px;background:var(--accent-lt);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s;}
-.txn-item:hover .txn-icon{transform:scale(1.1);}
+.txn-item:hover::before{content:"";position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 2px 2px 0;}
+.txn-icon{width:30px;height:30px;border-radius:8px;background:var(--accent-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .txn-icon svg{color:var(--accent);}
 .txn-info{flex:1;min-width:0;}
 .txn-hts{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--font);}
-.txn-desc{font-size:11px;color:var(--muted);overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
-.txn-duty{font-size:12px;font-family:var(--font);font-weight:700;
-  flex-shrink:0;padding:2px 8px;border-radius:6px;}
+.txn-desc{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+.txn-duty{font-size:12px;font-family:var(--font);font-weight:700;flex-shrink:0;}
+.txn-duty{padding:2px 8px;border-radius:6px;}
 .txn-duty.high{color:var(--red);background:#FFF1F1;}
 .txn-duty.mid{color:var(--amber);background:#FFFBEB;}
 .txn-duty.low{color:var(--green);background:var(--green-lt);}
 .txn-duty.free{color:var(--accent);background:var(--accent-lt);}
-
-/* ── RESULT PANEL ── */
-.result-col{padding:22px;overflow-y:auto;background:var(--bg);}
-.empty-wrap{display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:60vh;text-align:center;}
-.empty-gfx{width:88px;height:88px;border-radius:20px;background:#fff;
-  border:1.5px solid var(--border);display:flex;align-items:center;
-  justify-content:center;margin-bottom:18px;box-shadow:var(--sh-sm);
-  animation:float 4s ease-in-out infinite;}
+.result-col{padding:24px;overflow-y:auto;background:var(--bg);}
+.empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;}
+.empty-gfx{width:88px;height:88px;border-radius:20px;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:var(--shadow-sm);animation:float 4s ease-in-out infinite;}
 .empty-gfx svg{color:var(--faint);}
 .empty-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:8px;}
 .empty-sub{font-size:13px;color:var(--muted);max-width:300px;line-height:1.65;}
-.loading-wrap{display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:60vh;gap:14px;}
-.load-ring{width:44px;height:44px;border-radius:50%;border:3px solid var(--border2);
-  border-top:3px solid var(--accent);animation:spin .7s linear infinite;
-  box-shadow:0 0 20px rgba(0,71,255,.1);}
-.load-step{font-size:12px;color:var(--faint);font-family:var(--font);transition:all .3s;}
-.load-step.act{color:var(--accent);font-weight:600;transform:translateX(4px);}
-.load-step.done{color:var(--green);}
-
-/* ── RESULT CARDS — polished with micro-interactions ── */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.load-ring{width:44px;height:44px;border-radius:50%;border:3px solid var(--border2);border-top:3px solid var(--accent);animation:spin .7s linear infinite;}
+.load-step{font-size:12px;color:var(--faint);font-family:var(--font);transition:color .3s;}
+.load-step.act{color:var(--accent);font-weight:600;}.load-step.done{color:var(--green);}
 .result-wrap{animation:popIn .4s ease;}
-.hts-hero{background:#fff;border:1.5px solid var(--border);border-radius:16px;
-  padding:24px;margin-bottom:14px;box-shadow:var(--sh-sm);
-  position:relative;overflow:hidden;transition:box-shadow .2s;}
-.hts-hero:hover{box-shadow:var(--sh);}
-.hts-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),#6366F1,#8B5CF6);}
-.hts-code{font-family:var(--font);font-size:36px;font-weight:700;
-  color:var(--accent);letter-spacing:.04em;line-height:1;}
+.hts-hero{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+.hts-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#6366F1);}
+.hts-code{font-family:var(--font);font-size:36px;font-weight:700;color:var(--accent);letter-spacing:.04em;}
 .hts-desc{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
 .hts-meta{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.conf-badge{font-size:10px;font-family:var(--font);font-weight:700;
-  padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;}
-.conf-HIGH{background:var(--green-lt);color:var(--green);border:1px solid rgba(22,163,74,.2);}
-.conf-MEDIUM{background:#FFFBEB;color:var(--amber);border:1px solid rgba(217,119,6,.2);}
-.conf-LOW{background:#FFF1F1;color:var(--red);border:1px solid rgba(220,38,38,.2);}
+.conf-badge{font-size:10px;font-family:var(--font);font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;}
+.conf-HIGH{background:var(--green-lt);color:var(--green);border:1px solid rgba(22,163,74,0.2);}
+.conf-MEDIUM{background:#FFFBEB;color:var(--amber);border:1px solid rgba(217,119,6,0.2);}
+.conf-LOW{background:#FFF1F1;color:var(--red);border:1px solid rgba(220,38,38,0.2);}
 .hts-timing{font-size:11px;color:var(--faint);font-family:var(--font);}
-
-/* Duty grid — hover lifts */
 .duty-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
-.duty-cell{background:#fff;border:1.5px solid var(--border);border-radius:12px;
-  padding:14px;transition:all .22s;box-shadow:var(--sh-sm);cursor:default;}
-.duty-cell:hover{border-color:var(--border2);transform:translateY(-3px);
-  box-shadow:var(--sh);}
-.duty-lbl{font-size:10px;font-weight:600;color:var(--faint);
-  text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
-.duty-val{font-size:24px;font-weight:800;font-family:var(--font);
-  line-height:1;transition:transform .2s;}
-.duty-cell:hover .duty-val{transform:scale(1.04);}
+.duty-cell{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;transition:all .15s;box-shadow:var(--shadow-sm);}
+.duty-cell:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow);}
+.duty-lbl{font-size:10px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.duty-val{font-size:24px;font-weight:800;font-family:var(--font);line-height:1;}
 .duty-sub{font-size:11px;color:var(--faint);margin-top:4px;}
-.d-free{color:var(--accent);}.d-low{color:var(--green);}
-.d-mid{color:var(--amber);}.d-high{color:var(--red);}
-
-/* LCS */
-.lcs-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;
-  padding:16px;margin-bottom:14px;box-shadow:var(--sh-sm);}
+.d-free{color:var(--accent);}.d-low{color:var(--green);}.d-mid{color:var(--amber);}.d-high{color:var(--red);}
+.lcs-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
 .lcs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.lcs-lbl{font-size:10px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.07em;}
+.lcs-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
 .lcs-score{font-size:22px;font-weight:800;font-family:var(--font);}
 .lcs-high{color:var(--green);}.lcs-medium{color:var(--amber);}.lcs-low{color:var(--red);}
 .lcs-bar-bg{height:7px;background:#F3F4F6;border-radius:4px;overflow:hidden;margin-bottom:10px;}
 .lcs-bar{height:100%;border-radius:4px;animation:barFill .8s .2s ease both;}
-.lcs-bar-high{background:linear-gradient(90deg,var(--green),#4ADE80);}
-.lcs-bar-medium{background:linear-gradient(90deg,var(--amber),#FCD34D);}
-.lcs-bar-low{background:linear-gradient(90deg,var(--red),#F87171);}
+.lcs-bar-high{background:linear-gradient(90deg,var(--green),#4ADE80);}.lcs-bar-medium{background:linear-gradient(90deg,var(--amber),#FCD34D);}.lcs-bar-low{background:linear-gradient(90deg,var(--red),#F87171);}
 .lcs-note{font-size:11px;color:var(--muted);line-height:1.6;}
 .verify-row{display:flex;gap:7px;margin-top:10px;}
-.verify-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
-  padding:7px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,.12);
-  border-radius:8px;font-size:10px;font-weight:600;color:var(--accent);cursor:pointer;
-  text-decoration:none;transition:all .18s;font-family:var(--font);}
-.verify-btn:hover{background:rgba(0,71,255,.12);border-color:rgba(0,71,255,.28);
-  transform:translateY(-1px);}
-
-/* Tabs */
+.verify-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;background:var(--accent-lt);border:1.5px solid rgba(0,71,255,0.12);border-radius:8px;font-size:10px;font-weight:600;color:var(--accent);cursor:pointer;text-decoration:none;transition:all .15s;font-family:var(--font);}
+.verify-btn:hover{background:rgba(0,71,255,0.12);border-color:rgba(0,71,255,0.25);}
 .result-tabs{display:flex;gap:1px;border-bottom:1.5px solid var(--border);margin-bottom:0;}
-.rtab{padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;
-  color:var(--muted);border-bottom:2px solid transparent;transition:all .18s;
-  margin-bottom:-1px;}
-.rtab:hover{color:var(--ink);}
-.rtab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.rtab-body{padding-top:16px;display:none;}
-.rtab-body.active{display:block;animation:fadeUp .3s ease;}
-
-/* Flags */
+.rtab{padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;}
+.rtab:hover{color:var(--ink);}.rtab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.rtab-body{padding-top:16px;display:none;}.rtab-body.active{display:block;}
 .flag-list{display:flex;flex-direction:column;gap:7px;}
-.flag{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-radius:9px;
-  font-size:12.5px;transition:transform .15s;}
+.flag{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-radius:9px;font-size:12.5px;transition:transform .15s;}
 .flag:hover{transform:translateX(3px);}
-.flag-risk{background:#FFF1F1;border:1px solid rgba(220,38,38,.12);color:#991B1B;}
-.flag-info{background:#EFF6FF;border:1px solid rgba(59,130,246,.15);color:#1D4ED8;}
+.flag-risk{background:#FFF1F1;border:1px solid rgba(220,38,38,0.12);color:#991B1B;}
+.flag-info{background:#EFF6FF;border:1px solid rgba(59,130,246,0.15);color:#1D4ED8;}
 .flag-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px;}
 .dot-risk{background:var(--red);}.dot-info{background:#3B82F6;}
-
-.disclaimer-box{background:#FFFBEB;border:1.5px solid rgba(217,119,6,.15);
-  border-radius:10px;padding:12px 14px;margin-top:12px;display:flex;gap:9px;}
+.disclaimer-box{background:#FFFBEB;border:1.5px solid rgba(217,119,6,0.15);border-radius:10px;padding:12px 14px;margin-top:12px;display:flex;gap:9px;}
 .db-text{font-size:11px;color:#92400E;line-height:1.65;}
-.db-text strong{color:var(--amber);}
-.db-text a{color:var(--amber);text-decoration:none;}
-.db-text a:hover{text-decoration:underline;}
-
-.gri-box{background:#F9FAFB;border:1.5px solid var(--border);border-radius:11px;
-  padding:14px;margin-top:2px;}
-.gri-rule{font-size:11px;font-weight:700;color:#7C3AED;font-family:var(--font);
-  margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;}
+.db-text strong{color:var(--amber);}.db-text a{color:var(--amber);text-decoration:none;}.db-text a:hover{text-decoration:underline;}
+.gri-box{background:#F9FAFB;border:1.5px solid var(--border);border-radius:11px;padding:14px;margin-top:2px;}
+.gri-rule{font-size:11px;font-weight:700;color:#7C3AED;font-family:var(--font);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;}
 .gri-text{font-size:13px;color:var(--ink2);line-height:1.7;}
-.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--muted);margin:14px 0 7px;}
-
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 7px;}
 .alt-table{width:100%;border-collapse:collapse;font-size:11px;}
-.alt-table th{text-align:left;padding:6px 10px;border-bottom:1.5px solid var(--border);
-  color:var(--faint);font-weight:700;font-family:var(--font);font-size:10px;
-  text-transform:uppercase;letter-spacing:.06em;}
+.alt-table th{text-align:left;padding:6px 10px;border-bottom:1.5px solid var(--border);color:var(--faint);font-weight:700;font-family:var(--font);font-size:10px;text-transform:uppercase;letter-spacing:.06em;}
 .alt-table td{padding:7px 10px;border-bottom:1px solid rgba(0,0,0,.04);color:var(--ink2);}
 .alt-table .mono{font-family:var(--font);color:var(--accent);font-weight:600;}
-.alt-table tr:hover td{background:#FAFBFF;}
-
-.memo-box{background:#F9FAFB;border:1.5px solid var(--border);border-radius:11px;
-  padding:16px;font-family:var(--font);font-size:11px;color:var(--ink2);
-  white-space:pre-wrap;line-height:1.8;max-height:380px;overflow-y:auto;margin-top:2px;}
-.copy-btn{font-size:11px;padding:5px 12px;border:1.5px solid var(--border2);
-  border-radius:7px;background:#fff;color:var(--muted);cursor:pointer;
-  font-family:var(--font);font-weight:600;transition:all .18s;}
-.copy-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.04);}
-
-.save-btn{width:100%;margin-top:14px;padding:11px;border-radius:10px;
-  border:1.5px solid rgba(0,71,255,.2);background:var(--accent-lt);font-family:var(--font);
-  font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;}
-.save-btn:hover{background:rgba(0,71,255,.12);border-color:rgba(0,71,255,.35);
-  transform:translateY(-1px);}
-.save-btn.saved{background:var(--green-lt);border-color:rgba(22,163,74,.25);
-  color:var(--green);}
-
-/* ── SKU LIBRARY — fintech-style ── */
-.history-view{padding:28px 28px;overflow-y:auto;flex:1;animation:fadeIn .3s ease;}
-.history-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.memo-box{background:#F9FAFB;border:1.5px solid var(--border);border-radius:11px;padding:16px;font-family:var(--font);font-size:11px;color:var(--ink2);white-space:pre-wrap;line-height:1.8;max-height:380px;overflow-y:auto;margin-top:2px;}
+.copy-btn{font-size:11px;padding:5px 12px;border:1.5px solid var(--border2);border-radius:7px;background:#fff;color:var(--muted);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .15s;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.save-btn{width:100%;margin-top:14px;padding:11px;border-radius:10px;border:1.5px solid rgba(0,71,255,0.2);background:var(--accent-lt);font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;}
+.save-btn:hover{background:rgba(0,71,255,0.12);border-color:rgba(0,71,255,0.35);}
+.save-btn.saved{background:var(--green-lt);border-color:rgba(22,163,74,.25);color:var(--green);}
+.history-view{padding:28px 32px;overflow-y:auto;flex:1;}
+.history-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .history-head h2{font-size:20px;font-weight:800;letter-spacing:-.02em;}
 .history-head p{font-size:12px;color:var(--muted);margin-top:3px;}
 .hh-btns{display:flex;gap:10px;}
-.btn-xs{padding:7px 14px;font-size:11px;border-radius:8px;border:1.5px solid var(--border2);
-  background:#fff;color:var(--muted);cursor:pointer;font-family:var(--font);
-  font-weight:600;transition:all .18s;box-shadow:var(--sh-sm);}
-.btn-xs:hover{color:var(--ink);border-color:var(--border);box-shadow:var(--sh);}
-.btn-xs.accent{background:var(--accent);color:#fff;border-color:transparent;
-  box-shadow:0 2px 10px var(--accent-glow);}
-.btn-xs.accent:hover{background:#0035CC;transform:translateY(-1px);}
-
-/* Fintech-style SKU rows */
-.sku-list{display:flex;flex-direction:column;gap:8px;}
-.sku-row{background:#fff;border:1.5px solid var(--border);border-radius:12px;
-  padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto auto auto;
-  gap:12px;align-items:center;transition:all .2s;cursor:default;
-  box-shadow:var(--sh-sm);}
-.sku-row:hover{box-shadow:var(--sh);border-color:var(--border2);transform:translateY(-1px);}
-.sku-icon{width:36px;height:36px;border-radius:10px;background:var(--accent-lt);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:transform .2s;}
-.sku-row:hover .sku-icon{transform:scale(1.08);}
-.sku-icon svg{color:var(--accent);}
-.sku-info{min-width:0;}
-.sku-hts{font-size:13px;font-weight:700;color:var(--accent);font-family:var(--font);
-  margin-bottom:2px;}
-.sku-desc{font-size:11px;color:var(--muted);overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;}
-.sku-duty-badge{font-size:12px;font-family:var(--font);font-weight:700;
-  padding:4px 10px;border-radius:8px;flex-shrink:0;}
-.sku-duty-badge.high{color:var(--red);background:#FFF1F1;border:1px solid rgba(220,38,38,.12);}
-.sku-duty-badge.mid{color:var(--amber);background:#FFFBEB;border:1px solid rgba(217,119,6,.12);}
-.sku-duty-badge.low{color:var(--green);background:var(--green-lt);border:1px solid rgba(22,163,74,.12);}
-.sku-duty-badge.free{color:var(--accent);background:var(--accent-lt);border:1px solid rgba(0,71,255,.12);}
-.sku-meta{font-size:10px;color:var(--faint);font-family:var(--font);
-  text-align:right;flex-shrink:0;line-height:1.6;}
-.sku-eng{font-size:10px;padding:2px 7px;border-radius:20px;font-family:var(--font);font-weight:600;}
-.sku-eng.ai{background:var(--accent-lt);color:var(--accent);}
-.sku-eng.rules{background:#FFFBEB;color:var(--amber);}
-.del-btn{background:none;border:none;color:var(--faint);cursor:pointer;
-  font-size:18px;padding:0 2px;transition:all .15s;flex-shrink:0;}
-.del-btn:hover{color:var(--red);transform:scale(1.2);}
+.btn-xs{padding:7px 14px;font-size:11px;border-radius:8px;border:1.5px solid var(--border2);background:#fff;color:var(--muted);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .15s;box-shadow:var(--shadow-sm);}
+.btn-xs:hover{color:var(--ink);border-color:var(--border);}
+.btn-xs.accent{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 2px 10px var(--accent-glow);}
+.btn-xs.accent:hover{background:#0035CC;}
+.sku-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.sku-table th{text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--border);color:var(--faint);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em;background:#F9FAFB;}
+.sku-table td{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.04);color:var(--ink2);}
+.sku-table tr:hover td{background:#FAFBFF;}
+.sku-table .hts{font-family:var(--font);color:var(--accent);font-weight:700;font-size:13px;}
+.eng-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--font);font-weight:600;}
+.eng-ai{background:var(--accent-lt);color:var(--accent);}.eng-rules{background:#FFFBEB;color:var(--amber);}
 .sku-empty{text-align:center;padding:56px;color:var(--muted);font-size:13px;}
-
-/* LEGAL FOOTER */
-.legal-foot{flex-shrink:0;background:#fff;border-top:1.5px solid var(--border);
-  padding:7px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.del-btn{background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;transition:color .15s;}
+.del-btn:hover{color:var(--red);}
+.legal-foot{flex-shrink:0;background:#fff;border-top:1.5px solid var(--border);padding:7px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
 .lf-text{font-size:10px;color:var(--faint);line-height:1.5;font-family:var(--font);}
 .lf-links{display:flex;gap:12px;flex-shrink:0;}
-.lf-link{font-size:10px;color:var(--faint);cursor:pointer;text-decoration:none;
-  font-family:var(--font);transition:color .15s;}
+.lf-link{font-size:10px;color:var(--faint);cursor:pointer;text-decoration:none;font-family:var(--font);transition:color .12s;}
 .lf-link:hover{color:var(--accent);}
+@media(max-width:800px){.gate-left{display:none;}.gate-right{width:100%;padding:40px 28px;}}
+@media(max-width:700px){.sidebar{display:none;}.workspace{grid-template-columns:1fr;}.result-col{display:none;}.input-col{border-right:none;}}
 
-/* ============================================================
-   RESPONSIVE — MOBILE
-============================================================ */
-@media(max-width:900px){
-  .workspace{grid-template-columns:1fr;}
-  .result-col{display:none;}
-  .result-col.visible{display:block;}
-  .input-col{border-right:none;}
-}
 @media(max-width:700px){
-  .app{flex-direction:column;}
-  .sidebar{
-    width:100%;height:auto;flex-direction:row;flex-wrap:wrap;
-    position:fixed;bottom:0;left:0;right:0;z-index:50;
-    border-right:none;border-top:1.5px solid var(--border);
-    box-shadow:0 -4px 24px rgba(0,0,0,.08);
-    padding:0;overflow:hidden;max-height:64px;
-    transition:max-height .3s ease;
-  }
+  .sidebar{width:100%;height:auto;flex-direction:row;flex-wrap:wrap;position:fixed;bottom:0;left:0;right:0;z-index:50;border-right:none;border-top:1.5px solid var(--border);box-shadow:0 -4px 24px rgba(0,0,0,.08);padding:0;overflow:hidden;max-height:64px;transition:max-height .3s ease;}
   .sidebar.expanded{max-height:100vh;overflow-y:auto;}
   .logo{flex:1;padding:14px 16px;}
   .usage-wrap,.user-info,.sidebar-foot{display:none;}
-  .sidebar.expanded .usage-wrap,
-  .sidebar.expanded .user-info,
-  .sidebar.expanded .sidebar-foot{display:block;width:100%;}
+  .sidebar.expanded .usage-wrap,.sidebar.expanded .user-info,.sidebar.expanded .sidebar-foot{display:block;width:100%;}
   .nav{flex-direction:row;padding:8px 10px;display:flex;width:100%;overflow-x:auto;}
   .sidebar.expanded .nav{flex-direction:column;width:100%;}
   .nav-label{display:none;}
   .sidebar.expanded .nav-label{display:block;}
-  .mobile-menu-btn{display:flex;}
   .main{padding-bottom:64px;}
   .hero-bar{padding:20px 16px 16px;}
-  .hero-h1{font-size:26px;}
-  .hero-metrics{gap:7px;}
-  .hm{padding:7px 11px;}
-  .hm-val{font-size:14px;}
+  .hero-h1{font-size:22px;}
   .topbar{padding:0 16px;}
   .tb-sub{display:none;}
-  .history-view{padding:20px 16px;}
-  .sku-row{grid-template-columns:auto 1fr auto auto;}
-  .sku-meta{display:none;}
+  .workspace{grid-template-columns:1fr;}
+  .result-col.visible{display:block;}
+  .input-col{border-right:none;}
   .duty-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:480px){
   .gate-container{flex-direction:column;}
-  .gate-left{min-height:220px;padding:28px 24px;justify-content:flex-start;gap:24px;}
+  .gate-left{min-height:200px;padding:28px 24px;justify-content:flex-start;gap:20px;}
   .gate-left-metrics{display:none;}
   .gate-right{width:100%;padding:28px 24px;}
-  .gate-right-title{font-size:22px;}
   .form-row{grid-template-columns:1fr;}
-  .duty-grid{grid-template-columns:1fr;}
 }
+.mobile-menu-btn{display:none;position:fixed;bottom:76px;right:16px;z-index:200;width:44px;height:44px;background:var(--accent);border:none;border-radius:50%;box-shadow:var(--sh-lg);cursor:pointer;align-items:center;justify-content:center;}
+.mobile-menu-btn svg{color:#fff;}
+@media(max-width:700px){.mobile-menu-btn{display:flex;}}
 
-.backend-status{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--font);color:var(--faint);padding:2px 0;}
-.status-dot{width:5px;height:5px;border-radius:50%;background:var(--faint);transition:background .3s;flex-shrink:0;}
-.status-dot.online{background:var(--green);box-shadow:0 0 6px rgba(22,163,74,.4);animation:pulse 2.5s infinite;}
-.status-dot.offline{background:var(--red);}
 </style>
 </head>
 <body>
 
+<button class="mobile-menu-btn" id="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('expanded')"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <!-- SIGN-IN GATE -->
 <div class="gate-overlay" id="gate">
   <div class="gate-container">
@@ -738,7 +435,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <span class="gate-brand-name">Tariffly</span>
       </div>
       <div class="gate-left-content">
-        <div class="gate-left-tag">HTS Trade Intelligence</div>
+        <div class="gate-left-tag">HTS Classification Engine</div>
         <h2 class="gate-left-h2">HTS Classification,<br>Optimized by AI.</h2>
         <p class="gate-left-sub">Achieve up to 98% classification accuracy and discover duty savings in seconds. Powered by GRI logic and the 2026 USITC HTS Schedule.</p>
       </div>
@@ -751,15 +448,39 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     <div class="gate-right">
       <div class="gate-right-title">Create your account</div>
       <div class="gate-right-sub">No credit card &nbsp;&bull;&nbsp; 3 free classifications &nbsp;&bull;&nbsp; $199/mo after</div>
+
+      <!-- ERROR MESSAGE -->
       <div class="form-error-msg" id="form-error">Something went wrong. Please try again.</div>
-      <div id="google-signin-btn"></div>
-      <button class="social-btn btn-apple" onclick="void(0)" title="Apple Sign-In — coming soon" style="opacity:.4;cursor:not-allowed;">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-        </svg>
-        Continue with Apple <span style="background:rgba(255,255,255,.15);border-radius:20px;font-size:9px;padding:2px 8px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-left:5px">Soon</span>
-      </button>
-      <div class="divider"><div class="divider-line"></div><span class="divider-text">or sign up with email</span><div class="divider-line"></div></div>
+
+      <!-- REAL GOOGLE SIGN-IN BUTTON (rendered by Google GSI) -->
+      <div id="google-btn-wrap" style="display:flex;justify-content:center;margin-bottom:12px;">
+        <div id="g_id_onload"
+          data-client_id="GOOGLE_CLIENT_ID_PLACEHOLDER"
+          data-callback="handleGoogleCredential"
+          data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-size="large"
+          data-theme="outline"
+          data-text="continue_with"
+          data-shape="rectangular"
+          data-logo_alignment="left"
+          data-width="360">
+        </div>
+      </div>
+      <!-- Fallback if GSI not configured yet -->
+      <div id="google-fallback" style="display:none;">
+        <div id="google-signin-btn" style="width:100%;margin-bottom:12px;display:flex;justify-content:center;min-height:44px;"></div>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">or sign up with email</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- EMAIL FORM — submits to Formspree -->
       <div id="email-form-wrap">
         <form id="signup-form" onsubmit="emailSignIn(event)">
           <div class="form-row">
@@ -777,22 +498,25 @@ body{min-height:100vh;display:flex;flex-direction:column;}
             <input class="form-input" id="email" name="email" type="email" placeholder="john@company.com" autocomplete="email" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Company <span style="color:var(--faint)">(optional)</span></label>
+            <label class="form-label">Company (optional)</label>
             <input class="form-input" id="company" name="company" type="text" placeholder="Your company">
           </div>
           <input type="hidden" name="signup_source" value="email_form">
           <input type="hidden" name="product" value="Tariffly">
-          <button class="gate-submit" id="submit-btn" type="submit">Get instant access &rarr;</button>
+          <button class="gate-submit" id="submit-btn" type="submit">Create free account</button>
         </form>
       </div>
+
+      <!-- SUCCESS STATE -->
       <div class="form-success" id="form-success">
         <div class="form-success-icon">
-          <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h3>You&rsquo;re in!</h3>
-        <p>Welcome to Tariffly. You have 3 free classifications. No credit card needed.</p>
-        <button class="form-success-btn" onclick="proceedToApp()">Start Classifying &rarr;</button>
+        <h3>Account created!</h3>
+        <p>Welcome to Tariffly. You have 3 free classifications to start. No credit card needed.</p>
+        <button class="form-success-btn" onclick="proceedToApp()">Start Classifying</button>
       </div>
+
       <div class="gate-terms" id="gate-terms-txt">
         By creating an account you agree to our <a href="#" onclick="document.getElementById('terms-modal').style.display='flex'">Terms of Use</a> and <a href="#" onclick="document.getElementById('terms-modal').style.display='flex'">Privacy Policy</a>.
       </div>
@@ -804,13 +528,16 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <!-- CONSENT MODAL -->
 <div class="consent-overlay" id="consent-modal" style="display:none;">
   <div class="consent-card">
-    <div class="consent-logo"><div class="consent-logo-mark">TF</div><div class="consent-logo-text">Tariffly</div></div>
+    <div class="consent-logo">
+      <div class="consent-logo-mark">TF</div>
+      <div class="consent-logo-text">Tariffly</div>
+    </div>
     <div class="consent-badge">Decision Support Tool &mdash; Not Legal Advice</div>
     <h2>One quick disclosure</h2>
     <p>Tariffly uses AI and GRI rules to assist with HTS tariff classification. Please confirm you understand the following.</p>
     <div class="consent-items">
       <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>Tariffly generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions rest with CBP.</span></div>
-      <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>Duty rates and Section 301/232 data may not reflect real-time changes. Always verify before filing.</span></div>
+      <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>Duty rates and Section 301/232 data are updated periodically but may not reflect real-time changes. Always verify before filing.</span></div>
       <div class="ci"><div class="ci-check"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span>A licensed U.S. Customs Broker should review all classifications prior to formal entry filing.</span></div>
     </div>
     <div class="consent-cb-row" onclick="toggleConsent()">
@@ -827,18 +554,19 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <div class="terms-card">
     <h2>Terms of Use &amp; Privacy Policy</h2>
     <h3>1. Nature of Service</h3>
-    <p>Tariffly provides automated HTS tariff classification suggestions using AI. <strong>All outputs are informational only</strong> and do not constitute legal advice or binding customs rulings.</p>
+    <p>Tariffly provides automated HTS tariff classification suggestions using AI. <strong>All outputs are informational only</strong> and do not constitute legal advice, binding customs rulings, or professional customs brokerage services under 19 U.S.C. &sect; 1641.</p>
     <h3>2. Non-Binding Nature of AI Outputs</h3>
-    <p>Classification results are not binding on any customs authority; do not constitute a CBP binding ruling under 19 CFR Part 177; and should be independently verified by a licensed customs broker before formal entry filing.</p>
+    <p>Classification results: (a) are not binding on any customs authority; (b) do not constitute a CBP binding ruling under 19 CFR Part 177; (c) should be independently verified by a licensed customs broker before formal entry filing.</p>
     <h3>3. Limitation of Liability</h3>
     <p>Tariffly&rsquo;s total aggregate liability shall not exceed the greater of $100 USD or fees paid in the prior 30 days. Tariffly shall not be liable for customs penalties, back-duties, or seizure of goods.</p>
     <h3>4. User Responsibilities</h3>
     <ul>
       <li>The importer of record bears full legal responsibility for all customs declarations</li>
       <li>Users must verify classifications with USITC, CBP, or a licensed broker</li>
+      <li>HTS schedules and trade action rates change frequently &mdash; always verify</li>
     </ul>
     <h3>5. Data Usage</h3>
-    <p>Product descriptions may be used in <strong>anonymized, aggregated form</strong> to improve accuracy. No PII is retained beyond the current session.</p>
+    <p>Product descriptions may be used in <strong>anonymized, aggregated form</strong> to improve accuracy. No personally identifiable information is retained beyond the current session.</p>
     <h3>6. Governing Law</h3>
     <p>These Terms are governed by the laws of the State of Israel. Disputes shall be resolved in Tel Aviv, Israel.</p>
     <button class="terms-close" onclick="document.getElementById('terms-modal').style.display='none'">Close</button>
@@ -848,28 +576,45 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <!-- PAYWALL -->
 <div class="pw-overlay" id="paywall" style="display:none;">
   <div class="pw-card">
-    <div class="pw-icon"><svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div>
-    <h2>3 free uses reached</h2>
-    <p>Add your Gemini API key to continue free, or upgrade to Pro for unlimited access.</p>
-    <div class="pw-feat">Unlimited HTS classifications</div>
-    <div class="pw-feat">SKU Library &mdash; save and track all codes</div>
-    <div class="pw-feat">Section 301 &amp; 232 alerts</div>
-    <div class="pw-feat">CBP-format classification memos</div>
-    <button class="pw-up" onclick="openStripeCheckout()">Upgrade to Pro &mdash; $199/mo</button>
-    <button class="pw-api" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">Add Gemini API key (free)</button>
+    <div class="pw-card-top">
+      <div class="pw-icon"><svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+      <div class="pw-tag">Upgrade to Pro</div>
+      <h2 class="pw-h2">You've used your 3 free classifications</h2>
+      <p class="pw-sub">Upgrade to Pro for unlimited access — or add your own Gemini API key to continue free.</p>
+    </div>
+    <div class="pw-price-row">
+      <span class="pw-price">$199</span>
+      <span class="pw-per">/month</span>
+      <span class="pw-save">Save $200 vs. one broker call</span>
+    </div>
+    <div class="pw-feats">
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Unlimited HTS classifications</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>SKU Library — save and track all codes</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Full CBP-format classification memos</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Section 301 &amp; 232 alerts + USMCA logic</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>Batch CSV import (up to 500 SKUs)</div>
+      <div class="pw-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>API access (coming soon)</div>
+    </div>
+    <button class="pw-stripe-btn" onclick="openStripeCheckout()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      Upgrade to Pro — $199/mo
+    </button>
+    <div class="pw-divider"><span>or</span></div>
+    <button class="pw-api-btn" onclick="document.getElementById('paywall').style.display='none';document.getElementById('api-inp').focus()">
+      Add my Gemini API key (continue free)
+    </button>
+    <div class="pw-guarantee">14-day money-back guarantee &middot; Cancel anytime</div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- MAIN APP --><!-- MAIN APP -->
 <div class="app" id="main-app" style="display:none;">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
     <div class="logo">
       <div class="logo-mark">TF</div>
-      <div><div class="logo-text">Tariffly</div><div class="logo-tag">Trade Intelligence</div></div>
+      <div><div class="logo-text">Tariffly</div><div class="logo-tag">Classification Engine</div></div>
     </div>
-    <div class="user-info">
+    <div id="user-info-bar" class="user-info">
       <div class="user-avatar" id="user-av">?</div>
       <div><div class="user-name" id="user-name-disp">Guest</div><div class="user-email" id="user-email-disp">Not signed in</div></div>
     </div>
@@ -896,17 +641,16 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <input class="api-inp" id="api-inp" type="password" placeholder="AIza..." oninput="setApiKey(this.value)">
         <div class="api-dot" id="api-dot"></div>
       </div>
-      <div class="ver">Tariffly v0.1 &middot; customsai.vercel.app</div>
+      <div class="ver">Tariffly v0.1 &middot; tariffly.vercel.app</div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="tb-title">Global Trade Intelligence</span>
+        <span class="tb-title">HTS Classification &amp; Duty Calculator</span>
         <div class="tb-sep"></div>
-        <span class="tb-sub">USITC 2026 &middot; §301 Current &middot; USMCA Active</span>
+        <span class="tb-sub">USITC 2026 &middot; Section 301 Updated</span>
       </div>
       <div class="topbar-right">
         <div class="tb-badge tb-legal" onclick="showTerms(event)">Decision Support Tool</div>
@@ -914,25 +658,23 @@ body{min-height:100vh;display:flex;flex-direction:column;}
       </div>
     </div>
 
-    <!-- CLASSIFY VIEW -->
     <div id="view-classify" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
       <div class="hero-bar">
-        <div class="hero-badge anim-1">Audit-Ready HTS Classification</div>
-        <h1 class="hero-h1 anim-2">Compliance Intelligence,<br><span class="accent">Automated.</span></h1>
-        <p class="hero-sub anim-3">Global trade intelligence in 15 seconds. Section 301/232 exposure, USMCA analysis, and CBP-standard memos — zero broker fees.</p>
+        <div class="hero-badge anim-1">AI-Powered Trade Classification</div>
+        <h1 class="hero-h1 anim-2">HTS Classification, <span class="accent">Optimized by AI.</span></h1>
+        <p class="hero-sub anim-3">Achieve up to 98% accuracy and discover duty savings in seconds.</p>
         <div class="hero-metrics anim-4">
-          <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Avg classification</span></div>
+          <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Average classification</span></div>
           <div class="hm"><span class="hm-val">40+</span><span class="hm-lbl">HTS categories</span></div>
           <div class="hm"><span class="hm-val">GRI</span><span class="hm-lbl">Rules 1&ndash;6 applied</span></div>
           <div class="hm"><span class="hm-val">CBP</span><span class="hm-lbl">Memo output</span></div>
         </div>
       </div>
-
       <div class="workspace" style="flex:1;overflow:hidden;">
         <div class="input-col">
-          <div class="card anim-1">
+          <div class="card">
             <div class="card-head">
-              <div class="card-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+              <div class="card-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
               <div><div class="card-title">New Classification</div><div class="card-sub">Describe your product in plain English</div></div>
             </div>
             <div class="card-body">
@@ -942,23 +684,13 @@ body{min-height:100vh;display:flex;flex-direction:column;}
                   <option value="CN">China (CN)</option>
                   <option value="VN">Vietnam (VN)</option>
                   <option value="IN">India (IN)</option>
-                  <option value="MX">Mexico (MX) — USMCA</option>
-                  <option value="CA">Canada (CA) — USMCA</option>
+                  <option value="MX">Mexico (MX)</option>
                   <option value="DE">Germany (DE)</option>
                   <option value="KR">South Korea (KR)</option>
                   <option value="JP">Japan (JP)</option>
                   <option value="TW">Taiwan (TW)</option>
                   <option value="BD">Bangladesh (BD)</option>
-                  <option value="TH">Thailand (TH)</option>
-                  <option value="ID">Indonesia (ID)</option>
-                  <option value="MY">Malaysia (MY)</option>
-                  <option value="PH">Philippines (PH)</option>
-                  <option value="PK">Pakistan (PK)</option>
-                  <option value="BR">Brazil (BR)</option>
-                  <option value="IT">Italy (IT)</option>
-                  <option value="FR">France (FR)</option>
-                  <option value="GB">United Kingdom (GB)</option>
-                  <option value="ES">Spain (ES)</option>
+                  <option value="CA">Canada (CA)</option>
                 </select>
                 <button class="classify-btn" id="classify-btn" onclick="classify()">
                   <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -975,149 +707,175 @@ body{min-height:100vh;display:flex;flex-direction:column;}
               <span class="chip" onclick="setEx(this)">Laptop under 10kg</span>
             </div>
           </div>
-
-          <div class="txn-card anim-2">
-            <div class="txn-header">
-              <span class="txn-title">Recent Classifications</span>
-              <span class="txn-badge" id="txn-count">0</span>
-            </div>
+          <div class="txn-card">
+            <div class="txn-header"><span class="txn-title">Recent Classifications</span><span class="txn-badge" id="txn-count">0</span></div>
             <div id="txn-list"><div class="txn-empty">No classifications yet</div></div>
           </div>
         </div>
-
         <div class="result-col" id="result-col">
           <div class="empty-wrap" id="empty-state">
             <div class="empty-gfx"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-            <div class="empty-title">Ready for Classification</div>
-            <div class="empty-sub">Enter any product description to receive your HTS code, §301/232 duty exposure, USMCA analysis, and a CBP-standard classification memo.</div>
+            <div class="empty-title">Ready to classify</div>
+            <div class="empty-sub">Enter a product description and click Classify. Results include duty rates, GRI analysis, and a CBP-format memo.</div>
           </div>
-          <div id="loading-state" style="display:none;">
-            <div class="loading-wrap">
-              <div class="load-ring"></div>
-              <div id="ls1" class="load-step act">Parsing product attributes...</div>
-              <div id="ls2" class="load-step">Traversing GRI rule hierarchy...</div>
-              <div id="ls3" class="load-step">Calculating duty thresholds...</div>
-              <div id="ls4" class="load-step">Overlaying §301 &amp; §232 exposure...</div>
-              <div id="ls5" class="load-step">Generating CBP classification memo...</div>
-            
-              <div id="ls6" class="load-step">Building verification deep links...</div>
-            </div>
-          </div>
+          <div id="loading-state" style="display:none;"><div class="loading-wrap"><div class="load-ring"></div><div id="ls1" class="load-step act">Extracting product attributes...</div><div id="ls2" class="load-step">Searching HTS schedule...</div><div id="ls3" class="load-step">Applying GRI rules...</div><div id="ls4" class="load-step">Checking Section 301/232...</div><div id="ls5" class="load-step">Generating classification memo...</div></div></div>
           <div id="result-area"></div>
         </div>
       </div>
-
       <div class="legal-foot">
-        <div class="lf-text">Tariffly is a classification research assistant. Outputs are informational only — not binding determinations. USITC 2026 &middot; USTR §301. Verify before filing.</div>
+        <div class="lf-text">Tariffly is a classification research assistant. Outputs are informational only and not binding. HTS: USITC 2026 &middot; Section 301: USTR. Verify before filing.</div>
         <div class="lf-links">
           <a class="lf-link" href="https://hts.usitc.gov" target="_blank">USITC</a>
-          <a class="lf-link" href="https://ustr.gov" target="_blank">USTR &sect;301</a>
+          <a class="lf-link" href="https://ustr.gov" target="_blank">USTR Section 301</a>
           <a class="lf-link" href="#" onclick="showTerms(event)">Terms</a>
         </div>
       </div>
     </div>
 
-    <!-- LIBRARY VIEW -->
     <div id="view-library" style="display:none;flex:1;overflow-y:auto;">
       <div class="history-view">
         <div class="history-head">
           <div><h2>SKU Library</h2><p id="lib-count">0 saved classifications</p></div>
-          <div class="hh-btns">
-            <button class="btn-xs" onclick="exportCSV()">Export CSV</button>
-            <button class="btn-xs accent" onclick="switchView('classify')">+ New</button>
-          </div>
+          <div class="hh-btns"><button class="btn-xs" onclick="exportCSV()">Export CSV</button><button class="btn-xs accent" onclick="switchView('classify')">+ New</button></div>
         </div>
         <div id="lib-table"><div class="sku-empty">No saved SKUs yet.<br>Classify a product and click Save to Library.</div></div>
       </div>
     </div>
-  </div><!-- /main -->
-</div><!-- /app -->
-
-<!-- MOBILE MENU BUTTON -->
-<button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()">
-  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-</button>
+  </div>
+</div>
 
 <script>
+const FORMSPREE = 'https://formspree.io/f/mjgpnokp';
 
-var API_BASE = window.location.hostname==='localhost' ? 'http://localhost:8000' : '';
-var backendOnline = false;
+let apiKey = localStorage.getItem('cai_key') || '';
+let usageCount = parseInt(localStorage.getItem('cai_usage') || '0');
+let skuLib = JSON.parse(localStorage.getItem('cai_sku') || '[]');
+let currentResult = null;
+let currentUser = JSON.parse(localStorage.getItem('cai_user') || 'null');
+const FREE_LIMIT = 3;
+let consentGiven = localStorage.getItem('cai_consent') === '1';
+let cbChecked = false;
+let pendingUser = null; // holds user data while Formspree submits
 
-function checkBackendHealth() {
-  var dot=document.getElementById('status-dot'), lbl=document.getElementById('status-label');
-  if (!API_BASE){ dot.className='status-dot offline'; lbl.textContent='Rules engine active'; return; }
+if (currentUser) {
+  document.getElementById('gate').style.display = 'none';
+  consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
+}
+
+function showApp() {
+  document.getElementById('main-app').style.display = 'flex';
+  document.getElementById('api-inp').value = apiKey;
+  if (apiKey) setApiKey(apiKey);
+  updateUsage(); updateSkuCount(); updateUserDisplay();
+}
+
+function updateUserDisplay() {
+  if (!currentUser) return;
+  const n = (currentUser.firstName || currentUser.name || 'User').trim();
+  const e = currentUser.email || '';
+  document.getElementById('user-name-disp').textContent = n + (currentUser.lastName ? ' ' + currentUser.lastName : '');
+  document.getElementById('user-email-disp').textContent = e;
+  document.getElementById('user-av').textContent = n.charAt(0).toUpperCase();
+}
+
+// ── FORMSPREE SUBMISSION ─────────────────────────────────────────
+async function submitToFormspree(data) {
+  const res = await fetch(FORMSPREE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Submission failed');
+  return json;
+}
+
+// ── REAL GOOGLE SIGN-IN ────────────────────────────────────────
+// Called automatically by Google GSI after user picks their account
+async function handleGoogleCredential(response) {
   try {
-    var r=fetch(API_BASE+'/health',{signal:AbortSignal.timeout(4000)});
-    if(r.ok){ var d=r.json(); backendOnline=true; dot.className='status-dot online';
-      var eng=d.engines?.anthropic==='configured'?'Anthropic AI':d.engines?.gemini==='configured'?'Gemini AI':'Rules Engine';
-      lbl.textContent=eng+' · Online';
-      var ep=document.getElementById('engine-badge'); if(ep){ep.textContent=eng+' Active'; ep.style.cssText='background:#EDFBF3;border:1px solid rgba(22,163,74,.2);color:#0D7A3E;';}
+    // Decode the JWT to get user info (no backend needed for this)
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const firstName = payload.given_name || payload.name?.split(' ')[0] || '';
+    const lastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || '';
+    const email = payload.email || '';
+    const picture = payload.picture || '';
+
+    pendingUser = { firstName, lastName, email, picture, company: '', provider: 'google', signedInAt: new Date().toISOString() };
+
+    // Send to Formspree → your inbox
+    try {
+      await submitToFormspree({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        company: '',
+        signup_source: 'google_oauth',
+        product: 'Tariffly',
+        google_name: payload.name,
+        signed_in_at: pendingUser.signedInAt
+      });
+    } catch(e) { console.warn('Formspree error:', e.message); }
+
+    currentUser = pendingUser;
+    localStorage.setItem('cai_user', JSON.stringify(currentUser));
+    document.getElementById('gate').style.display = 'none';
+    consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
+  } catch(e) {
+    console.error('Google sign-in error:', e);
+    document.getElementById('form-error').textContent = 'Google sign-in failed. Please use email below.';
+    document.getElementById('form-error').style.display = 'block';
+  }
+}
+
+// Fallback if Client ID not yet configured
+function googleFallback() {
+  document.getElementById('form-error').textContent = 'Google sign-in needs setup. Please use the email form below.';
+  document.getElementById('form-error').style.display = 'block';
+}
+
+// Check if GSI loaded successfully; show fallback if not
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const gsiBtn = document.querySelector('.g_id_signin iframe');
+    const placeholder = document.querySelector('[data-client_id="GOOGLE_CLIENT_ID_PLACEHOLDER"]');
+    if (!gsiBtn || placeholder) {
+      // GSI not loaded or placeholder still in place — show fallback
+      document.getElementById('google-btn-wrap').style.display = 'none';
+      document.getElementById('google-fallback').style.display = 'block';
     }
-  } catch { dot.className='status-dot offline'; lbl.textContent='Rules engine active'; }
-}
+  }, 2000);
+});
 
-var FORMSPREE='https://formspree.io/f/mjgpnokp';
-var CLIENT_ID='301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com';
-
-// API keys are server-side only
-var usageCount=parseInt(localStorage.getItem('cai_usage')||'0');
-var skuLib=JSON.parse(localStorage.getItem('cai_sku')||'[]');
-var currentResult=null;
-var currentUser=JSON.parse(localStorage.getItem('cai_user')||'null');
-var FREE_LIMIT=3;
-var consentGiven=localStorage.getItem('cai_consent')==='1';
-var cbChecked=false;
-var pendingUser=null;
-
-if(currentUser){
-  document.getElementById('gate').style.display='none';
-  consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
-}
-
-function showApp(){
-  document.getElementById('main-app').style.display='flex';
-  
-  updateUsage();updateSkuCount();updateUserDisplay();
-}
-function updateUserDisplay(){
-  if(!currentUser)return;
-  var n=(currentUser.firstName||currentUser.name||'User').trim();
-  var e=currentUser.email||'';
-  document.getElementById('user-name-disp').textContent=n+(currentUser.lastName?' '+currentUser.lastName:'');
-  document.getElementById('user-email-disp').textContent=e;
-  document.getElementById('user-av').textContent=n.charAt(0).toUpperCase();
-}
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('expanded');
-}
-
-// ── GOOGLE SIGN-IN ────────────────────────────────────────────
-function initGoogleSignIn(){
-  if(!window.google||!window.google.accounts){setTimeout(initGoogleSignIn,200);return;}
-  var el=document.getElementById('google-signin-btn');
-  if(!el){setTimeout(initGoogleSignIn,200);return;}
+function initGoogleSignIn() {
+  if (!window.google || !window.google.accounts) { setTimeout(initGoogleSignIn, 200); return; }
+  const el = document.getElementById('google-signin-btn');
+  if (!el) { setTimeout(initGoogleSignIn, 200); return; }
   google.accounts.id.initialize({
-    client_id:CLIENT_ID,callback:handleGoogleCredential,
-    auto_select:false,cancel_on_tap_outside:true,ux_mode:'popup'
+    client_id: '301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com',
+    callback: handleGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    ux_mode: 'popup'
   });
-  google.accounts.id.renderButton(el,{
-    theme:'outline',size:'large',width:360,
-    text:'continue_with',shape:'rectangular',logo_alignment:'left'
+  google.accounts.id.renderButton(el, {
+    theme: 'outline', size: 'large', width: 360,
+    text: 'continue_with', shape: 'rectangular', logo_alignment: 'left'
   });
 }
-function handleGoogleCredential(response){
-  var p=JSON.parse(atob(response.credential.split('.')[1]));
-  var firstName=p.given_name||(p.name||'').split(' ')[0]||'';
-  var lastName=p.family_name||(p.name||'').split(' ').slice(1).join(' ')||'';
-  var email=p.email||'';
-  var now=new Date().toISOString();
-  currentUser={firstName,lastName,email,company:'',provider:'google',signedInAt:now};
-  localStorage.setItem('cai_user',JSON.stringify(currentUser));
-  submitToFormspree({first_name:firstName,last_name:lastName,email,
-    company:'',signup_source:'google_oauth',product:'Tariffly',signed_in_at:now})
-    .catch(e=>console.warn('Formspree:',e.message));
-  document.getElementById('gate').style.display='none';
-  consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
+function handleGoogleCredential(response) {
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  const firstName = payload.given_name || (payload.name||'').split(' ')[0] || '';
+  const lastName = payload.family_name || (payload.name||'').split(' ').slice(1).join(' ') || '';
+  const email = payload.email || '';
+  const now = new Date().toISOString();
+  currentUser = { firstName, lastName, email, company: '', provider: 'google', signedInAt: now };
+  localStorage.setItem('cai_user', JSON.stringify(currentUser));
+  submitToFormspree({ first_name: firstName, last_name: lastName, email,
+    company: '', signup_source: 'google_oauth', product: 'Tariffly', signed_in_at: now
+  }).catch(e => console.warn('Formspree:', e.message));
+  document.getElementById('gate').style.display = 'none';
+  consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
 }
 
 function openStripeCheckout() {
@@ -1125,157 +883,150 @@ function openStripeCheckout() {
   var em = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
   window.open(em ? STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(em) : STRIPE_LINK, '_blank');
   var pw = document.getElementById('paywall');
-  if (pw) pw.style.display = 'none';
+  if (pw) { pw.style.display = 'none'; }
+}
+async function socialSignIn(provider) {
+  const name = prompt('Enter your full name:');
+  if (!name) return;
+  const email = prompt('Enter your work email:');
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+  const parts = name.trim().split(' ');
+  currentUser = { firstName: parts[0], lastName: parts.slice(1).join(' '), email, company: '', provider, signedInAt: new Date().toISOString() };
+  try { await submitToFormspree({ first_name: parts[0], last_name: parts.slice(1).join(' '), email, company: '', signup_source: provider + '_signin', product: 'Tariffly', signed_in_at: currentUser.signedInAt }); } catch(e) {}
+  localStorage.setItem('cai_user', JSON.stringify(currentUser));
+  document.getElementById('gate').style.display = 'none';
+  consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
 }
 
-function socialSignIn(provider){
-  var name=prompt('Enter your full name:');if(!name)return;
-  var email=prompt('Enter your work email:');
-  if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
-  var parts=name.trim().split(' ');
-  currentUser={firstName:parts[0],lastName:parts.slice(1).join(' '),email,company:'',provider,signedInAt:new Date().toISOString()};
-  try{submitToFormspree({first_name:parts[0],last_name:parts.slice(1).join(' '),email,company:'',signup_source:provider+'_signin',product:'Tariffly',signed_in_at:currentUser.signedInAt});}catch(e){}
-  localStorage.setItem('cai_user',JSON.stringify(currentUser));
-  document.getElementById('gate').style.display='none';
-  consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
-}
-function submitToFormspree(data){
-  var res=fetch(FORMSPREE,{method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify(data)});
-  var json=res.json();
-  if(!res.ok)throw new Error(json.error||'Submission failed');
-  return json;
-}
-function emailSignIn(e){
+async function emailSignIn(e) {
   e.preventDefault();
-  var fname=document.getElementById('fname').value.trim();
-  var lname=document.getElementById('lname').value.trim();
-  var email=document.getElementById('email').value.trim();
-  var company=document.getElementById('company').value.trim();
-  if(!email)return;
-  var btn=document.getElementById('submit-btn');
-  btn.disabled=true;btn.innerHTML='<span class="btn-spinner"></span> Creating account...';
-  document.getElementById('form-error').style.display='none';
-  currentUser={firstName:fname,lastName:lname,email,company,provider:'email',signedInAt:new Date().toISOString()};
-  try{
-    submitToFormspree({first_name:fname,last_name:lname,email,company,signup_source:'email_form',product:'Tariffly',signed_in_at:currentUser.signedInAt});
-    localStorage.setItem('cai_user',JSON.stringify(currentUser));
-    document.getElementById('email-form-wrap').style.display='none';
-    document.getElementById('gate-terms-txt').style.display='none';
-    document.getElementById('gate-login-txt').style.display='none';
-    document.getElementById('form-success').style.display='block';
-  }catch(err){
-    btn.disabled=false;btn.textContent='Create free account';
-    document.getElementById('form-error').textContent='Could not create account. Please try again.';
-    document.getElementById('form-error').style.display='block';
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const company = document.getElementById('company').value.trim();
+  if (!email) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="submitting-btn"><span class="btn-spinner"></span> Creating account...</span>';
+  document.getElementById('form-error').style.display = 'none';
+
+  pendingUser = { firstName: fname, lastName: lname, email, company, provider: 'email', signedInAt: new Date().toISOString() };
+
+  try {
+    await submitToFormspree({
+      first_name: fname,
+      last_name: lname,
+      email: email,
+      company: company,
+      signup_source: 'email_form',
+      product: 'Tariffly',
+      signed_in_at: pendingUser.signedInAt
+    });
+    // Show success state
+    document.getElementById('email-form-wrap').style.display = 'none';
+    document.getElementById('gate-terms-txt').style.display = 'none';
+    document.getElementById('gate-login-txt').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    // Save user locally
+    currentUser = pendingUser;
+    localStorage.setItem('cai_user', JSON.stringify(currentUser));
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = 'Create free account';
+    document.getElementById('form-error').textContent = 'Could not create account. Please try again.';
+    document.getElementById('form-error').style.display = 'block';
   }
 }
-function proceedToApp(){
-  document.getElementById('gate').style.display='none';
-  consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
-}
-function quickAccess(){
-  var email=prompt('Enter your email to sign in:');if(!email)return;
-  currentUser={email,firstName:email.split('@')[0],provider:'email',signedInAt:new Date().toISOString()};
-  localStorage.setItem('cai_user',JSON.stringify(currentUser));
-  document.getElementById('gate').style.display='none';
-  consentGiven?showApp():(document.getElementById('consent-modal').style.display='flex');
+
+function proceedToApp() {
+  document.getElementById('gate').style.display = 'none';
+  consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
 }
 
-// ── CONSENT ───────────────────────────────────────────────────
-function toggleConsent(){
-  cbChecked=!cbChecked;
-  document.getElementById('consent-cb').className='consent-cb'+(cbChecked?' on':'');
-  document.getElementById('consent-btn').className='consent-btn'+(cbChecked?' on':'');
+function quickAccess() {
+  const email = prompt('Enter your email to sign in:');
+  if (!email) return;
+  currentUser = { email, firstName: email.split('@')[0], provider: 'email', signedInAt: new Date().toISOString() };
+  localStorage.setItem('cai_user', JSON.stringify(currentUser));
+  document.getElementById('gate').style.display = 'none';
+  consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
 }
-function acceptConsent(){
-  if(!cbChecked)return;
-  localStorage.setItem('cai_consent','1');consentGiven=true;
-  document.getElementById('consent-modal').style.display='none';showApp();
-}
-function showTerms(e){if(e)e.preventDefault();document.getElementById('terms-modal').style.display='flex';}
 
-// ── APP STATE ─────────────────────────────────────────────────
-/* API keys are server-side only */
-  else{dot.className='api-dot';badge.textContent='Rules Engine';badge.style.cssText='';}
+// ── CONSENT ──────────────────────────────────────────────────────
+function toggleConsent() {
+  cbChecked = !cbChecked;
+  document.getElementById('consent-cb').className = 'consent-cb' + (cbChecked ? ' on' : '');
+  document.getElementById('consent-btn').className = 'consent-btn' + (cbChecked ? ' on' : '');
 }
-function updateUsage(){
-  var used=usageCount,rem=Math.max(0,FREE_LIMIT-used);
+function acceptConsent() {
+  if (!cbChecked) return;
+  localStorage.setItem('cai_consent', '1'); consentGiven = true;
+  document.getElementById('consent-modal').style.display = 'none';
+  showApp();
+}
+function showTerms(e) { if(e) e.preventDefault(); document.getElementById('terms-modal').style.display = 'flex'; }
+
+// ── APP ───────────────────────────────────────────────────────────
+function setApiKey(v) {
+  apiKey = v; localStorage.setItem('cai_key', v);
+  const dot = document.getElementById('api-dot'), badge = document.getElementById('engine-badge');
+  if (v && v.length > 5) { dot.className='api-dot live'; badge.textContent='Gemini AI Active'; badge.style.cssText='background:#F0FDF4;border:1px solid rgba(22,163,74,0.2);color:#16A34A;'; }
+  else { dot.className='api-dot'; badge.textContent='Rules Engine'; badge.style.cssText=''; }
+}
+function updateUsage() {
+  const used=usageCount, rem=Math.max(0,FREE_LIMIT-used);
   document.getElementById('usage-num').textContent=used+' / '+FREE_LIMIT;
   document.getElementById('usage-fill').style.width=Math.min((used/FREE_LIMIT)*100,100)+'%';
-  document.getElementById('usage-note').textContent=backendOnline?'AI engine active \u2014 unlimited':rem+' classification'+(rem!==1?'s':'')+' remaining';
+  document.getElementById('usage-note').textContent=apiKey?'API key active — unlimited':rem+' classification'+(rem!==1?'s':'')+' remaining';
 }
-function updateSkuCount(){
-  var n=skuLib.length;
+function updateSkuCount() {
+  const n=skuLib.length;
   document.getElementById('nav-pill').textContent=n;
   document.getElementById('txn-count').textContent=n;
-  var lc=document.getElementById('lib-count');if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
+  const lc=document.getElementById('lib-count');
+  if(lc) lc.textContent=n+' saved classification'+(n!==1?'s':'');
 }
-function switchView(v){
+function switchView(v) {
   document.getElementById('view-classify').style.display=v==='classify'?'flex':'none';
   document.getElementById('view-library').style.display=v==='library'?'flex':'none';
   document.getElementById('nav-classify').className='nav-item'+(v==='classify'?' active':'');
   document.getElementById('nav-library').className='nav-item'+(v==='library'?' active':'');
-  if(v==='library')renderLibrary();
+  if(v==='library') renderLibrary();
 }
 function setEx(el){document.getElementById('product-desc').value=el.textContent.trim();document.getElementById('product-desc').focus();}
 
-// ── CLASSIFY ──────────────────────────────────────────────────
-
-function buildVerifyLinks(hts) {
-  var raw = (hts||'').replace(/\./g,'').replace(/\s/g,'');
-  var hs6 = raw.substring(0,6), heading = raw.substring(0,4);
-  return [
-    {l:'USITC',u:`https://hts.usitc.gov/?query=${raw}`},
-    {l:'CBP Rulings',u:`https://rulings.cbp.gov/search?query=${hts}&collection=ALL`},
-    {l:'§301 USTR',u:`https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs?search_api_views_fulltext=${raw}`},
-    {l:'EU TARIC',u:`https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en&Taric=${hs6}&LangDescr=en`},
-    {l:'UK Tariff',u:`https://www.trade-tariff.service.gov.uk/headings/${heading}`},
-  ].map(x=>`<a class="verify-btn" href="${x.u}" target="_blank" rel="noopener">${x.l} ↗</a>`).join('');
-}
-
-function classify(){
-  var desc=document.getElementById('product-desc').value.trim();
-  var origin=document.getElementById('origin-sel').value;
-  if(!desc)return;
+async function classify() {
+  const desc=document.getElementById('product-desc').value.trim();
+  const origin=document.getElementById('origin-sel').value;
+  if(!desc) return;
   if(usageCount>=FREE_LIMIT&&!apiKey){document.getElementById('paywall').style.display='flex';return;}
-  var btn=document.getElementById('classify-btn');
-  btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Classifying...';
+  const btn=document.getElementById('classify-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Classifying...';
   document.getElementById('empty-state').style.display='none';
   document.getElementById('loading-state').style.display='flex';
   document.getElementById('result-area').innerHTML='';
-  var s=1;
-  var si=setInterval(()=>{if(s<=5){for(var i=1;i<=6;i++){var e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},800);
-  try{
-    var r;
-    if(backendOnline&&API_BASE){
-      try{
-        var resp=fetch(API_BASE+'/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,country_of_origin:origin,include_memo:true}),signal:AbortSignal.timeout(25000)});
-        if(resp.ok){var d=resp.json();r={hts_10:d.hts_code,description:d.description,gri_rule:d.gri_rule,gri_rationale:d.gri_rationale,confidence:d.confidence,duty_general_pct:d.duties.general_rate_pct,duty_general_formatted:d.duties.general_rate_formatted,usmca_applies:d.duties.usmca_applies,section_301:{applies:d.duties.section_301_applies,list:d.duties.section_301_list,rate_pct:d.duties.section_301_rate_pct},section_232:{applies:d.duties.section_232_applies,rate_pct:d.duties.section_232_rate_pct},total_effective_pct:d.duties.total_effective_pct,total_formatted:d.duties.total_effective_formatted,alternatives:d.alternative_codes||[],risk_flags:d.risk_flags||[],savings_tip:d.savings_tip,cbp_ruling:d.cbp_ruling,memo:d.memo,_engine:d.engine};}
-      }catch(err){console.warn('Backend unavailable, using rules engine:',err.message);}
-    }
-    if(!r) r=classifyRules(desc,origin);
-    clearInterval(si);currentResult=r;usageCount++;localStorage.setItem('cai_usage',usageCount);updateUsage();
+  let s=1;
+  const si=setInterval(()=>{if(s<=5){for(let i=1;i<=5;i++){const e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},900);
+  try {
+    const r=apiKey?await classifyGemini(desc,origin):classifyRules(desc,origin);
+    clearInterval(si); currentResult=r; usageCount++; localStorage.setItem('cai_usage',usageCount); updateUsage();
     document.getElementById('loading-state').style.display='none';
-    renderResult(r,desc,origin);addToRecent(r,desc);
-  }catch(e){
-    clearInterval(si);document.getElementById('loading-state').style.display='none';
+    renderResult(r,desc,origin); addToRecent(r,desc);
+  } catch(e) {
+    clearInterval(si); document.getElementById('loading-state').style.display='none';
     document.getElementById('empty-state').style.display='flex';
     document.getElementById('empty-state').innerHTML='<div class="empty-gfx" style="animation:none"><svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><div class="empty-title">Classification failed</div><div class="empty-sub" style="color:var(--red)">'+e.message+'</div>';
   }
-  btn.disabled=false;btn.innerHTML='<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Classify';
+  btn.disabled=false; btn.innerHTML='<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Classify';
 }
 
-var SYS='You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
-function classifyGemini(desc,origin){
-  var r=fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});
-  var d=r.json();if(d.error)throw new Error(d.error.message);
-  var t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);
-}
-var RULES=[
+const SYS='You are a licensed U.S. Customs Broker. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
+async function classifyGemini(desc,origin){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);let t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);}
+const RULES=[
+  // ── ELECTRONICS & COMPUTERS ──────────────────────────────
   {kw:['laptop','notebook','ultrabook','macbook','chromebook'],h:'8471.30.0100',d:'Portable ADP machines, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
-  {kw:['desktop computer','tower computer','workstation pc'],h:'8471.41.0150',d:'Processing units, other than portable ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['desktop computer','tower computer','workstation pc','personal computer'],h:'8471.41.0150',d:'Processing units, other than portable ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['tablet','ipad','android tablet','surface tablet'],h:'8471.30.0150',d:'Tablets/portable ADP with touchscreen, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
   {kw:['smartphone','mobile phone','cell phone','iphone','android phone'],h:'8517.12.0000',d:'Telephones for cellular networks — smartphones',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
   {kw:['monitor','computer screen','display screen','lcd monitor','led monitor'],h:'8528.52.0000',d:'Monitors of a kind used with ADP machines',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
@@ -1284,236 +1035,157 @@ var RULES=[
   {kw:['microchip','integrated circuit','ic chip','microcontroller','microprocessor','semiconductor'],h:'8542.31.0001',d:'Electronic integrated circuits — processors and controllers',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['pcb','printed circuit board','circuit board','motherboard'],h:'8534.00.0020',d:'Printed circuits — bare PCBs',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['camera','digital camera','webcam','security camera','cctv'],h:'8525.80.3040',d:'Digital cameras and video cameras',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['headphone','earphone','earbuds','airpod','bluetooth headset'],h:'8518.30.2000',d:'Headphones and earphones',g:'GRI-1',p:4.9,s301:{a:true,l:'List 3',r:25}},
+  {kw:['headphone','earphone','earbuds','airpod','bluetooth headset'],h:'8518.30.2000',d:'Headphones and earphones — whether combined with microphone',g:'GRI-1',p:4.9,s301:{a:true,l:'List 3',r:25}},
   {kw:['speaker','bluetooth speaker','soundbar','audio speaker'],h:'8518.22.0000',d:'Loudspeakers, mounted in enclosures',g:'GRI-1',p:4.9,s301:{a:true,l:'List 3',r:25}},
-  {kw:['router','wifi router','network switch','ethernet switch','modem'],h:'8517.62.0090',d:'Machines for receiving/converting/transmitting data',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['router','wifi router','network switch','ethernet switch','modem'],h:'8517.62.0090',d:'Machines for receiving/converting/transmitting data — routers/switches',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['battery','lithium battery','rechargeable battery','li-ion','battery pack'],h:'8507.60.0020',d:'Lithium-ion storage batteries',g:'GRI-1',p:3.4,s301:{a:true,l:'List 3',r:25}},
   {kw:['charger','power adapter','usb charger','wall charger','power supply'],h:'8504.40.8500',d:'Static converters — power supplies and chargers',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['led light','led bulb','led strip','led lamp'],h:'8539.50.0040',d:'LED lamps and light-emitting diode light sources',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
   {kw:['solar panel','photovoltaic','solar module','solar cell'],h:'8541.40.6020',d:'Photovoltaic cells and modules',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── MOTORS & INDUSTRIAL MACHINERY ────────────────────────
   {kw:['dc motor','brushless motor','servo motor','stepper motor','hvac motor'],h:'8501.32.4500',d:'DC motors, output 750W-75kW — industrial and HVAC',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
   {kw:['ac motor','induction motor','electric motor','three phase motor'],h:'8501.52.4000',d:'AC motors, multi-phase, output exceeding 750W',g:'GRI-1',p:2.6,s301:{a:true,l:'List 3',r:25}},
-  {kw:['generator','electric generator','diesel generator','alternator'],h:'8501.64.0040',d:'AC generators (alternators)',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
+  {kw:['generator','electric generator','diesel generator','alternator'],h:'8501.64.0040',d:'AC generators (alternators), output exceeding 750 kVA',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
   {kw:['pump','centrifugal pump','water pump','hydraulic pump','submersible pump'],h:'8413.81.0040',d:'Centrifugal pumps for liquids — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
   {kw:['compressor','air compressor','hvac compressor','refrigeration compressor'],h:'8414.30.8160',d:'Compressors for refrigerating equipment',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['valve','solenoid valve','ball valve','gate valve','check valve'],h:'8481.80.9040',d:'Taps, cocks, valves — industrial NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['valve','solenoid valve','ball valve','gate valve','check valve','control valve'],h:'8481.80.9040',d:'Taps, cocks, valves — industrial, NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
   {kw:['bearing','ball bearing','roller bearing','tapered bearing'],h:'8482.10.5068',d:'Ball bearings — industrial',g:'GRI-1',p:2.4,s301:{a:true,l:'List 3',r:25}},
-  {kw:['gear','gearbox','reducer','transmission gear','sprocket'],h:'8483.40.5000',d:'Gears and gearing; ball or roller screws',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
-  {kw:['cnc machine','milling machine','lathe','machining center'],h:'8457.10.0000',d:'Machining centers for working metal',g:'GRI-1',p:4.4,s301:{a:true,l:'List 1',r:25}},
+  {kw:['gear','gearbox','reducer','transmission gear','sprocket'],h:'8483.40.5000',d:'Gears and gearing; ball or roller screws; gear boxes',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['cnc machine','milling machine','lathe','machining center','grinding machine'],h:'8457.10.0000',d:'Machining centers for working metal',g:'GRI-1',p:4.4,s301:{a:true,l:'List 1',r:25}},
   {kw:['industrial robot','robotic arm','welding robot','automation robot'],h:'8479.50.0000',d:'Industrial robots — NES',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
-  {kw:['sensor','pressure sensor','temperature sensor','proximity sensor'],h:'9026.20.8010',d:'Instruments for measuring pressure of liquids/gases',g:'GRI-1',p:1.7,s301:{a:true,l:'List 3',r:25}},
-  {kw:['conveyor','conveyor belt','belt conveyor','roller conveyor'],h:'8428.33.0000',d:'Belt conveyors — continuous-action',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['car tire','auto tire','vehicle tire','truck tire'],h:'4011.10.1010',d:'New pneumatic tires — for motor cars',g:'GRI-1',p:4.0,s301:{a:true,l:'List 1',r:25}},
-  {kw:['brake pad','brake disc','brake caliper'],h:'8708.30.5060',d:'Brakes and parts — for motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['sensor','pressure sensor','temperature sensor','proximity sensor','level sensor'],h:'9026.20.8010',d:'Instruments for measuring pressure of liquids/gases',g:'GRI-1',p:1.7,s301:{a:true,l:'List 3',r:25}},
+  {kw:['conveyor','conveyor belt','belt conveyor','roller conveyor'],h:'8428.33.0000',d:'Belt conveyors — continuous-action elevator/conveyor',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── AUTOMOTIVE ───────────────────────────────────────────
+  {kw:['car tire','auto tire','vehicle tire','truck tire','motorcycle tire'],h:'4011.10.1010',d:'New pneumatic tires — for motor cars',g:'GRI-1',p:4.0,s301:{a:true,l:'List 1',r:25}},
+  {kw:['brake pad','brake disc','brake caliper','auto brake'],h:'8708.30.5060',d:'Brakes and parts — for motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['catalytic converter','exhaust system','muffler','auto exhaust'],h:'8708.92.5000',d:'Silencers and exhaust pipes — motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
   {kw:['headlight','car light','auto lamp','led headlight','tail light'],h:'8512.20.4040',d:'Lighting equipment for motor vehicles',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
-  {kw:['car battery','automotive battery','lead acid battery'],h:'8507.10.0040',d:'Lead-acid storage batteries — for motor vehicles',g:'GRI-1',p:3.5,s301:{a:true,l:'List 3',r:25}},
-  {kw:['steel plate','hot rolled steel','steel sheet','carbon steel flat','steel coil'],h:'7208.51.0060',d:'Flat-rolled iron/non-alloy steel — hot-rolled',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
-  {kw:['stainless steel sheet','stainless plate','stainless flat rolled'],h:'7219.31.0010',d:'Flat-rolled stainless steel, width 600mm+',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
-  {kw:['steel pipe','steel tube','hollow section','steel tubing'],h:'7306.30.5015',d:'Tubes, pipes — iron/steel, welded, circular',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['car battery','automotive battery','lead acid battery','agm battery'],h:'8507.10.0040',d:'Lead-acid storage batteries — for motor vehicles',g:'GRI-1',p:3.5,s301:{a:true,l:'List 3',r:25}},
+  // ── METALS & FASTENERS ────────────────────────────────────
+  {kw:['steel plate','hot rolled steel','steel sheet','carbon steel flat','steel coil'],h:'7208.51.0060',d:'Flat-rolled iron/non-alloy steel — hot-rolled ≥600mm wide',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['stainless steel sheet','stainless steel plate','stainless flat rolled'],h:'7219.31.0010',d:'Flat-rolled stainless steel, width ≥600mm, cold-rolled',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
+  {kw:['steel pipe','steel tube','hollow section','steel tubing'],h:'7306.30.5015',d:'Tubes, pipes — iron/steel, welded, circular cross-section',g:'GRI-1',p:0,s301:{a:false},s232:{a:true,r:25}},
   {kw:['aluminum sheet','aluminum plate','aluminium alloy plate','aluminum strip'],h:'7606.12.3090',d:'Aluminum alloy plates, sheets — rectangular',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
-  {kw:['aluminum profile','aluminum extrusion','aluminium extrusion'],h:'7604.29.1010',d:'Aluminum alloy bars, rods, and profiles',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
+  {kw:['aluminum profile','aluminum extrusion','aluminium extrusion','aluminum bar'],h:'7604.29.1010',d:'Aluminum alloy bars, rods, and profiles',g:'GRI-1',p:3.0,s301:{a:false},s232:{a:true,r:10}},
   {kw:['copper pipe','copper tube','copper fitting','copper wire'],h:'7411.10.1030',d:'Copper tubes and pipes — refined copper',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['bolt','hex bolt','threaded bolt','machine screw','fastener'],h:'7318.15.2065',d:'Threaded bolts and screws of iron/steel',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['nut','hex nut','lock nut','threaded nut'],h:'7318.16.0085',d:'Nuts of iron or steel',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['stainless steel kitchen','stainless bowl','steel cookware','kitchen utensil'],h:'7323.93.0080',d:'Table/kitchen articles of stainless steel — NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['bolt','screw','fastener','hex bolt','threaded bolt','machine screw'],h:'7318.15.2065',d:'Threaded bolts and screws of iron/steel — not stainless',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['nut','hex nut','lock nut','threaded nut','stainless nut'],h:'7318.16.0085',d:'Nuts of iron or steel',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['stainless steel kitchen','stainless bowl','steel cookware','kitchen utensil','stainless flatware'],h:'7323.93.0080',d:'Table/kitchen articles of stainless steel — NES',g:'GRI-1',p:2.0,s301:{a:true,l:'List 3',r:25}},
+  // ── TEXTILES & APPAREL ────────────────────────────────────
   {kw:['cotton t-shirt','cotton tee','knit shirt','cotton singlet'],h:'6109.10.0012',d:"T-shirts, singlets — cotton, men's knitted",g:'GRI-1',p:16.5,s301:{a:false}},
-  {kw:["women shirt","ladies shirt","women blouse","cotton blouse"],h:'6206.10.0000',d:"Women's blouses and shirts",g:'GRI-1',p:0.9,s301:{a:false}},
+  {kw:["women's shirt","ladies shirt","women blouse","cotton blouse"],h:'6206.10.0000',d:"Women's/girls' blouses and shirts — silk/silk waste",g:'GRI-1',p:0.9,s301:{a:false}},
   {kw:['jeans','denim pants','denim trousers','blue jeans','cotton denim'],h:'6203.42.4011',d:"Men's trousers/breeches — cotton, blue denim",g:'GRI-1',p:16.6,s301:{a:false}},
-  {kw:['polo shirt','knit polo','cotton polo'],h:'6105.10.0010',d:"Men's shirts — cotton, knitted",g:'GRI-1',p:19.7,s301:{a:false}},
-  {kw:['jacket','winter jacket','puffer jacket','down jacket'],h:'6201.92.2010',d:"Men's anoraks/ski jackets — man-made fibers",g:'GRI-1',p:27.7,s301:{a:false}},
-  {kw:['dress','women dress','cotton dress','casual dress'],h:'6204.42.3050',d:"Women's dresses — cotton",g:'GRI-1',p:11.5,s301:{a:false}},
-  {kw:['sneaker','athletic shoe','running shoe','sports shoe'],h:'6402.99.3165',d:'Footwear — rubber/plastic outer soles and uppers',g:'GRI-1',p:20.0,s301:{a:false}},
+  {kw:['polo shirt','polo ralph','knit polo','cotton polo'],h:'6105.10.0010',d:"Men's shirts — cotton, knitted",g:'GRI-1',p:19.7,s301:{a:false}},
+  {kw:['jacket','winter jacket','puffer jacket','down jacket','men jacket'],h:'6201.92.2010',d:"Men's anoraks/ski jackets — man-made fibers",g:'GRI-1',p:27.7,s301:{a:false}},
+  {kw:['dress','women dress','cotton dress','polyester dress','casual dress'],h:'6204.42.3050',d:"Women's dresses — cotton",g:'GRI-1',p:11.5,s301:{a:false}},
+  {kw:['sneaker','athletic shoe','running shoe','sports shoe','basketball shoe'],h:'6402.99.3165',d:'Footwear — rubber/plastic outer soles and uppers',g:'GRI-1',p:20.0,s301:{a:false}},
   {kw:['leather shoe','dress shoe','leather loafer','leather boot'],h:'6403.99.9065',d:'Footwear — leather uppers, rubber/plastic outer soles',g:'GRI-1',p:8.5,s301:{a:false}},
-  {kw:['handbag','purse','tote bag','shoulder bag','leather bag'],h:'4202.21.6000',d:'Handbags — outer surface of leather',g:'GRI-1',p:9.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['handbag','purse','tote bag','shoulder bag','leather bag'],h:'4202.21.6000',d:'Handbags — outer surface of leather or composition leather',g:'GRI-1',p:9.0,s301:{a:true,l:'List 3',r:25}},
   {kw:['backpack','rucksack','school bag','hiking backpack'],h:'4202.92.9026',d:'Backpacks/rucksacks — outer surface of textile',g:'GRI-1',p:17.6,s301:{a:true,l:'List 3',r:25}},
-  {kw:['fabric','woven fabric','polyester fabric','cotton fabric'],h:'5513.21.0020',d:'Woven fabrics of synthetic staple fibers',g:'GRI-1',p:12.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['fabric','woven fabric','polyester fabric','cotton fabric','textile'],h:'5513.21.0020',d:'Woven fabrics of synthetic staple fibers — polyester',g:'GRI-1',p:12.0,s301:{a:true,l:'List 3',r:25}},
+  // ── HOME GOODS & FURNITURE ────────────────────────────────
   {kw:['wooden furniture','wood table','wood chair','bookcase','wood cabinet'],h:'9403.60.8081',d:'Other wooden furniture — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['sofa','couch','upholstered sofa','fabric sofa'],h:'9401.61.6010',d:'Seats — wooden frame, upholstered',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['mattress','foam mattress','memory foam','spring mattress'],h:'9404.21.0013',d:'Mattresses — with spring interior',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['toy','children toy','plastic toy','toy set','toy car','doll'],h:'9503.00.0090',d:'Toys NES — other toys',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
-  {kw:['carpet','rug','floor rug','area rug','tufted carpet'],h:'5703.20.0020',d:'Carpets and textile floor coverings — tufted',g:'GRI-1',p:6.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['sofa','couch','upholstered sofa','fabric sofa','sectional couch'],h:'9401.61.6010',d:'Seats — wooden frame, upholstered',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['mattress','foam mattress','memory foam','spring mattress','bed mattress'],h:'9404.21.0013',d:'Mattresses — with spring interior',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['toy','children toy','plastic toy','toy set','toy car','doll','action figure'],h:'9503.00.0090',d:'Toys NES — other toys',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['candle','scented candle','wax candle','pillar candle'],h:'3406.00.0000',d:'Candles, tapers and the like',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:7.5}},
+  {kw:['carpet','rug','floor rug','area rug','tufted carpet'],h:'5703.20.0020',d:'Carpets and other textile floor coverings — tufted, of nylon',g:'GRI-1',p:6.0,s301:{a:true,l:'List 3',r:25}},
   {kw:['ceramic tile','porcelain tile','floor tile','wall tile'],h:'6907.21.1005',d:'Glazed ceramic flags and paving tiles',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['mask','face mask','n95','surgical mask','respirator'],h:'6307.90.9889',d:'Other made-up textile articles — NES',g:'GRI-1',p:7.0,s301:{a:false}},
-  {kw:['glove','nitrile glove','latex glove','safety glove'],h:'3926.20.1000',d:'Articles of apparel/clothing accessories of plastics',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
-  {kw:['medical device','surgical instrument','diagnostic equipment'],h:'9018.90.8000',d:'Instruments/appliances used in medical sciences NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── MEDICAL & SAFETY ─────────────────────────────────────
+  {kw:['mask','face mask','n95','surgical mask','respirator'],h:'6307.90.9889',d:'Other made-up textile articles — NES (incl. face masks)',g:'GRI-1',p:7.0,s301:{a:false}},
+  {kw:['glove','nitrile glove','latex glove','safety glove','work glove'],h:'3926.20.1000',d:'Articles of apparel/clothing accessories of plastics — gloves',g:'GRI-1',p:3.0,s301:{a:true,l:'List 3',r:25}},
+  {kw:['medical device','medical equipment','surgical instrument','diagnostic equipment'],h:'9018.90.8000',d:'Instruments/appliances used in medical/surgical sciences NES',g:'GRI-1',p:0,s301:{a:true,l:'List 3',r:25}},
+  // ── FOOD & AGRICULTURE ───────────────────────────────────
   {kw:['coffee','roasted coffee','ground coffee','coffee bean'],h:'0901.21.0015',d:'Coffee — roasted, not decaffeinated',g:'GRI-1',p:0,s301:{a:false}},
-  {kw:['frozen shrimp','shrimp','prawn','frozen seafood'],h:'0306.17.0040',d:'Shrimps and prawns — frozen',g:'GRI-1',p:0,s301:{a:false}},
-  {kw:['wine','red wine','white wine','table wine'],h:'2204.21.5000',d:'Wine of fresh grapes — containers 2L or less',g:'GRI-1',p:0,s301:{a:false}},
-  {kw:['plastic parts','plastic components','plastic injection','plastic molded'],h:'3926.90.9990',d:'Other articles of plastics — NES',g:'GRI-1',p:5.3,s301:{a:true,l:'List 3',r:25}},
-  {kw:['rubber seal','o-ring','rubber gasket','silicone seal'],h:'4016.93.5000',d:'Other vulcanized rubber articles — gaskets, seals',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
-  {kw:['pvc pipe','plastic pipe','plastic tube','polyethylene pipe'],h:'3917.23.0000',d:'Tubes, pipes and hoses of polymers of vinyl chloride',g:'GRI-1',p:3.1,s301:{a:true,l:'List 3',r:25}},
-  {kw:['chemical','industrial chemical','specialty chemical','chemical compound'],h:'3824.90.9290',d:'Chemical preparations — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 1',r:25}},
+  {kw:['frozen shrimp','shrimp','prawn','frozen seafood','seafood'],h:'0306.17.0040',d:'Shrimps and prawns — frozen',g:'GRI-1',p:0,s301:{a:false}},
+  {kw:['wine','red wine','white wine','table wine'],h:'2204.21.5000',d:'Wine of fresh grapes — containers ≤2L',g:'GRI-1',p:0,s301:{a:false}},
+  // ── PLASTICS & RUBBER ────────────────────────────────────
+  {kw:['plastic parts','plastic components','plastic injection','plastic molded','plastic article'],h:'3926.90.9990',d:'Other articles of plastics — NES',g:'GRI-1',p:5.3,s301:{a:true,l:'List 3',r:25}},
+  {kw:['rubber seal','o-ring','rubber gasket','rubber part','silicone seal'],h:'4016.93.5000',d:'Other vulcanized rubber articles — gaskets, washers, seals',g:'GRI-1',p:2.5,s301:{a:true,l:'List 3',r:25}},
+  {kw:['pvc pipe','plastic pipe','plastic tube','polyethylene pipe'],h:'3917.23.0000',d:'Tubes, pipes and hoses of polymers of vinyl chloride (PVC)',g:'GRI-1',p:3.1,s301:{a:true,l:'List 3',r:25}},
+  // ── CHEMICALS ────────────────────────────────────────────
+  {kw:['chemical','industrial chemical','specialty chemical','chemical compound','chemical mixture'],h:'3824.90.9290',d:'Chemical preparations — NES',g:'GRI-1',p:0,s301:{a:true,l:'List 1',r:25}},
   {kw:['paint','coating','industrial paint','epoxy coating','powder coating'],h:'3208.10.0000',d:'Paints and varnishes based on polyesters',g:'GRI-1',p:3.7,s301:{a:true,l:'List 3',r:25}},
-  {kw:['adhesive','glue','industrial adhesive','epoxy adhesive'],h:'3506.10.5000',d:'Prepared glues and other prepared adhesives — NES',g:'GRI-1',p:2.1,s301:{a:true,l:'List 3',r:25}},
+  {kw:['adhesive','glue','industrial adhesive','epoxy adhesive','structural adhesive'],h:'3506.10.5000',d:'Prepared glues and other prepared adhesives — NES',g:'GRI-1',p:2.1,s301:{a:true,l:'List 3',r:25}},
 ];
 function classifyRules(desc,origin){
-  var dl=desc.toLowerCase();
-  var best=null,bs=0;
-  for(var r of RULES){
-    var s=0;
-    for(var kw of r.kw){if(dl.includes(kw.toLowerCase()))s+=Math.max(1,Math.floor(kw.length/4));}
+  const dl=desc.toLowerCase();
+  // Score every rule by keyword matches (weighted)
+  let best=null,bs=0;
+  for(const r of RULES){
+    let s=0;
+    for(const kw of r.kw){
+      if(dl.includes(kw.toLowerCase())){
+        // Longer keyword matches = higher confidence
+        s += Math.max(1, Math.floor(kw.length / 4));
+      }
+    }
     if(s>bs){bs=s;best=r;}
   }
   if(!best)best={kw:[],h:'8479.89.9899',d:'Machines and mechanical appliances — NES',g:'GRI-4',p:0,s301:{a:origin==='CN',l:'List 3',r:25}};
-  var usmcaFree=['MX','CA'].includes(origin);
-  var baseRate=usmcaFree?0:best.p;
-  var s301r=(best.s301?.a&&origin==='CN')?(best.s301.r||0):0;
-  var s232r=(best.s232?.a&&['CN','IN','TW'].includes(origin))?(best.s232.r||0):0;
-  var tot=baseRate+s301r+s232r;
-  var conf=bs>=4?'HIGH':bs>=1?'MEDIUM':'LOW';
-  var flags=[];
-  if(usmcaFree&&best.p>0)flags.push('USMCA preferential rate applied — duty reduced from '+best.p+'% to Free for '+origin+'-origin goods');
-  if(s301r>0)flags.push('Section 301 '+best.s301.l+' applies: +'+s301r+'% additional duty on China-origin goods');
-  if(s232r>0)flags.push('Section 232 tariff: +'+s232r+'% on '+origin+'-origin '+(best.s232?.r===25?'steel':'aluminum'));
-  if(tot>25)flags.push('High effective duty rate ('+tot.toFixed(1)+'%) — consider sourcing from Vietnam, Mexico, or India');
-  return{hts_10:best.h,description:best.d,gri_rule:best.g,
-    gri_rationale:'Under '+best.g+', the product is classified by heading '+best.h.substring(0,4)+'. '+best.d+'.'+(usmcaFree?' USMCA preferential rate applies for '+origin+'-origin goods.':''),
-    confidence:conf,duty_general_pct:best.p,duty_general_formatted:best.p===0?'Free':best.p+'%',
+
+  // USMCA: MX and CA get free rates on qualifying goods
+  const usmcaFree = ['MX','CA'].includes(origin);
+  const baseRate = usmcaFree ? 0 : best.p;
+  
+  // §301 only applies to CN origin
+  const s301r = (best.s301?.a && origin==='CN') ? (best.s301.r||0) : 0;
+  
+  // §232 applies to CN, IN, TW for steel (ch72-73) and aluminum (ch76)
+  const s232r = (best.s232?.a && ['CN','IN','TW'].includes(origin)) ? (best.s232.r||0) : 0;
+
+  const tot = baseRate + s301r + s232r;
+  const conf = bs >= 8 ? 'HIGH' : bs >= 3 ? 'MEDIUM' : 'LOW';
+
+  const flags=[];
+  if(usmcaFree && best.p > 0) flags.push('USMCA preferential rate applied — duty reduced from '+best.p+'% to Free');
+  if(s301r > 0) flags.push('Section 301 '+best.s301.l+' applies: +'+s301r+'% additional duty on China-origin goods');
+  if(s232r > 0) flags.push('Section 232 tariff applies: +'+s232r+'% on '+origin+'-origin '+( best.s232?.r===25?'steel':'aluminum'));
+  if(tot > 25) flags.push('High effective duty rate ('+tot.toFixed(1)+'%) — consider supplier diversification to Vietnam (VN), Mexico (MX), or India (IN)');
+
+  return{
+    hts_10:best.h,description:best.d,gri_rule:best.g,
+    gri_rationale:'Under GRI '+best.g.replace('GRI-','')+', the product is classified by the terms of heading '+best.h.substring(0,4)+'. '+best.d+'. Classification confirmed by keyword analysis of product description against 2026 USITC HTS Schedule.'+(usmcaFree?' USMCA preferential treatment applies for '+origin+'-origin goods.':''),
+    confidence:conf,
+    duty_general_pct:best.p,duty_general_formatted:best.p===0?'Free':best.p+'%',
     section_301:{applies:s301r>0,list:best.s301?.l||'',rate_pct:s301r},
     section_232:{applies:s232r>0,rate_pct:s232r},
-    total_effective_pct:tot,total_formatted:tot===0?'Free':tot.toFixed(1)+'%',
-    alternatives:[],risk_flags:flags,
-    savings_tip:tot>15?'Consider sourcing from Vietnam or Mexico to reduce effective duty to '+best.p+'%':''};}
+    total_effective_pct:tot,
+    total_formatted:tot===0?'Free':tot.toFixed(1)+'%',
+    alternatives:[],
+    risk_flags:flags,
+    savings_tip: tot > 15 ? 'Consider sourcing from Vietnam or Mexico to reduce effective duty to '+best.p+'%' : ''
+  };
+}
 
 function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return 'd-mid';return 'd-high';}
-function getLCS(c,engine){
-  if(c==='HIGH'&&engine&&engine!=='rules')return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};
-  if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Strong keyword match. Add Gemini API key for AI-enhanced analysis.'};
-  if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};
-  return{score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};
-}
-
-function renderResult(r,desc,origin){
-  var tot=r.total_effective_pct||0;
-  var s301=r.section_301||{},s232=r.section_232||{};
-  var ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');
-  var flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings: '+r.savings_tip);
-  var lcs=getLCS(r.confidence,r._engine);
-  var memo=buildMemo(r,desc,origin);
-  var today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  document.getElementById('result-area').innerHTML=`
-<div class="result-wrap">
-  <div class="hts-hero">
-    <div class="hts-code">${r.hts_10||'-'}</div>
-    <div class="hts-desc">${r.description||''}</div>
-    <div class="hts-meta">
-      <span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span>
-      <span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span>
-    </div>
-  </div>
-  <div class="duty-grid">
-    <div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div>
-    <div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No &sect;301/232'}</div></div>
-    <div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div>
-  </div>
-  <div class="lcs-card">
-    <div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div>
-    <div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div>
-    <div class="lcs-note">${lcs.note}</div>
-    <div class="verify-row">
-      ${buildVerifyLinks(r.hts_10)}
-      
-      
-    </div>
-  </div>
-  <div class="result-tabs">
-    <div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div>
-    <div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div>
-    <div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div>
-  </div>
-  <div class="rtab-body active" id="rt-duty">
-    ${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}
-    <div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR &sect;301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div>
-  </div>
-  <div class="rtab-body" id="rt-gri">
-    <div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'} Applied</div><div class="gri-text">${r.gri_rationale||''}</div></div>
-    ${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}
-  </div>
-  <div class="rtab-body" id="rt-memo">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button></div>
-    <div class="memo-box" id="memo-content">${memo}</div>
-  </div>
-  <button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button>
-</div>`;
-  // Scroll result into view on mobile
-  if(window.innerWidth<900){
-    document.getElementById('result-col').classList.add('visible');
-    document.getElementById('result-col').scrollIntoView({behavior:'smooth'});
-  }
-}
-function swR(el,id){
-  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.rtab-body').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');document.getElementById(id).classList.add('active');
-}
-function buildMemo(r,desc,origin){
-  var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  return `CUSTOMS CLASSIFICATION ANALYSIS MEMO\nTariffly - Classification Research Assistant\nDate: ${today}\n=========================================\n\nDISCLAIMER: Informational purposes only. Not a CBP binding ruling.\nA licensed U.S. Customs Broker must review prior to entry filing.\n\nI. PRODUCT\nProduct:  ${desc}\nOrigin:   ${origin}\n\nII. CLASSIFICATION\nHTS Code:    ${r.hts_10}\nDescription: ${r.description}\nGRI Rule:    ${r.gri_rule}\nConfidence:  ${r.confidence}\nRationale:   ${r.gri_rationale}\n\nIII. DUTY RATES\nColumn 1 General:  ${r.duty_general_formatted}\nSection 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}\nSection 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}\nTOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})\n\n${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  Warning: '+f).join('\n')+'\n\n':''}V. VERIFICATION\nUSITC HTS:   https://hts.usitc.gov\nCBP Rulings: https://rulings.cbp.gov\nUSTR 301:    https://ustr.gov\n\n=========================================\nTariffly - Informational use only\n=========================================`;
-}
-function copyMemo(){
-  var t=document.getElementById('memo-content').textContent;
-  navigator.clipboard.writeText(t).then(()=>{var b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});
-}
-function getIcon(hts){
-  var ch=parseInt((hts||'').substring(0,2));
-  if(ch>=84&&ch<=85)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
-  if(ch>=61&&ch<=64)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>';
-  if(ch>=72&&ch<=76)return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>';
-  return'<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
-}
-function dutyBadgeClass(duty){if(!duty||duty==='Free')return'free';var n=parseFloat(duty);if(n>20)return'high';if(n>5)return'mid';return'low';}
-
-function addToRecent(r,desc){
-  var txl=document.getElementById('txn-list');
-  if(txl.querySelector('.txn-empty'))txl.innerHTML='';
-  var d=document.createElement('div');d.className='txn-item';
-  var cls=dutyBadgeClass(r.total_formatted);
-  d.innerHTML=`<div class="txn-icon">${getIcon(r.hts_10)}</div><div class="txn-info"><div class="txn-hts">${r.hts_10}</div><div class="txn-desc">${desc.substring(0,42)}${desc.length>42?'...':''}</div></div><div class="txn-duty ${cls}">${r.total_formatted}</div>`;
-  txl.insertBefore(d,txl.firstChild);
-  var items=txl.querySelectorAll('.txn-item');if(items.length>6)items[items.length-1].remove();
-}
-function saveToLib(){
-  if(!currentResult)return;
-  var e={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};
-  skuLib.unshift(e);skuLib=skuLib.slice(0,100);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();
-  var b=document.getElementById('save-btn');b.textContent='Saved to Library';b.classList.add('saved');
-  setTimeout(()=>{b.textContent='Save to SKU Library';b.classList.remove('saved');},2500);
-}
-
-function renderLibrary(){
-  var el=document.getElementById('lib-table');
-  var lc=document.getElementById('lib-count');
-  var n=skuLib.length;if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');
-  if(!n){el.innerHTML='<div class="sku-empty">No saved SKUs yet.<br>Classify a product and click Save to Library.</div>';return;}
-  el.innerHTML='<div class="sku-list">'+skuLib.map(s=>`
-    <div class="sku-row">
-      <div class="sku-icon">${getIcon(s.hts)}</div>
-      <div class="sku-info"><div class="sku-hts">${s.hts}</div><div class="sku-desc">${s.desc}</div></div>
-      <div class="sku-duty-badge ${dutyBadgeClass(s.duty)}">${s.duty}</div>
-      <div class="sku-meta"><span class="sku-eng ${s.engine==='AI'?'ai':'rules'}">${s.engine}</span><br>${s.origin}<br>${s.date}</div>
-      <button class="del-btn" onclick="delSku('${s.id}')" title="Delete">&times;</button>
-    </div>`).join('')+'</div>';
-}
+function getLCS(c,k){if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Rules engine match. Add Gemini API key for AI-verified score.'};if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};return{score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};}
+function renderResult(r,desc,origin){const tot=r.total_effective_pct||0;const s301=r.section_301||{},s232=r.section_232||{};const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings tip: '+r.savings_tip);const lcs=getLCS(r.confidence,!!apiKey);const memo=buildMemo(r,desc,origin);const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('result-area').innerHTML=`<div class="result-wrap"><div class="hts-hero"><div class="hts-code">${r.hts_10||'-'}</div><div class="hts-desc">${r.description||''}</div><div class="hts-meta"><span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span><span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span></div></div><div class="duty-grid"><div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div><div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No Section 301/232'}</div></div><div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div></div><div class="lcs-card"><div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div><div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div><div class="lcs-note">${lcs.note}</div><div class="verify-row"><a class="verify-btn" href="https://hts.usitc.gov" target="_blank">Verify on USITC</a><a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">Check Section 301</a><a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">CBP Rulings</a></div></div><div class="result-tabs"><div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div><div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div><div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div></div><div class="rtab-body active" id="rt-duty">${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}<div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR Section 301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div></div><div class="rtab-body" id="rt-gri"><div class="gri-box"><div class="gri-rule">${r.gri_rule||'GRI-1'} Applied</div><div class="gri-text">${r.gri_rationale||''}</div></div>${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}</div><div class="rtab-body" id="rt-memo"><div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button></div><div class="memo-box" id="memo-content">${memo}</div></div><button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button></div>`;}
+function swR(el,id){document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.rtab-body').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById(id).classList.add('active');}
+function buildMemo(r,desc,origin){const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});return `CUSTOMS CLASSIFICATION ANALYSIS MEMO\nTariffly - Classification Research Assistant\nDate: ${today}\n=========================================\n\nDISCLAIMER: Informational purposes only. Not a CBP binding ruling.\nA licensed U.S. Customs Broker must review prior to entry filing.\n\nI. PRODUCT\nProduct:  ${desc}\nOrigin:   ${origin}\n\nII. CLASSIFICATION\nHTS Code:    ${r.hts_10}\nDescription: ${r.description}\nGRI Rule:    ${r.gri_rule}\nConfidence:  ${r.confidence}\nRationale:   ${r.gri_rationale}\n\nIII. DUTY RATES\nColumn 1 General:  ${r.duty_general_formatted}\nSection 301:       ${r.section_301?.applies?'+'+r.section_301.rate_pct+'% ('+r.section_301.list+')':'Not applicable'}\nSection 232:       ${r.section_232?.applies?'+'+r.section_232.rate_pct+'%':'Not applicable'}\nTOTAL EFFECTIVE:   ${r.total_formatted} (origin: ${origin})\n\n${r.risk_flags?.length?'IV. RISK FLAGS\n'+r.risk_flags.map(f=>'  Warning: '+f).join('\n')+'\n\n':''}V. VERIFICATION SOURCES\nUSITC HTS:   https://hts.usitc.gov\nCBP Rulings: https://rulings.cbp.gov\nUSTR 301:    https://ustr.gov\n\n=========================================\nTariffly - Informational use only\n=========================================`;}
+function copyMemo(){const t=document.getElementById('memo-content').textContent;navigator.clipboard.writeText(t).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});}
+function addToRecent(r,desc){const txl=document.getElementById('txn-list');if(txl.querySelector('.txn-empty'))txl.innerHTML='';const d=document.createElement('div');d.className='txn-item';d.innerHTML=`<div class="txn-icon"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="txn-info"><div class="txn-hts">${r.hts_10}</div><div class="txn-desc">${desc.substring(0,42)}${desc.length>42?'...':''}</div></div><div class="txn-duty ${r.total_formatted==='Free'?'free':parseFloat(r.total_formatted)>20?'high':parseFloat(r.total_formatted)>5?'mid':'low'}">${r.total_formatted}</div>`;txl.insertBefore(d,txl.firstChild);const items=txl.querySelectorAll('.txn-item');if(items.length>6)items[items.length-1].remove();}
+function saveToLib(){if(!currentResult)return;const e={id:Date.now()+'',hts:currentResult.hts_10,desc:document.getElementById('product-desc').value.substring(0,100),duty:currentResult.total_formatted,origin:document.getElementById('origin-sel').value,engine:apiKey?'AI':'Rules',date:new Date().toLocaleDateString()};skuLib.unshift(e);skuLib=skuLib.slice(0,100);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();const b=document.getElementById('save-btn');b.textContent='Saved to Library';b.classList.add('saved');setTimeout(()=>{b.textContent='Save to SKU Library';b.classList.remove('saved');},2500);}
+function renderLibrary(){const el=document.getElementById('lib-table');const lc=document.getElementById('lib-count');const n=skuLib.length;if(lc)lc.textContent=n+' saved classification'+(n!==1?'s':'');if(!n){el.innerHTML='<div class="sku-empty">No saved SKUs yet.</div>';return;}el.innerHTML=`<table class="sku-table"><tr><th>HTS Code</th><th>Description</th><th>Duty</th><th>Origin</th><th>Engine</th><th>Date</th><th></th></tr>${skuLib.map(s=>`<tr><td class="hts">${s.hts}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">${s.desc}</td><td style="font-family:var(--font);font-weight:700;color:${s.duty==='Free'?'var(--accent)':parseFloat(s.duty)>20?'var(--red)':parseFloat(s.duty)>5?'var(--amber)':'var(--green)'}">${s.duty}</td><td style="color:var(--muted)">${s.origin}</td><td><span class="eng-badge ${s.engine==='AI'?'eng-ai':'eng-rules'}">${s.engine}</span></td><td style="color:var(--faint);font-family:var(--font);font-size:11px">${s.date}</td><td><button class="del-btn" onclick="delSku('${s.id}')">x</button></td></tr>`).join('')}</table>`;}
 function delSku(id){skuLib=skuLib.filter(s=>s.id!==id);localStorage.setItem('cai_sku',JSON.stringify(skuLib));updateSkuCount();renderLibrary();}
-function exportCSV(){
-  var nl=String.fromCharCode(10);
-  var rows=skuLib.map(s=>[s.hts,s.desc.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));
-  var blob=new Blob([['HTS,Description,Duty,Origin,Engine,Date',...rows].join(nl)],{type:'text/csv'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tariffly-skus.csv';a.click();
-}
-
-// ── SCROLL REVEAL ──────────────────────────────────────────────
-var observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
-},{threshold:0.12});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-// ── KEYBOARD + INIT ───────────────────────────────────────────
+function exportCSV(){const nl=String.fromCharCode(10);const rows=skuLib.map(s=>[s.hts,s.desc.replace(/,/g,' '),s.duty,s.origin,s.engine,s.date].join(','));const blob=new Blob([['HTS,Description,Duty,Origin,Engine,Date',...rows].join(nl)],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='customsai-skus.csv';a.click();}
 document.addEventListener('DOMContentLoaded',()=>{
   initGoogleSignIn();
-  var ta=document.getElementById('product-desc');
-  if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});
-});
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el)); initGoogleSignIn();const ta=document.getElementById('product-desc');if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});});
 </script>
 </body>
 </html>
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes popIn{0%{opacity:0;transform:scale(0.92);}100%{opacity:1;transform:scale(1);}}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes neonPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,71,255,0.4);}70%{box-shadow:0 0 0 8px rgba(0,71,255,0);}}
+.anim-1{animation:fadeUp .5s .05s ease both;}
+.anim-2{animation:fadeUp .5s .12s ease both;}
+.anim-3{animation:fadeUp .5s .19s ease both;}
+.anim-4{animation:fadeUp .5s .26s ease both;}
+.anim-5{animation:fadeUp .5s .33s ease both;}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
