@@ -106,7 +106,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .glm-lbl{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.4;}
 .gate-right{width:480px;flex-shrink:0;display:flex;flex-direction:column;
   justify-content:center;padding:56px 52px;background:#fff;}
-.gate-right-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.gate-right-title{font-size:28px;font-weight:800;font-family:var(--display);letter-spacing:-.02em;margin-bottom:6px;}
 .gate-right-sub{font-size:13px;color:#6B7280;margin-bottom:32px;line-height:1.6;text-align:center;letter-spacing:.01em;}
 
 /* Social buttons */
@@ -283,7 +283,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
   box-shadow:0 4px 12px var(--accent-glow);transition:transform .2s;}
 .logo-mark:hover{transform:scale(1.08);}
-.logo-text{font-size:14px;font-weight:800;font-family:var(--display);color:var(--ink);letter-spacing:-.02em;}
+.logo-text{font-size:14px;font-weight:800;font-family:var(--display);font-family:var(--display);color:var(--ink);letter-spacing:-.02em;}
 .logo-tag{font-size:10px;color:var(--faint);font-family:var(--font);margin-top:1px;}
 
 .usage-wrap{padding:16px 18px;border-bottom:1px solid var(--border);}
@@ -1051,20 +1051,20 @@ if(currentUser){
 }
 
 
-const API_BASE = '';
-let backendOnline = false;
-async function checkBackendHealth() {
-  if (!API_BASE) return;
-  try {
-    const r = await fetch(API_BASE+'/health', {signal:AbortSignal.timeout(4000)});
-    if(r.ok){ const d=await r.json(); backendOnline=true;
-      const dot=document.getElementById('status-dot');
-      const lbl=document.getElementById('status-label');
-      if(dot) dot.style.background='#16A34A';
-      if(lbl) lbl.textContent='AI engine active';
-    }
-  } catch(e) {}
+var API_BASE = '';
+var backendOnline = false;
+function checkBackendHealth() {
+  if (!API_BASE) { return; }
+  fetch(API_BASE + '/health').then(function(r) {
+    if (!r.ok) return;
+    backendOnline = true;
+    var dot = document.getElementById('status-dot');
+    var lbl = document.getElementById('status-label');
+    if (dot) dot.style.background = '#16A34A';
+    if (lbl) lbl.textContent = 'AI engine active';
+  }).catch(function() {});
 }
+
 function showApp(){
   document.getElementById('main-app').style.display='flex';
   document.getElementById('api-inp').value=apiKey;
@@ -1116,7 +1116,8 @@ function openStripeCheckout() {
   var STRIPE_LINK = 'https://buy.stripe.com/test_4gM00cc1e6Ge781gU51RC00';
   var em = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
   window.open(em ? STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(em) : STRIPE_LINK, '_blank');
-  var pw = document.getElementById('paywall'); if (pw) pw.style.display = 'none';
+  var pw = document.getElementById('paywall');
+  if (pw) pw.style.display = 'none';
 }
 
 async function socialSignIn(provider){
@@ -1188,10 +1189,7 @@ function acceptConsent(){
 function showTerms(e){if(e)e.preventDefault();document.getElementById('terms-modal').style.display='flex';}
 
 // ── APP STATE ─────────────────────────────────────────────────
-function setApiKey(v){
-  apiKey=v;localStorage.setItem('cai_key',v);
-  const dot=document.getElementById('api-dot'),badge=document.getElementById('engine-badge');
-  if(v&&v.length>5){dot.className='api-dot live';badge.textContent='Gemini AI Active';badge.style.cssText='background:#F0FDF4;border:1px solid rgba(22,163,74,0.2);color:#16A34A;';}
+function setApiKey(v){ /* API keys are server-side only */ }
   else{dot.className='api-dot';badge.textContent='Rules Engine';badge.style.cssText='';}
 }
 function updateUsage(){
@@ -1502,5 +1500,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});
 });
 </script>
+<input type="hidden" id="api-inp" value="">
 </body>
 </html>
