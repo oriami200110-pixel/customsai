@@ -329,11 +329,16 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .api-lbl{font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
 .api-wrap{position:relative;}
-
-
-
-
-
+.api-inp{width:100%;background:#F9FAFB;border:1.5px solid var(--border2);
+  border-radius:9px;padding:9px 32px 9px 12px;font-size:11px;font-family:var(--mono);
+  color:var(--ink);outline:none;transition:all .2s;}
+.api-inp:focus{border-color:var(--accent);background:#fff;
+  box-shadow:0 0 0 3px var(--accent-glow);}
+.api-inp::placeholder{color:var(--faint);}
+.api-dot{position:absolute;right:11px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%;background:var(--faint);transition:all .3s;}
+.api-dot.live{background:var(--green);box-shadow:0 0 8px rgba(22,163,74,.5);
+  animation:pulse 2s infinite;}
 .ver{font-size:10px;color:var(--faint);text-align:center;margin-top:10px;
   font-family:var(--mono);}
 
@@ -720,11 +725,6 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   .form-row{grid-template-columns:1fr;}
   .duty-grid{grid-template-columns:1fr;}
 }
-
-.backend-status{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);color:var(--faint);padding:2px 0;}
-.status-dot{width:5px;height:5px;border-radius:50%;background:var(--faint);transition:background .3s;flex-shrink:0;}
-.status-dot.online{background:var(--green);box-shadow:0 0 6px rgba(22,163,74,.4);animation:pulse 2.5s infinite;}
-.status-dot.offline{background:var(--red);}
 </style>
 </head>
 <body>
@@ -738,7 +738,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <span class="gate-brand-name">Tariffly</span>
       </div>
       <div class="gate-left-content">
-        <div class="gate-left-tag">HTS Trade Intelligence</div>
+        <div class="gate-left-tag">HTS Classification Engine</div>
         <h2 class="gate-left-h2">HTS Classification,<br>Optimized by AI.</h2>
         <p class="gate-left-sub">Achieve up to 98% classification accuracy and discover duty savings in seconds. Powered by GRI logic and the 2026 USITC HTS Schedule.</p>
       </div>
@@ -750,7 +750,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     </div>
     <div class="gate-right">
       <div class="gate-right-title">Create your account</div>
-      <div class="gate-right-sub">3 free classifications. Audit-ready results. No credit card.</div>
+      <div class="gate-right-sub">Start classifying for free. No credit card required.</div>
       <div class="form-error-msg" id="form-error">Something went wrong. Please try again.</div>
       <div id="google-signin-btn"></div>
       <button class="social-btn btn-apple" onclick="socialSignIn('apple')">
@@ -782,7 +782,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
           </div>
           <input type="hidden" name="signup_source" value="email_form">
           <input type="hidden" name="product" value="Tariffly">
-          <button class="gate-submit" id="submit-btn" type="submit">Get instant access &rarr;</button>
+          <button class="gate-submit" id="submit-btn" type="submit">Create free account</button>
         </form>
       </div>
       <div class="form-success" id="form-success">
@@ -867,7 +867,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <aside class="sidebar" id="sidebar">
     <div class="logo">
       <div class="logo-mark">TF</div>
-      <div><div class="logo-text">Tariffly</div><div class="logo-tag">Trade Intelligence</div></div>
+      <div><div class="logo-text">Tariffly</div><div class="logo-tag">Classification Engine</div></div>
     </div>
     <div class="user-info">
       <div class="user-avatar" id="user-av">?</div>
@@ -904,9 +904,9 @@ body{min-height:100vh;display:flex;flex-direction:column;}
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="tb-title">Global Trade Intelligence</span>
+        <span class="tb-title">HTS Classification &amp; Duty Calculator</span>
         <div class="tb-sep"></div>
-        <span class="tb-sub">USITC 2026 &middot; §301 Current &middot; USMCA Active</span>
+        <span class="tb-sub">USITC 2026 &middot; Section 301 Updated</span>
       </div>
       <div class="topbar-right">
         <div class="tb-badge tb-legal" onclick="showTerms(event)">Decision Support Tool</div>
@@ -917,9 +917,9 @@ body{min-height:100vh;display:flex;flex-direction:column;}
     <!-- CLASSIFY VIEW -->
     <div id="view-classify" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
       <div class="hero-bar">
-        <div class="hero-badge anim-1">Audit-Ready HTS Classification</div>
-        <h1 class="hero-h1 anim-2">Compliance Intelligence,<br><span class="accent">Automated.</span></h1>
-        <p class="hero-sub anim-3">Global trade intelligence in 15 seconds. Section 301/232 exposure, USMCA analysis, and CBP-standard memos — zero broker fees.</p>
+        <div class="hero-badge anim-1">AI-Powered Trade Classification</div>
+        <h1 class="hero-h1 anim-2">HTS Classification, <span class="accent">Optimized by AI.</span></h1>
+        <p class="hero-sub anim-3">Achieve up to 98% accuracy and discover duty savings in seconds.</p>
         <div class="hero-metrics anim-4">
           <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Avg classification</span></div>
           <div class="hm"><span class="hm-val">40+</span><span class="hm-lbl">HTS categories</span></div>
@@ -988,19 +988,17 @@ body{min-height:100vh;display:flex;flex-direction:column;}
         <div class="result-col" id="result-col">
           <div class="empty-wrap" id="empty-state">
             <div class="empty-gfx"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-            <div class="empty-title">Ready for Classification</div>
-            <div class="empty-sub">Enter any product description to receive your HTS code, §301/232 duty exposure, USMCA analysis, and a CBP-standard classification memo.</div>
+            <div class="empty-title">Ready to classify</div>
+            <div class="empty-sub">Enter a product description and click Classify. Results include duty rates, GRI analysis, and a CBP-format memo.</div>
           </div>
           <div id="loading-state" style="display:none;">
             <div class="loading-wrap">
               <div class="load-ring"></div>
-              <div id="ls1" class="load-step act">Parsing product attributes...</div>
-              <div id="ls2" class="load-step">Traversing GRI rule hierarchy...</div>
-              <div id="ls3" class="load-step">Calculating duty thresholds...</div>
-              <div id="ls4" class="load-step">Overlaying §301 &amp; §232 exposure...</div>
-              <div id="ls5" class="load-step">Generating CBP classification memo...</div>
-            
-              <div id="ls6" class="load-step">Building verification deep links...</div>
+              <div id="ls1" class="load-step act">Extracting product attributes...</div>
+              <div id="ls2" class="load-step">Searching HTS schedule...</div>
+              <div id="ls3" class="load-step">Applying GRI rules...</div>
+              <div id="ls4" class="load-step">Checking Section 301/232...</div>
+              <div id="ls5" class="load-step">Generating classification memo...</div>
             </div>
           </div>
           <div id="result-area"></div>
@@ -1008,7 +1006,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
       </div>
 
       <div class="legal-foot">
-        <div class="lf-text">Tariffly is a classification research assistant. Outputs are informational only — not binding determinations. USITC 2026 &middot; USTR §301. Verify before filing.</div>
+        <div class="lf-text">Tariffly is a classification research assistant. Outputs are informational only and not binding. HTS: USITC 2026 &middot; Section 301: USTR. Verify before filing.</div>
         <div class="lf-links">
           <a class="lf-link" href="https://hts.usitc.gov" target="_blank">USITC</a>
           <a class="lf-link" href="https://ustr.gov" target="_blank">USTR &sect;301</a>
@@ -1039,27 +1037,10 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 </button>
 
 <script>
-
-const API_BASE = window.location.hostname==='localhost' ? 'http://localhost:8000' : '';
-let backendOnline = false;
-
-async function checkBackendHealth() {
-  const dot=document.getElementById('status-dot'), lbl=document.getElementById('status-label');
-  if (!API_BASE){ dot.className='status-dot offline'; lbl.textContent='Rules engine active'; return; }
-  try {
-    const r=await fetch(API_BASE+'/health',{signal:AbortSignal.timeout(4000)});
-    if(r.ok){ const d=await r.json(); backendOnline=true; dot.className='status-dot online';
-      const eng=d.engines?.anthropic==='configured'?'Anthropic AI':d.engines?.gemini==='configured'?'Gemini AI':'Rules Engine';
-      lbl.textContent=eng+' · Online';
-      const ep=document.getElementById('engine-badge'); if(ep){ep.textContent=eng+' Active'; ep.style.cssText='background:#EDFBF3;border:1px solid rgba(22,163,74,.2);color:#0D7A3E;';}
-    }
-  } catch { dot.className='status-dot offline'; lbl.textContent='Rules engine active'; }
-}
-
 const FORMSPREE='https://formspree.io/f/mjgpnokp';
 const CLIENT_ID='301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com';
 
-// API keys are server-side only
+let apiKey=localStorage.getItem('cai_key')||'';
 let usageCount=parseInt(localStorage.getItem('cai_usage')||'0');
 let skuLib=JSON.parse(localStorage.getItem('cai_sku')||'[]');
 let currentResult=null;
@@ -1076,7 +1057,8 @@ if(currentUser){
 
 function showApp(){
   document.getElementById('main-app').style.display='flex';
-  
+  document.getElementById('api-inp').value=apiKey;
+  if(apiKey)setApiKey(apiKey);
   updateUsage();updateSkuCount();updateUserDisplay();
 }
 function updateUserDisplay(){
@@ -1198,14 +1180,17 @@ function acceptConsent(){
 function showTerms(e){if(e)e.preventDefault();document.getElementById('terms-modal').style.display='flex';}
 
 // ── APP STATE ─────────────────────────────────────────────────
-/* API keys are server-side only */
+function setApiKey(v){
+  apiKey=v;localStorage.setItem('cai_key',v);
+  const dot=document.getElementById('api-dot'),badge=document.getElementById('engine-badge');
+  if(v&&v.length>5){dot.className='api-dot live';badge.textContent='Gemini AI Active';badge.style.cssText='background:#F0FDF4;border:1px solid rgba(22,163,74,0.2);color:#16A34A;';}
   else{dot.className='api-dot';badge.textContent='Rules Engine';badge.style.cssText='';}
 }
 function updateUsage(){
   const used=usageCount,rem=Math.max(0,FREE_LIMIT-used);
   document.getElementById('usage-num').textContent=used+' / '+FREE_LIMIT;
   document.getElementById('usage-fill').style.width=Math.min((used/FREE_LIMIT)*100,100)+'%';
-  document.getElementById('usage-note').textContent=backendOnline?'AI engine active \u2014 unlimited':rem+' classification'+(rem!==1?'s':'')+' remaining';
+  document.getElementById('usage-note').textContent=apiKey?'API key active \u2014 unlimited':rem+' classification'+(rem!==1?'s':'')+' remaining';
 }
 function updateSkuCount(){
   const n=skuLib.length;
@@ -1223,19 +1208,6 @@ function switchView(v){
 function setEx(el){document.getElementById('product-desc').value=el.textContent.trim();document.getElementById('product-desc').focus();}
 
 // ── CLASSIFY ──────────────────────────────────────────────────
-
-function buildVerifyLinks(hts) {
-  const raw = (hts||'').replace(/\./g,'').replace(/\s/g,'');
-  const hs6 = raw.substring(0,6), heading = raw.substring(0,4);
-  return [
-    {l:'USITC',u:`https://hts.usitc.gov/?query=${raw}`},
-    {l:'CBP Rulings',u:`https://rulings.cbp.gov/search?query=${hts}&collection=ALL`},
-    {l:'§301 USTR',u:`https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs?search_api_views_fulltext=${raw}`},
-    {l:'EU TARIC',u:`https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en&Taric=${hs6}&LangDescr=en`},
-    {l:'UK Tariff',u:`https://www.trade-tariff.service.gov.uk/headings/${heading}`},
-  ].map(x=>`<a class="verify-btn" href="${x.u}" target="_blank" rel="noopener">${x.l} ↗</a>`).join('');
-}
-
 async function classify(){
   const desc=document.getElementById('product-desc').value.trim();
   const origin=document.getElementById('origin-sel').value;
@@ -1247,16 +1219,9 @@ async function classify(){
   document.getElementById('loading-state').style.display='flex';
   document.getElementById('result-area').innerHTML='';
   let s=1;
-  const si=setInterval(()=>{if(s<=5){for(let i=1;i<=6;i++){const e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},800);
+  const si=setInterval(()=>{if(s<=5){for(let i=1;i<=5;i++){const e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},900);
   try{
-    let r;
-    if(backendOnline&&API_BASE){
-      try{
-        const resp=await fetch(API_BASE+'/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,country_of_origin:origin,include_memo:true}),signal:AbortSignal.timeout(25000)});
-        if(resp.ok){const d=await resp.json();r={hts_10:d.hts_code,description:d.description,gri_rule:d.gri_rule,gri_rationale:d.gri_rationale,confidence:d.confidence,duty_general_pct:d.duties.general_rate_pct,duty_general_formatted:d.duties.general_rate_formatted,usmca_applies:d.duties.usmca_applies,section_301:{applies:d.duties.section_301_applies,list:d.duties.section_301_list,rate_pct:d.duties.section_301_rate_pct},section_232:{applies:d.duties.section_232_applies,rate_pct:d.duties.section_232_rate_pct},total_effective_pct:d.duties.total_effective_pct,total_formatted:d.duties.total_effective_formatted,alternatives:d.alternative_codes||[],risk_flags:d.risk_flags||[],savings_tip:d.savings_tip,cbp_ruling:d.cbp_ruling,memo:d.memo,_engine:d.engine};}
-      }catch(err){console.warn('Backend unavailable, using rules engine:',err.message);}
-    }
-    if(!r) r=classifyRules(desc,origin);
+    const r=apiKey?await classifyGemini(desc,origin):classifyRules(desc,origin);
     clearInterval(si);currentResult=r;usageCount++;localStorage.setItem('cai_usage',usageCount);updateUsage();
     document.getElementById('loading-state').style.display='none';
     renderResult(r,desc,origin);addToRecent(r,desc);
@@ -1377,8 +1342,8 @@ function classifyRules(desc,origin){
     savings_tip:tot>15?'Consider sourcing from Vietnam or Mexico to reduce effective duty to '+best.p+'%':''};}
 
 function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return 'd-mid';return 'd-high';}
-function getLCS(c,engine){
-  if(c==='HIGH'&&engine&&engine!=='rules')return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};
+function getLCS(c,k){
+  if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match verified against 2026 HTS Schedule.'};
   if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Strong keyword match. Add Gemini API key for AI-enhanced analysis.'};
   if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match. CBP broker review recommended before filing.'};
   return{score:41,cls:'low',bar:41,note:'Low confidence. Professional customs broker review required.'};
@@ -1389,7 +1354,7 @@ function renderResult(r,desc,origin){
   const s301=r.section_301||{},s232=r.section_232||{};
   const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');
   const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings: '+r.savings_tip);
-  const lcs=getLCS(r.confidence,r._engine);
+  const lcs=getLCS(r.confidence,!!apiKey);
   const memo=buildMemo(r,desc,origin);
   const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('result-area').innerHTML=`
@@ -1412,9 +1377,9 @@ function renderResult(r,desc,origin){
     <div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div>
     <div class="lcs-note">${lcs.note}</div>
     <div class="verify-row">
-      ${buildVerifyLinks(r.hts_10)}
-      
-      
+      <a class="verify-btn" href="https://hts.usitc.gov" target="_blank">Verify USITC</a>
+      <a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank">Check &sect;301</a>
+      <a class="verify-btn" href="https://rulings.cbp.gov/search?query=${encodeURIComponent(r.description||'')}" target="_blank">CBP Rulings</a>
     </div>
   </div>
   <div class="result-tabs">
