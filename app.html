@@ -15,10 +15,10 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#F5F7FA;--white:#FFFFFF;--ink:#0A0B0F;--ink2:#1A1D26;
-  --muted:#6B7280;--faint:#9CA3AF;--border:#E5E7EB;--border2:#D1D5DB;
-  --accent:#0047FF;--accent-lt:#EEF2FF;--accent-glow:rgba(0,71,255,0.12);
-  --green:#16A34A;--green-lt:#F0FDF4;--red:#DC2626;--amber:#D97706;
+  --bg:#0A0B0F;--white:#F0F2F5;--ink:#F0F2F5;--ink2:#9CA3AF;
+  --muted:#6B7280;--faint:#4B5563;--border:#1F2937;--border2:#283041;
+  --accent:#C8FF00;--accent-lt:rgba(200,255,0,0.08);--accent-glow:rgba(200,255,0,0.18);
+  --green:#10B981;--green-lt:rgba(16,185,129,0.1);--red:#EF4444;--amber:#F59E0B;
   --font:'Inter',sans-serif;--mono:'Inter',sans-serif;
   --shadow-sm:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
   --shadow:0 4px 16px rgba(0,0,0,0.07),0 2px 6px rgba(0,0,0,0.03);
@@ -72,7 +72,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .form-input::placeholder{color:var(--faint);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .gate-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px var(--accent-glow);margin-top:6px;}
-.gate-submit:hover{background:#0035CC;transform:translateY(-1px);}
+.gate-submit:hover{background:#d4ff26;transform:translateY(-1px);}
 .gate-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .gate-terms{font-size:11px;color:var(--faint);text-align:center;margin-top:16px;line-height:1.6;}
 .gate-terms a{color:var(--accent);text-decoration:none;}
@@ -185,13 +185,13 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .pw-feat{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);margin-bottom:10px;text-align:left;}
 .pw-feat::before{content:'';width:16px;height:16px;background:var(--green-lt);border-radius:50%;flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316A34A' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:10px;}
 .pw-up{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:20px;box-shadow:0 4px 16px var(--accent-glow);transition:all .2s;}
-.pw-up:hover{background:#0035CC;transform:translateY(-1px);}
+.pw-up:hover{background:#d4ff26;transform:translateY(-1px);}
 .pw-api{width:100%;padding:11px;background:transparent;color:var(--muted);border:1.5px solid var(--border2);border-radius:10px;font-family:var(--font);font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s;}
 .pw-api:hover{color:var(--ink);border-color:var(--border);}
 
 /* APP SHELL */
 .app{display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:252px;flex-shrink:0;background:#fff;border-right:1.5px solid var(--border);display:flex;flex-direction:column;box-shadow:var(--shadow-sm);}
+.sidebar{width:252px;flex-shrink:0;background:#0F1116;border-right:1.5px solid var(--border);display:flex;flex-direction:column;box-shadow:var(--shadow-sm);}
 .logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;}
 .logo-mark{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
 .logo-text{font-family:var(--display);font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-.02em;}
@@ -265,7 +265,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .origin-sel:focus{border-color:var(--accent);background:#fff;}
 .classify-btn{height:42px;padding:0 20px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 10px var(--accent-glow);}
 .classify-btn{position:relative;overflow:hidden;}
-.classify-btn:hover:not(:disabled){background:#0035CC;transform:translateY(-1px);box-shadow:0 4px 18px var(--accent-glow);}
+.classify-btn:hover:not(:disabled){background:#d4ff26;transform:translateY(-1px);box-shadow:0 4px 18px var(--accent-glow);}
 .classify-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;background:var(--faint);}
 .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
 .shortcut{font-size:10px;color:var(--faint);text-align:right;margin-top:6px;font-family:var(--font);}
@@ -426,8 +426,6 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 <body>
 
 <button class="mobile-menu-btn" id="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('expanded')"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <button class="social-btn btn-apple" onclick="void(0)" title="Apple Sign-In coming soon" style="opacity:.4;cursor:not-allowed;pointer-events:none;"><svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>Continue with Apple<span style="background:rgba(255,255,255,.15);border-radius:20px;font-size:9px;padding:2px 8px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-left:6px">Soon</span>
-      </button>
 <!-- SIGN-IN GATE -->
 <div class="gate-overlay" id="gate">
   <div class="gate-container">
@@ -880,12 +878,25 @@ function handleGoogleCredential(response) {
   consentGiven ? showApp() : (document.getElementById('consent-modal').style.display = 'flex');
 }
 
+
+function buildVerifyLinks(hts10) {
+  var raw=(hts10||'').replace(/\./g,'').replace(/\s/g,'');
+  var q=encodeURIComponent(hts10||''),h4=raw.substring(0,4),hs6=raw.substring(0,6);
+  var lnks=[
+    {l:'USITC',u:'https://hts.usitc.gov/?query='+raw},
+    {l:'CBP Rulings',u:'https://rulings.cbp.gov/search?query='+q+'&collection=ALL'},
+    {l:'\u00a7301 USTR',u:'https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs?search_api_views_fulltext='+raw},
+    {l:'EU TARIC',u:'https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en&Taric='+hs6},
+    {l:'UK Tariff',u:'https://www.trade-tariff.service.gov.uk/headings/'+h4}
+  ];
+  return lnks.map(function(v){return '<a class="verify-btn" href="'+v.u+'" target="_blank" rel="noopener">'+v.l+' \u2197</a>';}).join('');
+}
 function openStripeCheckout() {
-  var STRIPE_LINK = 'https://buy.stripe.com/test_4gM00cc1e6Ge781gU51RC00';
+  var STRIPE_LINK = 'https://buy.stripe.com/test_4gM00cc1e6Ge781gU51RC00'; // ← swap for live Stripe link
   var em = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
   window.open(em ? STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(em) : STRIPE_LINK, '_blank');
   var pw = document.getElementById('paywall');
-  if (pw) { pw.style.display = 'none'; }
+  if (pw) pw.style.display = 'none';
 }
 async function socialSignIn(provider) {
   const name = prompt('Enter your full name:');
