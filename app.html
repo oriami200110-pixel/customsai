@@ -883,7 +883,7 @@ function openStripeCheckout() {
   const PAYMENT_LINK = 'https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806';
   if (PAYMENT_LINK.includes('REPLACE_ME')) {
     // Fallback until Stripe is connected
-    window.open('mailto:ori@customsai.app?subject=Tariffly Pro Upgrade&body=Hi, I would like to upgrade to Tariffly Pro ($199/month). My email is: ' + (currentUser?.email || ''), '_blank');
+    window.open('https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806' + (currentUser && currentUser.email ? '?checkout[email]=' + encodeURIComponent(currentUser.email) : ''), '_blank');
   } else {
     // Real Stripe checkout with prefilled email
     const url = currentUser?.email
