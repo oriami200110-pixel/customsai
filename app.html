@@ -421,6 +421,58 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 .mobile-menu-btn svg{color:#fff;}
 @media(max-width:700px){.mobile-menu-btn{display:flex;}}
 
+
+/* Phase 5 — Origin comparator */
+.origin-cmp-box{margin:14px 0;border:1px solid var(--border2);border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.02);}
+.cmp-hdr{padding:14px 18px 10px;border-bottom:1px solid var(--border2);background:linear-gradient(180deg,#FAFBFC 0%,#F5F7FA 100%);}
+.cmp-hdr-lbl{display:block;font:600 10px/1 var(--font);letter-spacing:.09em;color:#64748B;text-transform:uppercase;margin-bottom:4px;}
+.cmp-hdr-sub{display:block;font:500 11.5px/1.45 var(--font);color:#475569;}
+.cmp-th{display:grid;grid-template-columns:2fr 2.3fr 1fr 1fr;gap:10px;padding:10px 18px;background:#F8FAFC;border-bottom:1px solid var(--border2);font:600 10px/1 var(--font);letter-spacing:.08em;color:#64748B;text-transform:uppercase;}
+.cmp-row{display:grid;grid-template-columns:2fr 2.3fr 1fr 1fr;gap:10px;padding:11px 18px;border-bottom:1px solid #F1F5F9;font:500 12.5px/1.35 var(--font);color:var(--ink);align-items:center;transition:background .15s;}
+.cmp-row:last-child{border-bottom:none;}
+.cmp-row:hover{background:#FAFBFC;}
+.cmp-row.cmp-current{background:#FEF3C7;border-left:3px solid #F59E0B;padding-left:15px;}
+.cmp-row.cmp-current:hover{background:#FDE68A;}
+.cmp-cell{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+.cmp-c1{display:flex;align-items:center;gap:8px;font-weight:600;}
+.cmp-flag{font-size:16px;line-height:1;}
+.cmp-name{color:var(--ink);}
+.cmp-best{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;background:#DCFCE7;color:#15803D;font:700 9px/1 var(--font);letter-spacing:.06em;}
+.cmp-c2{color:#475569;font-size:11.5px;font-variant-numeric:tabular-nums;}
+.cmp-c3{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);}
+.cmp-c4{font-weight:600;font-variant-numeric:tabular-nums;}
+.cmp-delta.down{color:#15803D;}
+.cmp-delta.up{color:#B91C1C;}
+.cmp-delta.same{color:#94A3B8;}
+.cmp-foot{padding:10px 18px;background:#F8FAFC;border-top:1px solid var(--border2);font:500 10.5px/1.5 var(--font);color:#64748B;letter-spacing:.01em;}
+/* Phase 5 — Batch CSV card */
+.batch-card{background:#fff;border:1px solid var(--border2);border-radius:14px;padding:16px 18px;margin-top:12px;}
+.batch-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+.batch-title{font:600 13.5px/1 var(--font);color:var(--ink);}
+.batch-sub{font:500 11px/1 var(--font);color:#94A3B8;}
+.batch-actions{display:flex;gap:8px;}
+.batch-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:38px;background:#fff;border:1.5px solid var(--border2);border-radius:9px;font:600 12.5px/1 var(--font);color:var(--ink);cursor:pointer;transition:all .15s;}
+.batch-btn:hover{border-color:#94A3B8;background:#F8FAFC;}
+.batch-tmpl{padding:0 14px;height:38px;background:transparent;border:1.5px solid var(--border2);border-radius:9px;font:600 12px/1 var(--font);color:#64748B;cursor:pointer;transition:all .15s;}
+.batch-tmpl:hover{color:var(--ink);border-color:#94A3B8;}
+.batch-progress{margin-top:12px;padding-top:12px;border-top:1px solid var(--border2);}
+.batch-bar{height:6px;background:#F1F5F9;border-radius:999px;overflow:hidden;}
+.batch-fill{height:100%;background:linear-gradient(90deg,#635BFF 0%,#8B5CF6 100%);width:0;transition:width .3s ease;}
+.batch-stat{margin-top:8px;font:500 11px/1.4 var(--font);color:#64748B;}
+/* Phase 5 — PDF export */
+.pdf-btn{background:#fff;border:1.5px solid var(--border2);color:var(--ink);padding:0 14px;height:34px;border-radius:8px;font:600 12px/1 var(--font);cursor:pointer;margin-left:8px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.pdf-btn:hover{border-color:#94A3B8;background:#F8FAFC;}
+#print-target{display:none;}
+@media print{
+  @page{margin:15mm;size:letter;}
+  body.is-printing > *{display:none !important;}
+  body.is-printing #print-target{display:block !important;position:fixed;left:0;top:0;width:100%;padding:0;margin:0;font:10pt/1.45 'SF Mono','Menlo','Consolas',ui-monospace,monospace;color:#000;background:#fff;white-space:pre-wrap;word-wrap:break-word;}
+}
+@media (max-width:720px){
+  .cmp-th,.cmp-row{grid-template-columns:1.4fr 1fr .8fr;}
+  .cmp-th .cmp-c2,.cmp-row .cmp-c2{display:none;}
+}
+
 </style>
 </head>
 <body>
@@ -705,6 +757,22 @@ body{min-height:100vh;display:flex;flex-direction:column;}
               <span class="chip" onclick="setEx(this)">Steel kitchen bowls</span>
               <span class="chip" onclick="setEx(this)">Cotton jeans</span>
               <span class="chip" onclick="setEx(this)">Laptop under 10kg</span>
+            </div>
+          </div>
+
+          <div class="batch-card">
+            <div class="batch-hdr"><span class="batch-title">Batch Classify</span><span class="batch-sub">CSV · description, origin</span></div>
+            <div class="batch-actions">
+              <input type="file" id="batch-file" accept=".csv" style="display:none" onchange="batchFileChosen(event)"/>
+              <button class="batch-btn" id="batch-btn" onclick="document.getElementById('batch-file').click()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 0l-4 4m4-4l4 4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>
+                Upload CSV
+              </button>
+              <button class="batch-tmpl" onclick="downloadBatchTemplate()">Template</button>
+            </div>
+            <div class="batch-progress" id="batch-progress" style="display:none">
+              <div class="batch-bar"><div class="batch-fill" id="batch-fill"></div></div>
+              <div class="batch-stat" id="batch-stat">Starting...</div>
             </div>
           </div>
           <div class="txn-card">
@@ -1167,7 +1235,7 @@ function classifyRules(desc,origin){
 
 function dc(p){if(p===0)return 'd-free';if(p<=5)return 'd-low';if(p<=20)return 'd-mid';return 'd-high';}
 function getLCS(c,k){if(c==='HIGH'&&k)return{score:94,cls:'high',bar:94,note:'Strong GRI-1 match AI-verified against the 2026 HTSUS Schedule. Suitable for entry summary preparation pending licensed broker review.'};if(c==='HIGH')return{score:78,cls:'high',bar:78,note:'Strong rules-engine match against HTSUS nomenclature. Add Gemini API key to enable AI-verified classification with competing-heading analysis.'};if(c==='MEDIUM')return{score:62,cls:'medium',bar:62,note:'Moderate match — product description may map to multiple headings. CBP-licensed broker review recommended before entry filing (CBP Form 7501).'};return{score:41,cls:'low',bar:41,note:'Low confidence classification. Professional customs broker review required; consider a CBP Binding Ruling request via eRulings (19 CFR 177) for high-volume SKUs.'};}
-function renderResult(r,desc,origin){const tot=r.total_effective_pct||0;const s301=r.section_301||{},s232=r.section_232||{};const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings tip: '+r.savings_tip);const lcs=getLCS(r.confidence,!!apiKey);const memo=buildMemo(r,desc,origin);const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('result-area').innerHTML=`<div class="result-wrap"><div class="hts-hero"><div class="hts-id-label">U.S. HARMONIZED TARIFF SCHEDULE · CLASSIFICATION</div><div class="hts-code">${r.hts_10||'-'}</div><div class="hts-desc">${r.description||''}</div>${r.hts_10&&r.hts_10.length>=12?`<div class="hts-breadcrumb"><div class="hts-crumb"><div class="crumb-lbl">Chapter</div><div class="crumb-val">${r.hts_10.substring(0,2)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Heading</div><div class="crumb-val">${r.hts_10.substring(0,4)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Subheading</div><div class="crumb-val">${r.hts_10.substring(0,7)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Statistical</div><div class="crumb-val">${r.hts_10}</div></div></div>`:''}<div class="hts-meta"><span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span><span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span></div></div><div class="duty-grid"><div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div><div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No Section 301/232'}</div></div><div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div></div><div class="lcs-card"><div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div><div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div><div class="lcs-note">${lcs.note}</div><div class="verify-label">VERIFY AGAINST OFFICIAL SOURCES</div><div class="verify-row"><a class="verify-btn" href="https://hts.usitc.gov/search?query=${encodeURIComponent(r.hts_10||'')}" target="_blank" rel="noopener"><span class="vb-domain">USITC.gov</span><span class="vb-action">HTS Schedule Entry</span></a><a class="verify-btn" href="https://rulings.cbp.gov/search?term=${encodeURIComponent(r.hts_10||r.description||'')}" target="_blank" rel="noopener"><span class="vb-domain">CBP CROSS</span><span class="vb-action">Binding Ruling Precedent</span></a><a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank" rel="noopener"><span class="vb-domain">USTR.gov</span><span class="vb-action">Section 301 Exclusions</span></a></div></div><div class="result-tabs"><div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div><div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div><div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div></div><div class="rtab-body active" id="rt-duty">${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}<div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR Section 301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div></div><div class="rtab-body" id="rt-gri"><div class="gri-box"><div class="gri-header"><div class="gri-authority">Legal Authority</div><div class="gri-rule-badge">${r.gri_rule||'GRI-1'}</div></div><div class="gri-sub">General Rules of Interpretation · Harmonized Tariff Schedule of the United States (2026)</div><div class="gri-text">${r.gri_rationale||''}</div><div class="gri-footer"><span class="gri-foot-lbl">Applied by:</span> ${apiKey?'Gemini 2.0 Flash (AI-verified)':'Tariffly Rules Engine · HTSUS 2026'} · <span class="gri-foot-lbl">Reviewed:</span> Pre-filing decision support only</div></div>${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}</div><div class="rtab-body" id="rt-memo"><div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button></div><div class="memo-box" id="memo-content">${memo}</div></div><button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button></div>`;}
+function renderResult(r,desc,origin){const tot=r.total_effective_pct||0;const s301=r.section_301||{},s232=r.section_232||{};const ta=(s301.applies?'+'+s301.rate_pct+'% Section 301 '+(s301.list||''):'')+(s232.applies?' +'+s232.rate_pct+'% Section 232':'');const flags=[...(r.risk_flags||[])];if(r.savings_tip)flags.push('Savings tip: '+r.savings_tip);const lcs=getLCS(r.confidence,!!apiKey);const memo=buildMemo(r,desc,origin);const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('result-area').innerHTML=`<div class="result-wrap"><div class="hts-hero"><div class="hts-id-label">U.S. HARMONIZED TARIFF SCHEDULE · CLASSIFICATION</div><div class="hts-code">${r.hts_10||'-'}</div><div class="hts-desc">${r.description||''}</div>${r.hts_10&&r.hts_10.length>=12?`<div class="hts-breadcrumb"><div class="hts-crumb"><div class="crumb-lbl">Chapter</div><div class="crumb-val">${r.hts_10.substring(0,2)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Heading</div><div class="crumb-val">${r.hts_10.substring(0,4)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Subheading</div><div class="crumb-val">${r.hts_10.substring(0,7)}</div></div><div class="crumb-sep">›</div><div class="hts-crumb"><div class="crumb-lbl">Statistical</div><div class="crumb-val">${r.hts_10}</div></div></div>`:''}<div class="hts-meta"><span class="conf-badge conf-${r.confidence||'MEDIUM'}">${r.confidence||'MED'} Confidence</span><span class="hts-timing">${today} &middot; ${apiKey?'Gemini AI':'Rules Engine'}</span></div></div><div class="duty-grid"><div class="duty-cell"><div class="duty-lbl">Base Rate</div><div class="duty-val ${dc(r.duty_general_pct||0)}">${r.duty_general_formatted||'Free'}</div><div class="duty-sub">Column 1 General</div></div><div class="duty-cell"><div class="duty-lbl">Trade Actions</div><div class="duty-val ${(s301.rate_pct||0)+(s232.rate_pct||0)>0?'d-high':'d-free'}">${ta||'None'}</div><div class="duty-sub">${s301.list||'No Section 301/232'}</div></div><div class="duty-cell" style="border-color:${tot>20?'rgba(220,38,38,.2)':tot>5?'rgba(217,119,6,.2)':'rgba(0,71,255,.2)'}"><div class="duty-lbl">Total Effective</div><div class="duty-val ${dc(tot)}">${r.total_formatted||'Free'}</div><div class="duty-sub">All-in landed rate</div></div></div><div class="lcs-card"><div class="lcs-header"><span class="lcs-lbl">Legal Confidence Score</span><span class="lcs-score lcs-${lcs.cls}">${lcs.score}/100</span></div><div class="lcs-bar-bg"><div class="lcs-bar lcs-bar-${lcs.cls}" style="width:${lcs.bar}%"></div></div><div class="lcs-note">${lcs.note}</div><div class="verify-label">VERIFY AGAINST OFFICIAL SOURCES</div><div class="verify-row"><a class="verify-btn" href="https://hts.usitc.gov/search?query=${encodeURIComponent(r.hts_10||'')}" target="_blank" rel="noopener"><span class="vb-domain">USITC.gov</span><span class="vb-action">HTS Schedule Entry</span></a><a class="verify-btn" href="https://rulings.cbp.gov/search?term=${encodeURIComponent(r.hts_10||r.description||'')}" target="_blank" rel="noopener"><span class="vb-domain">CBP CROSS</span><span class="vb-action">Binding Ruling Precedent</span></a><a class="verify-btn" href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/search-tariffs" target="_blank" rel="noopener"><span class="vb-domain">USTR.gov</span><span class="vb-action">Section 301 Exclusions</span></a></div></div>${renderComparison(r, origin)}<div class="result-tabs"><div class="rtab active" onclick="swR(this,'rt-duty')">Duty Analysis</div><div class="rtab" onclick="swR(this,'rt-gri')">Classification Logic</div><div class="rtab" onclick="swR(this,'rt-memo')">CBP Memo</div></div><div class="rtab-body active" id="rt-duty">${flags.length?'<div class="sec-lbl">Risk Flags</div><div class="flag-list">'+flags.map(f=>`<div class="flag ${f.startsWith('Savings')?'flag-info':'flag-risk'}"><div class="flag-dot ${f.startsWith('Savings')?'dot-info':'dot-risk'}"></div><span>${f}</span></div>`).join('')+'</div>':''}<div class="disclaimer-box" style="margin-top:14px;"><div class="db-text"><strong>Decision Support Only.</strong> This result is based on the 2026 USITC HTS Schedule and USTR Section 301 data. It is <strong>not a binding customs determination</strong>. The importer of record bears full responsibility. <a href="https://hts.usitc.gov" target="_blank">Verify on USITC</a></div></div></div><div class="rtab-body" id="rt-gri"><div class="gri-box"><div class="gri-header"><div class="gri-authority">Legal Authority</div><div class="gri-rule-badge">${r.gri_rule||'GRI-1'}</div></div><div class="gri-sub">General Rules of Interpretation · Harmonized Tariff Schedule of the United States (2026)</div><div class="gri-text">${r.gri_rationale||''}</div><div class="gri-footer"><span class="gri-foot-lbl">Applied by:</span> ${apiKey?'Gemini 2.0 Flash (AI-verified)':'Tariffly Rules Engine · HTSUS 2026'} · <span class="gri-foot-lbl">Reviewed:</span> Pre-filing decision support only</div></div>${r.alternatives&&r.alternatives.length?'<div class="sec-lbl">Alternatives Considered</div><table class="alt-table"><tr><th>HTS Code</th><th>Description</th><th>Reason</th></tr>'+r.alternatives.map(a=>`<tr><td class="mono">${a.hts}</td><td>${a.desc}</td><td style="color:var(--muted)">${a.reason}</td></tr>`).join('')+'</table>':''}</div><div class="rtab-body" id="rt-memo"><div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="copy-btn" onclick="copyMemo()">Copy memo</button><button class="pdf-btn" onclick="downloadPdf()" title="Export memo as PDF"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>Download PDF</button></div><div class="memo-box" id="memo-content">${memo}</div></div><button class="save-btn" id="save-btn" onclick="saveToLib()">Save to SKU Library</button></div>`;}
 function swR(el,id){document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.rtab-body').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById(id).classList.add('active');}
 function buildMemo(r,desc,origin){const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});const stamp=new Date().toISOString().replace(/[^0-9]/g,'').slice(2,12);const ref='TRF-'+stamp;const s301=r.section_301?.applies?('+'+r.section_301.rate_pct+'% ('+r.section_301.list+')'):'Not applicable';const s232=r.section_232?.applies?('+'+r.section_232.rate_pct+'% Section 232'):'Not applicable';const totPct=r.total_effective_pct||0;const hts=r.hts_10||'—';const chapter=hts.length>=2?hts.substring(0,2):'—';const heading=hts.length>=4?hts.substring(0,4):'—';const subheading=hts.length>=7?hts.substring(0,7):'—';const risks=(r.risk_flags||[]).map((f,i)=>'  ['+(i+1)+'] '+f).join('\n');const alts=(r.alternatives||[]).filter(a=>a&&a.hts).map((a,i)=>'  ['+(i+1)+'] '+a.hts+' — '+a.desc+'\n      Rejected: '+a.reason).join('\n');return `CLASSIFICATION MEMORANDUM\nTariffly · CustomsAI.app — Classification Research Assistant\n\nReference:     ${ref}\nDate prepared: ${today}\nClassifier:    ${apiKey?'Gemini 2.0 Flash (AI-verified)':'Tariffly Rules Engine'}\n\n════════════════════════════════════════════════════════════\nRE:  Classification of subject merchandise under the 2026 HTSUS\n════════════════════════════════════════════════════════════\n\nI. SUBJECT MERCHANDISE\n────────────────────────────────────────────────────────────\nProduct description: ${desc}\nCountry of origin:   ${origin}\n\nII. CLASSIFICATION DETERMINATION\n────────────────────────────────────────────────────────────\nHTS (10-digit):   ${hts}\n  Chapter:        ${chapter}\n  Heading:        ${heading}\n  Subheading:     ${subheading}\nArticle text:     ${r.description||'—'}\nConfidence:       ${r.confidence||'MEDIUM'}\n\nIII. RULES OF INTERPRETATION\n────────────────────────────────────────────────────────────\nRule applied: ${r.gri_rule||'GRI-1'}\nLegal authority: General Rules of Interpretation, Harmonized Tariff\nSchedule of the United States (2026 edition), as administered by\nU.S. Customs and Border Protection (19 U.S.C. § 1202).\n\nRationale:\n${(r.gri_rationale||'').replace(/(.{1,64})(\\s|$)/g,'$1\\n').trim()}\n\nIV. DUTY ANALYSIS\n────────────────────────────────────────────────────────────\nColumn 1 General:  ${r.duty_general_formatted||'Free'}\nSection 301:       ${s301}\nSection 232:       ${s232}\n                   ──────────────────────────────\nTotal effective:   ${r.total_formatted||'Free'}${totPct>0?' ('+totPct.toFixed(1)+'% ad valorem)':''}\n${r.savings_tip?'\nSavings opportunity: '+r.savings_tip+'\n':''}\nV. RISK ASSESSMENT\n────────────────────────────────────────────────────────────\n${risks||'  No material risk flags identified.'}\n\nVI. ALTERNATIVES CONSIDERED\n────────────────────────────────────────────────────────────\n${alts||'  No alternative headings of comparable specificity identified.'}\n\nVII. VERIFICATION SOURCES\n────────────────────────────────────────────────────────────\nUSITC HTS Schedule:    https://hts.usitc.gov\nCBP Rulings (CROSS):   https://rulings.cbp.gov\nUSTR Section 301:      https://ustr.gov/issue-areas/enforcement/section-301-investigations\nCBP Form 7501 (Entry): https://www.cbp.gov/trade/programs-administration/entry-summary\n\nVIII. DISCLAIMER\n────────────────────────────────────────────────────────────\nThis memorandum constitutes classification research only and does\nnot constitute a CBP Binding Ruling under 19 CFR Part 177. Results\nare informational and non-binding on any customs authority. The\nimporter of record bears sole responsibility for the accuracy of\nentry declarations. A licensed U.S. Customs Broker must review\nthis determination prior to entry filing. For binding classification\nauthority, submit an electronic ruling request via CBP eRulings.\n\n════════════════════════════════════════════════════════════\nPrepared by Tariffly · ${today} · Ref ${ref}\n════════════════════════════════════════════════════════════`;}
 function copyMemo(){const t=document.getElementById('memo-content').textContent;navigator.clipboard.writeText(t).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy memo',1500);});}
@@ -1180,6 +1248,193 @@ document.addEventListener('DOMContentLoaded',()=>{
   initGoogleSignIn();
   const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el)); initGoogleSignIn();const ta=document.getElementById('product-desc');if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))classify();});});
+
+// === Phase 5 Functions ===
+const ORIGIN_CATALOG=[
+  {code:'CN',name:'China',flag:'🇨🇳'},
+  {code:'VN',name:'Vietnam',flag:'🇻🇳'},
+  {code:'MX',name:'Mexico',flag:'🇲🇽'},
+  {code:'IN',name:'India',flag:'🇮🇳'},
+  {code:'TH',name:'Thailand',flag:'🇹🇭'},
+  {code:'MY',name:'Malaysia',flag:'🇲🇾'},
+  {code:'KR',name:'South Korea',flag:'🇰🇷'},
+  {code:'TW',name:'Taiwan',flag:'🇹🇼'},
+  {code:'CA',name:'Canada',flag:'🇨🇦'},
+  {code:'BD',name:'Bangladesh',flag:'🇧🇩'}
+];
+function findRuleForHts(hts){
+  if(!hts||typeof RULES==='undefined') return null;
+  let r=RULES.find(x=>x.h===hts);
+  if(r) return r;
+  const p7=hts.substring(0,7);
+  r=RULES.find(x=>x.h.substring(0,7)===p7);
+  if(r) return r;
+  const p4=hts.substring(0,4);
+  r=RULES.find(x=>x.h.substring(0,4)===p4);
+  return r||null;
+}
+function dutyForOrigin(rule,res,origin){
+  const usmcaFree=['MX','CA'].includes(origin);
+  const general=rule?rule.p:(res.duty_general_pct||0);
+  const base=usmcaFree?0:general;
+  let s301=0;
+  if(rule&&rule.s301){ s301=(origin==='CN')?(rule.s301.r||0):0; }
+  else if(res.section_301&&res.section_301.rate_pct&&origin==='CN'){ s301=res.section_301.rate_pct; }
+  let s232=0;
+  if(rule&&rule.s232){ if(['CN','IN','TW'].includes(origin)) s232=rule.s232.r||0; }
+  else if(res.section_232&&res.section_232.rate_pct){ if(['CN','IN','TW'].includes(origin)) s232=res.section_232.rate_pct; }
+  return {general,usmca:usmcaFree,base,s301,s232,total:base+s301+s232};
+}
+function renderComparison(res,currentOrigin){
+  if(!res||!res.hts_10) return '';
+  const rule=findRuleForHts(res.hts_10);
+  const rows=ORIGIN_CATALOG.map(o=>Object.assign({},o,dutyForOrigin(rule,res,o.code)));
+  const current=rows.find(r=>r.code===currentOrigin)||rows[0];
+  const cheapest=rows.reduce((a,b)=>b.total<a.total?b:a,rows[0]);
+  const sorted=rows.slice().sort((a,b)=>a.total-b.total);
+  const rowHtml=sorted.map(function(r){
+    const delta=r.total-current.total;
+    const dClass=delta<0?'down':delta>0?'up':'same';
+    const dTxt=delta===0?'—':(delta>0?'+':'')+delta.toFixed(1)+'%';
+    const isCur=r.code===currentOrigin?' cmp-current':'';
+    const badge=(r.code===cheapest.code&&cheapest.total<current.total)?'<span class="cmp-best">BEST</span>':'';
+    const parts=[];
+    parts.push(r.usmca?'USMCA Free':(r.base?r.base.toFixed(1)+'% Gen':'Free'));
+    if(r.s301) parts.push('§301 +'+r.s301+'%');
+    if(r.s232) parts.push('§232 +'+r.s232+'%');
+    const breakdown=parts.join(' · ');
+    return '<div class="cmp-row'+isCur+'">'+
+      '<div class="cmp-cell cmp-c1"><span class="cmp-flag">'+r.flag+'</span><span class="cmp-name">'+r.name+' ('+r.code+')</span>'+badge+'</div>'+
+      '<div class="cmp-cell cmp-c2">'+breakdown+'</div>'+
+      '<div class="cmp-cell cmp-c3">'+(r.total===0?'Free':r.total.toFixed(1)+'%')+'</div>'+
+      '<div class="cmp-cell cmp-c4 cmp-delta '+dClass+'">'+dTxt+'</div>'+
+    '</div>';
+  }).join('');
+  return '<div class="origin-cmp-box">'+
+    '<div class="cmp-hdr">'+
+      '<span class="cmp-hdr-lbl">Sourcing Comparison · Effective Duty by Country of Origin</span>'+
+      '<span class="cmp-hdr-sub">HTS '+res.hts_10+' · Current origin: '+current.name+' ('+current.code+') · Sorted low to high</span>'+
+    '</div>'+
+    '<div class="cmp-th"><div class="cmp-cell cmp-c1">Country</div><div class="cmp-cell cmp-c2">Breakdown</div><div class="cmp-cell cmp-c3">Effective</div><div class="cmp-cell cmp-c4">Δ vs '+current.code+'</div></div>'+
+    rowHtml+
+    '<div class="cmp-foot">Estimates per 2026 HTSUS Column 1 General · USMCA via General Note 11 · Section 301/232 per USTR · Pre-filing analysis only — consult a licensed broker before sourcing decisions</div>'+
+  '</div>';
+}
+function downloadPdf(){
+  if(typeof currentResult==='undefined'||!currentResult){ alert('Classify something first to generate a memo.'); return; }
+  const memo=document.getElementById('memo-content');
+  if(!memo){ alert('Memo not found.'); return; }
+  let pt=document.getElementById('print-target');
+  if(!pt){ pt=document.createElement('div'); pt.id='print-target'; document.body.appendChild(pt); }
+  pt.textContent=memo.textContent;
+  const originalTitle=document.title;
+  document.title='Tariffly_Memo_'+(currentResult.hts_10||'HTS')+'_'+new Date().toISOString().slice(0,10);
+  document.body.classList.add('is-printing');
+  setTimeout(function(){
+    window.print();
+    setTimeout(function(){
+      document.body.classList.remove('is-printing');
+      document.title=originalTitle;
+    },100);
+  },50);
+}
+function downloadBatchTemplate(){
+  const csv='description,origin\nDC motor 500W brushless HVAC equipment,CN\nStainless steel kitchen bowls 20cm,CN\nCotton mens jeans size 34,VN\nLED office lamp with USB charging,CN\nAluminum folding bicycle adult,TW\n';
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=u; a.download='tariffly-batch-template.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(u);},1000);
+}
+function parseCsv(txt){
+  const lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
+  if(lines.length<1) return [];
+  const parseLine=function(l){
+    const cells=[]; let cur=''; let q=false;
+    for(let i=0;i<l.length;i++){
+      const c=l[i];
+      if(c==='"'){ if(q&&l[i+1]==='"'){cur+='"';i++;continue;} q=!q; continue; }
+      if(c===','&&!q){ cells.push(cur); cur=''; continue; }
+      cur+=c;
+    }
+    cells.push(cur);
+    return cells;
+  };
+  const header=parseLine(lines[0]).map(function(s){return s.trim().toLowerCase();});
+  return lines.slice(1).map(function(l){
+    const cells=parseLine(l);
+    const o={};
+    header.forEach(function(h,i){o[h]=(cells[i]||'').trim();});
+    return o;
+  });
+}
+async function batchFileChosen(e){
+  const f=e.target.files[0]; if(!f) return;
+  e.target.value='';
+  try{
+    const txt=await f.text();
+    const rows=parseCsv(txt);
+    if(!rows.length){ alert('CSV appears empty.'); return; }
+    if(!('description' in rows[0])){ alert('CSV must include a "description" column. Use the Template button for a working example.'); return; }
+    if(rows.length>100){ if(!confirm('Process '+rows.length+' rows? This may take a few minutes.')) return; }
+    await runBatch(rows);
+  }catch(err){
+    alert('Could not read CSV: '+err.message);
+  }
+}
+async function runBatch(rows){
+  const prog=document.getElementById('batch-progress');
+  const fill=document.getElementById('batch-fill');
+  const stat=document.getElementById('batch-stat');
+  const btn=document.getElementById('batch-btn');
+  prog.style.display='block'; btn.disabled=true; btn.style.opacity='.6';
+  const results=[];
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i];
+    const desc=(row.description||'').trim();
+    const origin=((row.origin||'CN').toUpperCase()).trim();
+    stat.textContent='Classifying '+(i+1)+' / '+rows.length+' · '+desc.substring(0,46)+(desc.length>46?'…':'');
+    fill.style.width=((i+1)/rows.length*100).toFixed(1)+'%';
+    if(!desc){ results.push({desc:'',origin,hts:'SKIPPED',duty:'',general:'',s301:'',s232:'',gri:'',confidence:'',error:'empty description'}); continue; }
+    try{
+      let res;
+      if(typeof apiKey!=='undefined'&&apiKey){ res=await classifyGemini(desc,origin); }
+      else { res=classifyRules(desc,origin); }
+      results.push({
+        desc, origin,
+        hts:res.hts_10||'',
+        duty:res.total_formatted||'',
+        general:res.duty_general_pct!=null?(res.duty_general_pct+'%'):'',
+        s301:(res.section_301&&res.section_301.rate_pct)?(res.section_301.rate_pct+'%'):'',
+        s232:(res.section_232&&res.section_232.rate_pct)?(res.section_232.rate_pct+'%'):'',
+        gri:res.gri_rule||'',
+        confidence:res.confidence||'',
+        error:''
+      });
+    }catch(err){
+      results.push({desc,origin,hts:'ERROR',duty:'',general:'',s301:'',s232:'',gri:'',confidence:'',error:String(err.message||err).substring(0,120)});
+    }
+    if(typeof apiKey!=='undefined'&&apiKey&&i<rows.length-1){ await new Promise(function(r){setTimeout(r,450);}); }
+  }
+  stat.textContent='Done — '+results.length+' row'+(results.length===1?'':'s')+' · downloading…';
+  exportBatchCsv(results);
+  btn.disabled=false; btn.style.opacity='';
+  setTimeout(function(){ prog.style.display='none'; fill.style.width='0%'; },2500);
+}
+function exportBatchCsv(results){
+  const cols=['desc','origin','hts','duty','general','s301','s232','gri','confidence','error'];
+  const esc=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const csv=[cols.map(function(c){return c==='desc'?'description':c;}).join(',')].concat(results.map(function(r){return cols.map(function(c){return esc(r[c]);}).join(',');})).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=u; a.download='tariffly-batch-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(u);},1000);
+}
+// === end Phase 5 ===
 </script>
+    <div id="print-target" aria-hidden="true"></div>
 </body>
   </html>
