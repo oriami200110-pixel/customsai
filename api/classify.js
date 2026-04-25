@@ -14,7 +14,7 @@
 //   - Single-shot classification; multi-pass + RAG land in Phase C
 
 export const config = {
-  runtime: 'nodejs20.x',
+  runtime: 'nodejs',
   maxDuration: 30,
 };
 
