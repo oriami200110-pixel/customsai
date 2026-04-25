@@ -254,7 +254,7 @@ Apply the mandatory classification procedure. Return only the JSON object per th
     generationConfig: {
       temperature: 0.1,
       topP: 0.95,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
       responseMimeType: 'application/json',
       responseSchema: OUTPUT_SCHEMA,
     },
@@ -296,11 +296,27 @@ Apply the mandatory classification procedure. Return only the JSON object per th
     return res.status(502).json({ ok: false, error: 'Empty response from classifier' });
   }
 
+  // Robust JSON extraction — strip code fences, trim whitespace, fall back to
+  // first-{...}-last-} substring if the model added preamble/trailing prose.
   let parsed;
-  try { parsed = JSON.parse(rawText); }
+  let cleaned = rawText.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+  }
+  try { parsed = JSON.parse(cleaned); }
   catch {
-    console.error('Gemini returned non-JSON', rawText.slice(0, 500));
-    return res.status(502).json({ ok: false, error: 'Classifier returned malformed JSON' });
+    const first = cleaned.indexOf('{');
+    const last = cleaned.lastIndexOf('}');
+    if (first >= 0 && last > first) {
+      try { parsed = JSON.parse(cleaned.slice(first, last + 1)); }
+      catch {
+        console.error('Gemini returned non-JSON', cleaned.slice(0, 500), 'len=', cleaned.length);
+        return res.status(502).json({ ok: false, error: 'Classifier returned malformed JSON' });
+      }
+    } else {
+      console.error('Gemini returned non-JSON', cleaned.slice(0, 500), 'len=', cleaned.length);
+      return res.status(502).json({ ok: false, error: 'Classifier returned malformed JSON' });
+    }
   }
 
   // Last-line sanity rules (defense in depth — the prompt should already prevent these)
