@@ -474,7 +474,7 @@ body{min-height:100vh;display:flex;flex-direction:column;}
 }
 
 </style>
-</head>
+<style>.sidebar-foot{display:none!important;}</style></head>
 <body>
 
 <button class="mobile-menu-btn" id="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('expanded')"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
@@ -1084,7 +1084,7 @@ async function classify() {
   let s=1;
   const si=setInterval(()=>{if(s<=5){for(let i=1;i<=5;i++){const e=document.getElementById('ls'+i);if(e)e.className='load-step'+(i<s?' done':i===s?' act':'');}s++;}},900);
   try {
-    const r=apiKey?await classifyGemini(desc,origin):classifyRules(desc,origin);
+    const r=await classifyGemini(desc,origin).catch(function(){return classifyRules(desc,origin);});
     clearInterval(si); currentResult=r; usageCount++; localStorage.setItem('cai_usage',usageCount); updateUsage();
     document.getElementById('loading-state').style.display='none';
     renderResult(r,desc,origin); addToRecent(r,desc);
@@ -1097,7 +1097,7 @@ async function classify() {
 }
 
 const SYS='You are a licensed U.S. Customs Broker preparing an audit-grade classification memorandum for an importer of record. Apply the General Rules of Interpretation (GRI 1-6) of the HTSUS in strict legal order. In gri_rationale write 3-4 full sentences of formal broker prose: (1) cite the specific GRI rule invoked and its legal basis, (2) justify heading selection (first 4 digits) with reference to chapter/section notes where relevant, (3) explain subheading specificity (digits 5-6) and the statistical suffix (digits 7-10), (4) if applicable note any competing heading eliminated. Use formal, declarative language — no hedging. description must match standard USITC HTS line text. Return ONLY this JSON (no markdown): {"hts_10":"","description":"","gri_rule":"GRI-1","gri_rationale":"","confidence":"HIGH|MEDIUM|LOW","duty_general_pct":0,"duty_general_formatted":"Free","section_301":{"applies":false,"list":"","rate_pct":0},"section_232":{"applies":false,"rate_pct":0},"total_effective_pct":0,"total_formatted":"Free","alternatives":[{"hts":"","desc":"","reason":""}],"risk_flags":[],"savings_tip":""}';
-async function classifyGemini(desc,origin){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\nProduct: '+desc+'\nOrigin: '+origin}]}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);let t=d.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');return JSON.parse(t);}
+async function classifyGemini(desc,origin){const r=await fetch('/api/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,origin:origin})});const d=await r.json();if(!r.ok||!d.ok)throw new Error((d&&d.error)||('Classifier '+r.status));return d.result;}
 const RULES=[
   // ── ELECTRONICS & COMPUTERS ──────────────────────────────
   {kw:['laptop','notebook','ultrabook','macbook','chromebook'],h:'8471.30.0100',d:'Portable ADP machines, not over 10 kg',g:'GRI-1',p:0,s301:{a:true,l:'List 4A',r:7.5}},
@@ -1399,8 +1399,7 @@ async function runBatch(rows){
     if(!desc){ results.push({desc:'',origin,hts:'SKIPPED',duty:'',general:'',s301:'',s232:'',gri:'',confidence:'',error:'empty description'}); continue; }
     try{
       let res;
-      if(typeof apiKey!=='undefined'&&apiKey){ res=await classifyGemini(desc,origin); }
-      else { res=classifyRules(desc,origin); }
+      res=await classifyGemini(desc,origin).catch(function(){return classifyRules(desc,origin);})
       results.push({
         desc, origin,
         hts:res.hts_10||'',
