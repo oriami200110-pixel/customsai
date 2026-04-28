@@ -1915,7 +1915,10 @@ function fillExample(el) {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
-document.addEventListener('DOMContentLoaded', () => {
+// Script is at end of <body> — DOM is fully available now. Use IIFE instead of
+// DOMContentLoaded to avoid any event-timing race where the event fires before
+// this listener is registered.
+(function initApp() {
   initSupabase();
 
   // Show auth modal immediately — hide it only once we confirm a valid session.
@@ -1965,7 +1968,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeTermsModal(); closeApiKeyModal();
     }
   });
-});
+})();
 </script>
 
 <!-- Formspree AJAX (used for email signup notification) -->
