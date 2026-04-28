@@ -14,8 +14,8 @@
   <!-- Supabase JS v2 (optional — set SUPABASE_URL + SUPABASE_ANON_KEY below to enable backend auth & admin) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
-  <!-- Google Sign-In -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Google Sign-In — defer (not async) so handleGoogleResponse is defined first -->
+  <script src="https://accounts.google.com/gsi/client" defer></script>
 
   <style>
     /* ─── Reset & Base ─────────────────────────────────────────────────────── */
@@ -675,11 +675,12 @@
         <button class="btn btn-primary" type="submit" id="signupBtn">Create free account</button>
       </form>
 
-      <div class="success-card" id="signupSuccess">
-        <div class="success-icon">✓</div>
-        <h3>Account created!</h3>
-        <p>Welcome to Tariffly. You have 3 free classifications to start. No credit card needed.</p>
-        <button class="btn btn-primary" onclick="onSignupSuccessContinue()">Start Classifying →</button>
+      <!-- Supabase signup: show email confirmation message -->
+      <div class="success-card" id="signupSuccess" data-mode="confirm">
+        <div class="success-icon">✉</div>
+        <h3 id="signupSuccessTitle">Check your email</h3>
+        <p id="signupSuccessMsg">We sent a confirmation link to your email. Click it to activate your account, then come back and sign in.</p>
+        <button class="btn btn-primary" id="signupSuccessBtn" onclick="onSignupSuccessContinue()">Go to Sign In →</button>
       </div>
 
       <p class="auth-footer">By creating an account you agree to our <a href="#" onclick="openTermsModal();return false">Terms of Use</a> and <a href="#" onclick="openTermsModal();return false">Privacy Policy</a>.</p>
@@ -1166,15 +1167,22 @@ async function handleSignupSubmit(e) {
       localStorage.setItem(LS.USER, JSON.stringify(profile));
     }
 
-    // Show success
+    // Show success — different message for Supabase (needs email confirm) vs localStorage
     document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('signupSuccess').classList.add('show');
-
-    // Pre-cache user if not using Supabase realtime
-    if (!supabaseReady) {
-      const profile = { firstName, lastName, email, company, provider: 'email' };
-      localStorage.setItem(LS.USER, JSON.stringify(profile));
+    if (supabaseReady) {
+      document.getElementById('signupSuccessTitle').textContent = 'Check your inbox';
+      document.getElementById('signupSuccessMsg').textContent =
+        `We sent a confirmation link to ${email}. Click it to activate your account, then sign in here.`;
+      document.getElementById('signupSuccessBtn').textContent = 'Go to Sign In →';
+      document.querySelector('#signupSuccess .success-icon').textContent = '✉';
+    } else {
+      document.getElementById('signupSuccessTitle').textContent = 'Account created!';
+      document.getElementById('signupSuccessMsg').textContent =
+        'Welcome to Tariffly. You have 3 free classifications to start.';
+      document.getElementById('signupSuccessBtn').textContent = 'Start Classifying →';
+      document.querySelector('#signupSuccess .success-icon').textContent = '✓';
     }
+    document.getElementById('signupSuccess').classList.add('show');
   } catch(err) {
     showAuthError(err.message || 'Signup failed. Please try again.');
   } finally {
@@ -1255,9 +1263,17 @@ async function signInWithApple() {
 }
 
 function onSignupSuccessContinue() {
-  const profile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
-  if (profile) onAuthSuccess(profile);
-  else { closeAuthModal(); showConsentIfNeeded(); }
+  // If Supabase is active, user needs to confirm email first — go to sign-in tab
+  if (supabaseReady) {
+    document.getElementById('signupSuccess').classList.remove('show');
+    document.getElementById('signupForm').style.display = '';
+    switchAuthTab('signin');
+  } else {
+    // localStorage mode — go straight to app
+    const profile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
+    if (profile) onAuthSuccess(profile);
+    else closeAuthModal();
+  }
 }
 
 function onAuthSuccess(profile) {
@@ -1365,13 +1381,32 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
-function checkUsageGate() {
-  const used = getUsage();
+// Async paywall gate — checks Supabase plan first, falls back to localStorage
+async function checkUsageGate() {
   const apiKey = localStorage.getItem(LS.APIKEY);
-  // Pro check (stub — extend with Supabase user.plan check)
-  const profile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
-  const isPro = profile?.plan === 'pro';
-  if (!isPro && !apiKey && used >= FREE_LIMIT) {
+  if (apiKey) return true; // Own API key = unlimited
+
+  // Check Supabase plan (server-side, tamper-proof)
+  if (supabaseReady && supabase) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('plan')
+          .eq('id', user.id)
+          .single();
+        if (prof?.plan === 'pro' || prof?.plan === 'team') return true;
+      }
+    } catch(e) { /* fall through to localStorage check */ }
+  }
+
+  // localStorage fallback (not tamper-proof, but acceptable for free tier)
+  const localProfile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
+  if (localProfile?.plan === 'pro') return true;
+
+  const used = getUsage();
+  if (used >= FREE_LIMIT) {
     showUpgradeModal();
     return false;
   }
@@ -1414,8 +1449,8 @@ async function runClassify() {
   // Consent gate
   if (!localStorage.getItem(LS.CONSENT)) { showConsentModal(); return; }
 
-  // Usage gate
-  if (!checkUsageGate()) return;
+  // Usage gate (async — verifies plan in Supabase before allowing classification)
+  if (!(await checkUsageGate())) return;
 
   // UI: loading
   document.getElementById('emptyState').style.display   = 'none';
@@ -1519,14 +1554,23 @@ async function persistClassification(result, description, origin) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     await supabase.from('classifications').insert({
-      user_id:     user.id,
-      description, origin,
-      hts_10:      result.hts_10,
-      total_pct:   result.total_effective_pct,
+      user_id:            user.id,
+      product_desc:       description,       // matches SQL schema
+      country_of_origin:  origin,            // matches SQL schema
+      hts_code:           result.hts_10,
+      hts_description:    result.description || '',
+      base_rate:          result.duty_general_pct   || 0,
+      section_301:        result.section_301?.rate_pct || 0,
+      section_232:        result.section_232?.rate_pct || 0,
+      total_rate:         result.total_effective_pct || 0,
+      gri_rule:           result.gri_rule  || '',
+      confidence:         String(result.confidence || ''),
+      risk_flags:         result.risk_flags || [],
+      alternatives:       result.alternatives || [],
     });
-    // Increment classification count in profiles
-    await supabase.rpc('increment_classification_count', { uid: user.id });
-  } catch(e) { /* silent */ }
+    // Increment classification count in profiles (parameter must match SQL function)
+    await supabase.rpc('increment_classification_count', { user_id: user.id });
+  } catch(e) { console.warn('persistClassification error:', e.message); }
 }
 
 function showError(msg) {
