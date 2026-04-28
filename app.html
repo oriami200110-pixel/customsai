@@ -602,8 +602,8 @@
      MODALS
 ═══════════════════════════════════════════════════════════════ -->
 
-<!-- Auth Modal -->
-<div class="overlay" id="authOverlay">
+<!-- Auth Modal — active by default so it's always visible even if JS fails -->
+<div class="overlay active" id="authOverlay">
   <div class="modal">
     <div class="modal-logo">
       <div>
@@ -1089,9 +1089,9 @@ function initSupabase() {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseReady = true;
 
-    // Listen for auth state changes
+    // Listen for auth state changes — INITIAL_SESSION fires on page load with current session
     supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
         const u = session.user;
         const profile = {
           firstName: u.user_metadata?.first_name || u.email.split('@')[0],
@@ -1102,6 +1102,8 @@ function initSupabase() {
         };
         localStorage.setItem(LS.USER, JSON.stringify(profile));
         onAuthSuccess(profile);
+      } else if (event === 'INITIAL_SESSION' && !session) {
+        // No existing session — auth modal is already visible, nothing to do
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(LS.USER);
         showAuthModal();
@@ -1915,57 +1917,43 @@ function fillExample(el) {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Script is at end of <body> — DOM is fully available now. Use IIFE instead of
-// DOMContentLoaded to avoid any event-timing race where the event fires before
-// this listener is registered.
+// ─── App Init ─────────────────────────────────────────────────────────────────
+// IIFE so it runs immediately (script is at end of body — DOM is ready).
+// Auth modal is visible by default in HTML; we close it only after confirming a session.
 (function initApp() {
+  // 1. Wire up Supabase. onAuthStateChange fires INITIAL_SESSION synchronously
+  //    (or on next microtask) — it will call onAuthSuccess() if a session exists,
+  //    which closes the auth modal. If no session, modal stays visible.
   initSupabase();
 
-  // Show auth modal immediately — hide it only once we confirm a valid session.
-  // This ensures the screen is never blank while async auth resolves.
-  showAuthModal();
-
-  // Check for existing session
-  const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
-
-  if (supabaseReady) {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const u = session.user;
-        const profile = {
-          firstName: u.user_metadata?.first_name || u.email.split('@')[0],
-          lastName:  u.user_metadata?.last_name  || '',
-          email:     u.email,
-          provider:  u.app_metadata?.provider || 'email',
-          id:        u.id,
-        };
-        localStorage.setItem(LS.USER, JSON.stringify(profile));
-        onAuthSuccess(profile);
-      }
-      // else: auth modal is already showing — nothing to do
-    }).catch(() => {
-      // getSession failed — auth modal is already showing
-    });
-  } else if (stored) {
-    // localStorage auth (no Supabase) — close modal and show app
-    onAuthSuccess(stored);
-  }
-  // else: auth modal already showing
-
-  // Show Apple buttons only if Supabase is configured
-  if (supabaseReady) {
-    document.getElementById('appleBtn')?.style.setProperty('display', '');
-    document.getElementById('appleSigninBtn')?.style.setProperty('display', '');
+  // 2. localStorage fallback — if Supabase isn't configured but we have a stored
+  //    profile, skip the auth modal immediately.
+  if (!supabaseReady) {
+    const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
+    if (stored?.email) {
+      onAuthSuccess(stored);
+    }
+    // else: auth modal stays visible (default state)
   }
 
-  // Pre-fill sidebar API key
+  // 3. Show Apple buttons only when Supabase is active
+  if (supabaseReady) {
+    document.getElementById('appleBtn')?.removeAttribute('style');
+    document.getElementById('appleSigninBtn')?.removeAttribute('style');
+  }
+
+  // 4. Restore sidebar API key
   const key = localStorage.getItem(LS.APIKEY);
-  if (key) document.getElementById('sidebarApiKey').value = key;
+  if (key) {
+    const inp = document.getElementById('sidebarApiKey');
+    if (inp) inp.value = key;
+  }
 
-  // Keyboard shortcut
+  // 5. Global keyboard shortcuts
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      closeTermsModal(); closeApiKeyModal();
+      closeTermsModal();
+      closeApiKeyModal();
     }
   });
 })();
