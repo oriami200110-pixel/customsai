@@ -62,12 +62,10 @@
       position: fixed; inset: 0; z-index: 100;
       background: rgba(0,0,0,0.75);
       backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
+      display: none; align-items: center; justify-content: center;
       padding: 16px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .2s;
     }
-    .overlay.active { opacity: 1; pointer-events: all; }
+    .overlay.active { display: flex; }
 
     .modal {
       background: var(--bg2);
@@ -1876,6 +1874,10 @@ function fillExample(el) {
 document.addEventListener('DOMContentLoaded', () => {
   initSupabase();
 
+  // Show auth modal immediately — hide it only once we confirm a valid session.
+  // This ensures the screen is never blank while async auth resolves.
+  showAuthModal();
+
   // Check for existing session
   const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
 
@@ -1892,16 +1894,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem(LS.USER, JSON.stringify(profile));
         onAuthSuccess(profile);
-      } else {
-        showAuthModal();
       }
+      // else: auth modal is already showing — nothing to do
+    }).catch(() => {
+      // getSession failed — auth modal is already showing
     });
   } else if (stored) {
-    // localStorage auth (no Supabase)
+    // localStorage auth (no Supabase) — close modal and show app
     onAuthSuccess(stored);
-  } else {
-    showAuthModal();
   }
+  // else: auth modal already showing
 
   // Show Apple buttons only if Supabase is configured
   if (supabaseReady) {
