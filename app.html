@@ -1152,32 +1152,45 @@ async function handleSignupSubmit(e) {
   try {
     if (supabaseReady) {
       // Supabase email/password signup
+      // Note: do NOT pass emailRedirectTo unless that URL is whitelisted in
+      // Supabase → Authentication → URL Configuration → Redirect URLs.
       const { data, error } = await supabase.auth.signUp({
         email, password,
-        options: {
-          data: { first_name: firstName, last_name: lastName, company },
-          emailRedirectTo: window.location.href,
-        }
+        options: { data: { first_name: firstName, last_name: lastName, company } }
       });
       if (error) throw error;
-      // Also notify via Formspree (no await — best effort)
-      notifyFormspree({ firstName, lastName, email, company });
-    } else {
-      // localStorage fallback — also send to Formspree
-      await notifyFormspree({ firstName, lastName, email, company });
-      const profile = { firstName, lastName, email, company, provider: 'email' };
-      localStorage.setItem(LS.USER, JSON.stringify(profile));
-    }
 
-    // Show success — different message for Supabase (needs email confirm) vs localStorage
-    document.getElementById('signupForm').style.display = 'none';
-    if (supabaseReady) {
+      // Notify via Formspree (no await — best effort)
+      notifyFormspree({ firstName, lastName, email, company });
+
+      // If email confirmation is DISABLED in Supabase, data.session is non-null
+      // and we can log the user in immediately. Otherwise show the confirm email card.
+      if (data.session) {
+        const u = data.user;
+        const profile = {
+          firstName: u.user_metadata?.first_name || firstName || email.split('@')[0],
+          lastName:  u.user_metadata?.last_name  || lastName  || '',
+          email:     u.email,
+          provider:  'email',
+          id:        u.id,
+        };
+        localStorage.setItem(LS.USER, JSON.stringify(profile));
+        onAuthSuccess(profile);
+        return; // skip success card — already in app
+      }
+      // else: email confirmation required
+      document.getElementById('signupForm').style.display = 'none';
       document.getElementById('signupSuccessTitle').textContent = 'Check your inbox';
       document.getElementById('signupSuccessMsg').textContent =
         `We sent a confirmation link to ${email}. Click it to activate your account, then sign in here.`;
       document.getElementById('signupSuccessBtn').textContent = 'Go to Sign In →';
       document.querySelector('#signupSuccess .success-icon').textContent = '✉';
     } else {
+      // localStorage fallback
+      await notifyFormspree({ firstName, lastName, email, company });
+      const profile = { firstName, lastName, email, company, provider: 'email' };
+      localStorage.setItem(LS.USER, JSON.stringify(profile));
+      document.getElementById('signupForm').style.display = 'none';
       document.getElementById('signupSuccessTitle').textContent = 'Account created!';
       document.getElementById('signupSuccessMsg').textContent =
         'Welcome to Tariffly. You have 3 free classifications to start.';
@@ -1186,7 +1199,14 @@ async function handleSignupSubmit(e) {
     }
     document.getElementById('signupSuccess').classList.add('show');
   } catch(err) {
-    showAuthError(err.message || 'Signup failed. Please try again.');
+    // Give friendlier messages for common Supabase errors
+    let msg = err.message || 'Signup failed. Please try again.';
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      msg = 'This email is already registered. Please sign in instead.';
+    } else if (msg.includes('password')) {
+      msg = 'Password must be at least 8 characters.';
+    }
+    showAuthError(msg);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Create free account';
@@ -1206,9 +1226,19 @@ async function handleSigninSubmit(e) {
     if (supabaseReady) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // onAuthStateChange will handle the rest
+      // Explicitly call onAuthSuccess — don't rely solely on onAuthStateChange
+      const u = data.user;
+      const profile = {
+        firstName: u.user_metadata?.first_name || email.split('@')[0],
+        lastName:  u.user_metadata?.last_name  || '',
+        email:     u.email,
+        provider:  u.app_metadata?.provider || 'email',
+        id:        u.id,
+      };
+      localStorage.setItem(LS.USER, JSON.stringify(profile));
+      onAuthSuccess(profile);
     } else {
-      // localStorage fallback: accept any email
+      // localStorage fallback: accept any stored email
       const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
       if (!stored || stored.email !== email) {
         throw new Error('No account found with this email. Please sign up first.');
@@ -1216,7 +1246,15 @@ async function handleSigninSubmit(e) {
       onAuthSuccess(stored);
     }
   } catch(err) {
-    showAuthError(err.message || 'Sign-in failed. Please try again.');
+    let msg = err.message || 'Sign-in failed. Please try again.';
+    if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+      msg = 'Incorrect email or password. Please try again.';
+    } else if (msg.includes('Email not confirmed')) {
+      msg = 'Please confirm your email first — check your inbox for the confirmation link.';
+    } else if (msg.includes('Too many requests')) {
+      msg = 'Too many attempts. Please wait a minute and try again.';
+    }
+    showAuthError(msg);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Sign in';
