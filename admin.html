@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tariffly Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F1117;
+      --bg2:     #161B27;
+      --surface: #1E2535;
+      --border:  #2A3347;
+      --accent:  #3B82F6;
+      --green:   #10B981;
+      --red:     #EF4444;
+      --amber:   #F59E0B;
+      --text:    #F1F5F9;
+      --text-2:  #94A3B8;
+      --text-3:  #64748B;
+      --font:    'Inter', system-ui, sans-serif;
+      --radius:  10px;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Login Screen ─────────────────────────────────────────────────── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    }
+    .login-brand { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+    .login-sub { font-size: .75rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 28px; }
+    .login-label { font-size: .8rem; font-weight: 500; color: var(--text-2); margin-bottom: 5px; display: block; }
+    .login-input {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: var(--font); font-size: .9rem;
+      margin-bottom: 12px; transition: border-color .15s;
+    }
+    .login-input:focus { outline: none; border-color: var(--accent); }
+    .login-btn {
+      width: 100%; padding: 11px; border-radius: 8px;
+      background: var(--accent); color: #fff; border: none;
+      font-family: var(--font); font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: filter .15s;
+    }
+    .login-btn:hover { filter: brightness(1.1); }
+    .login-error {
+      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3);
+      color: #FCA5A5; border-radius: 6px; padding: 9px 12px;
+      font-size: .82rem; margin-bottom: 12px; display: none;
+    }
+    .login-error.show { display: block; }
+
+    /* ── Admin Shell ──────────────────────────────────────────────────── */
+    #adminShell { display: none; flex-direction: column; min-height: 100vh; }
+
+    .admin-topbar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .topbar-brand { font-size: 1rem; font-weight: 700; }
+    .topbar-badge {
+      background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3);
+      color: #FCA5A5; border-radius: 20px; padding: 3px 10px;
+      font-size: .72rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-user { font-size: .82rem; color: var(--text-2); }
+    .topbar-logout {
+      padding: 6px 14px; border-radius: 7px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-2); font-family: var(--font); font-size: .82rem;
+      cursor: pointer; transition: all .15s;
+    }
+    .topbar-logout:hover { background: var(--surface); color: var(--text); }
+
+    /* ── Main Content ─────────────────────────────────────────────────── */
+    .admin-body { padding: 28px; flex: 1; }
+
+    /* ── Stats Row ────────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+    }
+    .stat-label { font-size: .72rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; overflow-wrap: break-word; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue  { color: var(--accent); }
+    .stat-value.amber { color: var(--amber); }
+
+    /* ── Section Card ─────────────────────────────────────────────────── */
+    .section-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 24px;
+    }
+    .section-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .section-title { font-size: .95rem; font-weight: 600; }
+    .section-actions { display: flex; gap: 8px; align-items: center; }
+
+    .search-input {
+      padding: 7px 12px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: var(--font); font-size: .82rem;
+      width: 220px; max-width: 100%;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-3); }
+
+    .filter-select {
+      padding: 7px 10px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: var(--font); font-size: .82rem; cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--accent); }
+
+    .export-btn {
+      padding: 7px 14px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-2); font-family: var(--font); font-size: .82rem;
+      cursor: pointer; transition: all .15s;
+    }
+    .export-btn:hover { background: var(--border); color: var(--text); }
+
+    /* ── Table ────────────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: .83rem; min-width: 600px;
+    }
+    thead th {
+      padding: 11px 16px; text-align: left;
+      font-size: .72rem; font-weight: 600; letter-spacing: .5px;
+      text-transform: uppercase; color: var(--text-3);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap; background: var(--bg2);
+      cursor: pointer; user-select: none;
+    }
+    thead th:hover { color: var(--text-2); }
+    thead th.sort-asc::after  { content: ' ↑'; }
+    thead th.sort-desc::after { content: ' ↓'; }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
+    tbody td {
+      padding: 12px 16px; color: var(--text-2);
+      vertical-align: middle; overflow-wrap: break-word;
+    }
+    .td-name { font-weight: 500; color: var(--text); }
+    .td-email { font-size: .8rem; overflow-wrap: break-word; word-break: break-all; }
+
+    .plan-badge {
+      display: inline-block; padding: 3px 9px; border-radius: 20px;
+      font-size: .72rem; font-weight: 600; letter-spacing: .3px; text-transform: uppercase;
+    }
+    .plan-free { background: var(--surface); color: var(--text-3); border: 1px solid var(--border); }
+    .plan-pro  { background: rgba(59,130,246,.15); color: #93C5FD; border: 1px solid rgba(59,130,246,.3); }
+    .plan-team { background: rgba(16,185,129,.15); color: #6EE7B7; border: 1px solid rgba(16,185,129,.3); }
+
+    .provider-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .75rem; color: var(--text-3);
+    }
+
+    .action-btn {
+      padding: 4px 10px; border-radius: 5px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-3); font-family: var(--font); font-size: .75rem;
+      cursor: pointer; transition: all .15s;
+    }
+    .action-btn:hover { background: var(--surface); color: var(--text); }
+    .action-btn.danger:hover { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.4); color: var(--red); }
+
+    /* ── Empty / Loading ──────────────────────────────────────────────── */
+    .table-empty {
+      padding: 40px; text-align: center;
+      font-size: .85rem; color: var(--text-3);
+    }
+    .table-loading { padding: 30px; text-align: center; color: var(--text-3); font-size: .85rem; }
+    .spinner {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      animation: spin .7s linear infinite;
+      display: inline-block; margin-right: 8px; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Pagination ───────────────────────────────────────────────────── */
+    .pagination {
+      padding: 14px 20px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px; font-size: .82rem;
+    }
+    .pagination-info { color: var(--text-3); }
+    .pagination-btns { display: flex; gap: 6px; }
+    .page-btn {
+      padding: 5px 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-2); font-family: var(--font); font-size: .8rem;
+      cursor: pointer; transition: all .15s;
+    }
+    .page-btn:hover:not(:disabled) { background: var(--surface); color: var(--text); }
+    .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Detail Drawer ────────────────────────────────────────────────── */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 50; display: none;
+    }
+    .drawer-overlay.open { display: block; }
+    .drawer {
+      position: fixed; right: 0; top: 0; bottom: 0;
+      width: 380px; max-width: 100%;
+      background: var(--bg2); border-left: 1px solid var(--border);
+      padding: 24px; overflow-y: auto;
+      transform: translateX(100%); transition: transform .25s;
+      z-index: 51;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .drawer-title { font-size: 1rem; font-weight: 700; }
+    .drawer-close { background: none; border: none; color: var(--text-2); cursor: pointer; font-size: 1.3rem; padding: 4px; }
+    .drawer-field { margin-bottom: 14px; }
+    .drawer-field-label { font-size: .72rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+    .drawer-field-value { font-size: .88rem; color: var(--text); overflow-wrap: break-word; }
+    .drawer-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .plan-change-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .plan-select {
+      flex: 1; padding: 8px 10px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: var(--font); font-size: .85rem; cursor: pointer;
+    }
+    .save-plan-btn {
+      padding: 8px 14px; border-radius: 7px;
+      background: var(--accent); color: #fff; border: none;
+      font-family: var(--font); font-size: .82rem; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Toast ────────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 18px;
+      font-size: .85rem; color: var(--text);
+      transform: translateY(20px); opacity: 0;
+      transition: all .25s; z-index: 99;
+      pointer-events: none; max-width: 300px; overflow-wrap: break-word;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Setup Notice ─────────────────────────────────────────────────── */
+    .setup-notice {
+      background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25);
+      border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px;
+      font-size: .85rem; color: var(--amber); line-height: 1.55; overflow-wrap: break-word;
+    }
+    .setup-notice strong { color: #FCD34D; }
+    .setup-notice code {
+      background: rgba(0,0,0,.3); border-radius: 4px;
+      padding: 1px 6px; font-size: .8rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ══════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">Tariffly</div>
+    <div class="login-sub">Admin Dashboard</div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <label class="login-label" for="adminEmail">Email</label>
+    <input class="login-input" type="email" id="adminEmail" placeholder="admin@company.com"
+      onkeydown="if(event.key==='Enter')adminLogin()">
+
+    <label class="login-label" for="adminPassword">Password</label>
+    <input class="login-input" type="password" id="adminPassword" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')adminLogin()">
+
+    <button class="login-btn" onclick="adminLogin()" id="loginBtn">Sign in to Admin</button>
+    <p style="margin-top:16px;font-size:.78rem;color:var(--text-3);text-align:center">
+      Access restricted to authorized administrators only.
+    </p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN SHELL ════════════════════════════════════════════════════════ -->
+<div id="adminShell">
+
+  <!-- Top Bar -->
+  <div class="admin-topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="topbar-brand">Tariffly</div>
+      <span class="topbar-badge">Admin</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="adminUserLabel">—</span>
+      <button class="topbar-logout" onclick="adminLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="admin-body">
+
+    <!-- Setup notice (shown when Supabase is not configured) -->
+    <div class="setup-notice" id="setupNotice" style="display:none">
+      <strong>⚙ Supabase not configured.</strong> This admin panel is running in demo mode with mock data.
+      To connect real data: open <code>admin.html</code>, set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code>
+      at the top of the script, then run the SQL schema from <code>SUPABASE_SETUP.md</code>.
+      Also add <code>ADMIN_EMAILS</code> with your email address.
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value blue" id="statTotal">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pro Subscribers</div>
+        <div class="stat-value green" id="statPro">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Free Tier</div>
+        <div class="stat-value" id="statFree">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Classifications</div>
+        <div class="stat-value amber" id="statClassifications">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Signups (30 days)</div>
+        <div class="stat-value blue" id="statRecent">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">MRR (Est.)</div>
+        <div class="stat-value green" id="statMrr">—</div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">Users</div>
+        <div class="section-actions">
+          <input class="search-input" type="search" id="searchInput"
+            placeholder="Search email or name…" oninput="filterUsers()">
+          <select class="filter-select" id="planFilter" onchange="filterUsers()">
+            <option value="">All plans</option>
+            <option value="free">Free</option>
+            <option value="pro">Pro</option>
+            <option value="team">Team</option>
+          </select>
+          <button class="export-btn" onclick="exportUsersCSV()">Export CSV</button>
+          <button class="export-btn" onclick="loadUsers(true)">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('name')">Name</th>
+              <th onclick="sortBy('email')">Email</th>
+              <th onclick="sortBy('created_at')">Signup Date</th>
+              <th onclick="sortBy('plan')">Plan</th>
+              <th onclick="sortBy('classification_count')">Classifications</th>
+              <th>Provider</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="7" class="table-loading"><span class="spinner"></span>Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <div class="pagination-info" id="paginationInfo">—</div>
+        <div class="pagination-btns" id="paginationBtns"></div>
+      </div>
+    </div>
+
+    <!-- Recent Classifications Table -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">Recent Classifications</div>
+        <div class="section-actions">
+          <button class="export-btn" onclick="exportClassificationsCSV()">Export CSV</button>
+          <button class="export-btn" onclick="loadClassifications()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Description</th>
+              <th>Origin</th>
+              <th>HTS Code</th>
+              <th>Total Duty</th>
+              <th>User</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="classTableBody">
+            <tr><td colspan="6" class="table-loading"><span class="spinner"></span>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /admin-body -->
+</div><!-- /adminShell -->
+
+<!-- User Detail Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="userDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">User Detail</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div id="drawerContent"></div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── TODO: Paste your Supabase project URL and anon key here.
+//           Get them from Supabase Dashboard → Settings → API.
+const SUPABASE_URL      = 'https://wqkuliasszkgwllifinp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa3VsaWFzc3prZ3dsbGlmaW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNDgxODAsImV4cCI6MjA5MjkyNDE4MH0.7qBUMVuz9myH8cWBPjb_nWY-vM0_d7xGr93HhNmnKxM';
+
+// ─── TODO: Add the email address(es) that are allowed to access this admin panel.
+//           These must be accounts in your Supabase Auth.
+const ADMIN_EMAILS = [
+  'oriami200110@gmail.com',
+  // 'another-admin@company.com',
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SUPABASE INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+let supabase = null;
+let demoMode = false;
+
+function initSupabase() {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    demoMode = true;
+    return;
+  }
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function adminLogin() {
+  const email    = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
+
+  errEl.classList.remove('show');
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  try {
+    if (demoMode) {
+      // Demo mode: any login works, show mock data
+      showAdmin({ email: email || 'demo@tariffly.app' });
+      return;
+    }
+
+    if (!supabase) throw new Error('Supabase not initialized');
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    const userEmail = data.user?.email || '';
+    if (!ADMIN_EMAILS.includes(userEmail)) {
+      await supabase.auth.signOut();
+      throw new Error('This account does not have admin access.');
+    }
+
+    showAdmin(data.user);
+  } catch(e) {
+    errEl.textContent = e.message || 'Login failed.';
+    errEl.classList.add('show');
+  } finally {
+    btn.textContent = 'Sign in to Admin';
+    btn.disabled = false;
+  }
+}
+
+async function adminLogout() {
+  if (supabase) await supabase.auth.signOut();
+  document.getElementById('adminShell').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminPassword').value = '';
+}
+
+function showAdmin(user) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'flex';
+  document.getElementById('adminUserLabel').textContent = user.email || 'Admin';
+  if (demoMode) document.getElementById('setupNotice').style.display = '';
+  loadUsers();
+  loadClassifications();
+  loadStats();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA: USERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+let allUsers = [];
+let filteredUsers = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+let sortField = 'created_at';
+let sortDir = 'desc';
+
+async function loadUsers(forceRefresh = false) {
+  if (demoMode) {
+    allUsers = generateMockUsers(87);
+    applyFilters();
+    return;
+  }
+
+  document.getElementById('usersTableBody').innerHTML =
+    '<tr><td colspan="7" class="table-loading"><span class="spinner"></span>Loading users...</td></tr>';
+
+  try {
+    // NOTE: reading from auth.users requires service_role key or a profiles view.
+    // We read from the public.profiles table (see SUPABASE_SETUP.md for schema).
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, first_name, last_name, plan, classification_count, created_at, provider')
+      .order(sortField, { ascending: sortDir === 'asc' });
+
+    if (error) throw error;
+    allUsers = data || [];
+    applyFilters();
+  } catch(e) {
+    document.getElementById('usersTableBody').innerHTML =
+      `<tr><td colspan="7" class="table-empty">Error loading users: ${escHtml(e.message)}</td></tr>`;
+  }
+}
+
+function applyFilters() {
+  const q    = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const plan = document.getElementById('planFilter')?.value || '';
+
+  filteredUsers = allUsers.filter(u => {
+    const matchQ = !q ||
+      (u.email||'').toLowerCase().includes(q) ||
+      (u.first_name||'').toLowerCase().includes(q) ||
+      (u.last_name||'').toLowerCase().includes(q);
+    const matchPlan = !plan || (u.plan || 'free') === plan;
+    return matchQ && matchPlan;
+  });
+
+  currentPage = 1;
+  renderUsersTable();
+}
+
+function filterUsers() { applyFilters(); }
+
+function sortBy(field) {
+  if (sortField === field) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField = field;
+    sortDir = 'desc';
+  }
+  // Update header classes
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+  });
+  // Find the th with the right onclick text and mark it
+  document.querySelectorAll('thead th').forEach(th => {
+    if (th.getAttribute('onclick') === `sortBy('${field}')`) {
+      th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+  // Re-sort
+  filteredUsers.sort((a, b) => {
+    let va = a[field] ?? '';
+    let vb = b[field] ?? '';
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  renderUsersTable();
+}
+
+function renderUsersTable() {
+  const total = filteredUsers.length;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filteredUsers.slice(start, start + PAGE_SIZE);
+
+  if (!pageData.length) {
+    document.getElementById('usersTableBody').innerHTML =
+      '<tr><td colspan="7" class="table-empty">No users found.</td></tr>';
+    document.getElementById('paginationInfo').textContent = '0 users';
+    document.getElementById('paginationBtns').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('usersTableBody').innerHTML = pageData.map(u => {
+    const name    = [(u.first_name||''), (u.last_name||'')].filter(Boolean).join(' ') || '—';
+    const plan    = u.plan || 'free';
+    const planBadge = `<span class="plan-badge plan-${plan}">${plan}</span>`;
+    const date    = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+    const prov    = `<span class="provider-badge">${providerIcon(u.provider)}${u.provider||'email'}</span>`;
+    const count   = u.classification_count ?? 0;
+
+    return `<tr>
+      <td class="td-name">${escHtml(name)}</td>
+      <td class="td-email">${escHtml(u.email||'')}</td>
+      <td>${escHtml(date)}</td>
+      <td>${planBadge}</td>
+      <td style="font-variant-numeric:tabular-nums">${count}</td>
+      <td>${prov}</td>
+      <td>
+        <button class="action-btn" onclick="openDrawer(${JSON.stringify(u).replace(/"/g,'&quot;')})">View</button>
+        <button class="action-btn danger" onclick="confirmDeleteUser('${escHtml(u.id||'')}','${escHtml(u.email||'')}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Pagination info
+  const end = Math.min(start + PAGE_SIZE, total);
+  document.getElementById('paginationInfo').textContent =
+    `Showing ${start + 1}–${end} of ${total} users`;
+
+  // Pagination buttons
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  let btns = '';
+  btns += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>‹ Prev</button>`;
+  for (let p = Math.max(1, currentPage-2); p <= Math.min(totalPages, currentPage+2); p++) {
+    btns += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  btns += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>Next ›</button>`;
+  document.getElementById('paginationBtns').innerHTML = btns;
+}
+
+function goPage(p) {
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderUsersTable();
+}
+
+function providerIcon(prov) {
+  if (prov === 'google') return '🔵 ';
+  if (prov === 'apple')  return '⚫ ';
+  return '✉ ';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA: STATS
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function loadStats() {
+  if (demoMode) {
+    document.getElementById('statTotal').textContent = '87';
+    document.getElementById('statPro').textContent   = '12';
+    document.getElementById('statFree').textContent  = '75';
+    document.getElementById('statClassifications').textContent = '1,243';
+    document.getElementById('statRecent').textContent = '23';
+    document.getElementById('statMrr').textContent    = '$2,388';
+    return;
+  }
+  if (!supabase) return;
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('plan, classification_count, created_at');
+
+    const total  = data?.length || 0;
+    const pro    = data?.filter(u => u.plan === 'pro').length || 0;
+    const free   = total - pro;
+    const totalC = data?.reduce((s, u) => s + (u.classification_count || 0), 0) || 0;
+    const now    = Date.now();
+    const recent = data?.filter(u => u.created_at && (now - new Date(u.created_at)) < 30*24*3600*1000).length || 0;
+    const mrr    = pro * 199;
+
+    document.getElementById('statTotal').textContent          = total.toLocaleString();
+    document.getElementById('statPro').textContent            = pro.toLocaleString();
+    document.getElementById('statFree').textContent           = free.toLocaleString();
+    document.getElementById('statClassifications').textContent = totalC.toLocaleString();
+    document.getElementById('statRecent').textContent          = recent.toLocaleString();
+    document.getElementById('statMrr').textContent             = '$' + mrr.toLocaleString();
+  } catch(e) { console.warn('Stats load failed', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA: CLASSIFICATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+let allClassifications = [];
+
+async function loadClassifications() {
+  if (demoMode) {
+    allClassifications = generateMockClassifications(30);
+    renderClassificationsTable(allClassifications);
+    return;
+  }
+  if (!supabase) return;
+
+  document.getElementById('classTableBody').innerHTML =
+    '<tr><td colspan="6" class="table-loading"><span class="spinner"></span>Loading...</td></tr>';
+
+  try {
+    const { data, error } = await supabase
+      .from('classifications')
+      .select('id, description, origin, hts_10, total_pct, created_at, profiles(email)')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) throw error;
+    allClassifications = data || [];
+    renderClassificationsTable(allClassifications);
+  } catch(e) {
+    document.getElementById('classTableBody').innerHTML =
+      `<tr><td colspan="6" class="table-empty">Error: ${escHtml(e.message)}</td></tr>`;
+  }
+}
+
+function renderClassificationsTable(rows) {
+  if (!rows.length) {
+    document.getElementById('classTableBody').innerHTML =
+      '<tr><td colspan="6" class="table-empty">No classifications yet.</td></tr>';
+    return;
+  }
+  document.getElementById('classTableBody').innerHTML = rows.slice(0, 100).map(r => {
+    const email = r.profiles?.email || r.user_email || '—';
+    const date  = r.created_at ? new Date(r.created_at).toLocaleDateString() : '—';
+    const desc  = (r.description || '').slice(0, 60) + ((r.description||'').length > 60 ? '…' : '');
+    return `<tr>
+      <td style="max-width:220px;overflow-wrap:break-word">${escHtml(desc)}</td>
+      <td>${escHtml(r.origin||'')}</td>
+      <td style="font-weight:600;font-variant-numeric:tabular-nums">${escHtml(r.hts_10||'')}</td>
+      <td>${r.total_pct != null ? r.total_pct + '%' : '—'}</td>
+      <td class="td-email">${escHtml(email)}</td>
+      <td>${escHtml(date)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// USER DETAIL DRAWER
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openDrawer(user) {
+  if (typeof user === 'string') {
+    // came from onclick attr — parse
+    try { user = JSON.parse(user.replace(/&quot;/g, '"')); } catch { return; }
+  }
+  const name = [(user.first_name||''), (user.last_name||'')].filter(Boolean).join(' ') || '—';
+  document.getElementById('drawerContent').innerHTML = `
+    <div class="drawer-field"><div class="drawer-field-label">Name</div><div class="drawer-field-value">${escHtml(name)}</div></div>
+    <div class="drawer-field"><div class="drawer-field-label">Email</div><div class="drawer-field-value">${escHtml(user.email||'')}</div></div>
+    <div class="drawer-field"><div class="drawer-field-label">Signup Date</div><div class="drawer-field-value">${user.created_at ? new Date(user.created_at).toLocaleString() : '—'}</div></div>
+    <div class="drawer-field"><div class="drawer-field-label">Provider</div><div class="drawer-field-value">${providerIcon(user.provider)}${user.provider||'email'}</div></div>
+    <div class="drawer-field"><div class="drawer-field-label">Classifications</div><div class="drawer-field-value">${user.classification_count ?? 0}</div></div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-field">
+      <div class="drawer-field-label">Plan</div>
+      <div class="plan-change-row">
+        <select class="plan-select" id="drawerPlanSelect">
+          <option value="free"  ${(user.plan||'free')==='free'  ?'selected':''}>Free</option>
+          <option value="pro"   ${(user.plan||'')==='pro'   ?'selected':''}>Pro ($199/mo)</option>
+          <option value="team"  ${(user.plan||'')==='team'  ?'selected':''}>Team ($499/mo)</option>
+        </select>
+        <button class="save-plan-btn" onclick="updateUserPlan('${escHtml(user.id||'')}')">Save</button>
+      </div>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-field">
+      <div class="drawer-field-label">User ID</div>
+      <div class="drawer-field-value" style="font-size:.75rem;word-break:break-all">${escHtml(user.id||'')}</div>
+    </div>
+  `;
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('userDrawer').classList.add('open');
+  // store userId for plan update
+  document.getElementById('userDrawer').dataset.userId = user.id;
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('userDrawer').classList.remove('open');
+}
+
+async function updateUserPlan(userId) {
+  const plan = document.getElementById('drawerPlanSelect').value;
+  if (demoMode) { toast('Plan updated (demo mode)'); closeDrawer(); return; }
+  if (!supabase) return;
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ plan })
+      .eq('id', userId);
+    if (error) throw error;
+    toast(`Plan updated to ${plan}`);
+    closeDrawer();
+    loadUsers(true);
+    loadStats();
+  } catch(e) {
+    toast('Error: ' + e.message, true);
+  }
+}
+
+async function confirmDeleteUser(userId, email) {
+  if (!confirm(`Are you sure you want to delete the account for ${email}?\n\nThis will permanently remove their profile and cannot be undone.`)) return;
+  if (demoMode) { toast('User deleted (demo mode)'); return; }
+  if (!supabase) return;
+  try {
+    // Delete profile (auth user deletion requires service_role — do via Supabase Dashboard)
+    const { error } = await supabase.from('profiles').delete().eq('id', userId);
+    if (error) throw error;
+    toast('Profile deleted. Remove auth user in Supabase Dashboard if needed.');
+    loadUsers(true);
+    loadStats();
+  } catch(e) {
+    toast('Error: ' + e.message, true);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function exportUsersCSV() {
+  if (!filteredUsers.length) { toast('No users to export'); return; }
+  const rows = [['Name','Email','Plan','Classifications','Signup Date','Provider']];
+  filteredUsers.forEach(u => {
+    const name = [(u.first_name||''), (u.last_name||'')].filter(Boolean).join(' ');
+    rows.push([
+      `"${name}"`, `"${u.email||''}"`, u.plan||'free',
+      u.classification_count||0,
+      u.created_at ? new Date(u.created_at).toLocaleDateString() : '',
+      u.provider||'email',
+    ]);
+  });
+  downloadCSV(rows, 'tariffly-users.csv');
+}
+
+function exportClassificationsCSV() {
+  if (!allClassifications.length) { toast('No classifications to export'); return; }
+  const rows = [['Description','Origin','HTS Code','Total Duty %','User Email','Date']];
+  allClassifications.forEach(r => {
+    rows.push([
+      `"${(r.description||'').replace(/"/g,'""')}"`, r.origin||'', r.hts_10||'',
+      r.total_pct != null ? r.total_pct : '',
+      r.profiles?.email || r.user_email || '',
+      r.created_at ? new Date(r.created_at).toLocaleDateString() : '',
+    ]);
+  });
+  downloadCSV(rows, 'tariffly-classifications.csv');
+}
+
+function downloadCSV(rows, filename) {
+  const csv  = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOCK DATA (demo mode only)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function generateMockUsers(n) {
+  const providers = ['email','google','apple'];
+  const plans     = ['free','free','free','free','free','pro','pro','team'];
+  const firstNames = ['Alice','Bob','Carlos','Diana','Eve','Frank','Grace','Henry','Iris','Jack'];
+  const lastNames  = ['Smith','Jones','Garcia','Chen','Kim','Patel','Lee','Wang','Davis','Martinez'];
+  return Array.from({ length: n }, (_, i) => ({
+    id:    'mock-' + i,
+    email: `user${i}@company${i%10}.com`,
+    first_name: firstNames[i%firstNames.length],
+    last_name:  lastNames[i%lastNames.length],
+    plan: plans[Math.floor(Math.random()*plans.length)],
+    classification_count: Math.floor(Math.random()*150),
+    provider: providers[Math.floor(Math.random()*providers.length)],
+    created_at: new Date(Date.now() - Math.random()*90*24*3600*1000).toISOString(),
+  }));
+}
+
+function generateMockClassifications(n) {
+  const products = [
+    'USB-C charging cable 1m','Cotton knitted t-shirt','DC motor 500W HVAC',
+    'Smartwatch with GPS','Portable power bank 20000mAh','DJI Mini 4 Pro drone',
+    'Steel kitchen bowls set','Laptop 15-inch Intel Core i7','LED strip lights 5m',
+    'Bamboo cutting board','Electric bicycle 250W','Bluetooth headphones',
+  ];
+  return Array.from({ length: n }, (_, i) => ({
+    id: 'mc-' + i,
+    description: products[i % products.length],
+    origin: ['CN','VN','IN','MX'][Math.floor(Math.random()*4)],
+    hts_10: `${8000 + Math.floor(Math.random()*999)}.${Math.floor(Math.random()*99)}.${String(Math.floor(Math.random()*9999)).padStart(4,'0')}`,
+    total_pct: (Math.random()*30).toFixed(1),
+    profiles: { email: `user${i%10}@company.com` },
+    created_at: new Date(Date.now() - Math.random()*30*24*3600*1000).toISOString(),
+  }));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+let toastTimer;
+function toast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = isError ? 'rgba(239,68,68,.4)' : 'var(--border)';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSupabase();
+
+  if (!demoMode && supabase) {
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && ADMIN_EMAILS.includes(session.user.email)) {
+        showAdmin(session.user);
+      }
+    });
+  }
+
+  // Keyboard: Enter on login
+  document.getElementById('adminPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+});
+</script>
+
+</body>
+</html>

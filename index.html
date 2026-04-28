@@ -2,65 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Tariffly classifies any product to its 10-digit HTS code, calculates Section 301 and 232 tariff exposure, and generates a CBP-ready classification memo in 15 seconds. Free to start.">
-  <meta name="keywords" content="HTS classification, tariff code, customs classification, Section 301, import duty, HS code, CBP, USITC, customs broker, trade compliance">
-  <meta name="author" content="Tariffly">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://customsai.vercel.app/">
-
-  <!-- Open Graph (LinkedIn, Facebook) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://customsai.vercel.app/">
-  <meta property="og:title" content="Tariffly — HTS Classification in 15 Seconds">
-  <meta property="og:description" content="Know your real duty rate before the shipment moves. AI-powered HTS code classification with Section 301/232 flags and CBP-ready memos. Free to start.">
-  <meta property="og:image" content="https://customsai.vercel.app/og-image.png">
-  <meta property="og:site_name" content="Tariffly">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://customsai.vercel.app/">
-  <meta name="twitter:title" content="Tariffly — HTS Classification in 15 Seconds">
-  <meta name="twitter:description" content="Know your real duty rate before the shipment moves. AI-powered HTS classification with Section 301/232 flags and CBP memos.">
-  <meta name="twitter:image" content="https://customsai.vercel.app/og-image.png">
-
-  <!-- Structured Data (Google) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Tariffly",
-    "applicationCategory": "BusinessApplication",
-    "description": "AI-powered HTS tariff classification engine for US importers. Classifies products to 10-digit HTS codes, calculates Section 301 and 232 duty exposure, and generates CBP-ready classification memos in 15 seconds.",
-    "url": "https://customsai.vercel.app",
-    "offers": [
-      {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-        "description": "Free — 3 classifications per month"
-      },
-      {
-        "@type": "Offer",
-        "price": "199",
-        "priceCurrency": "USD",
-        "priceSpecification": {
-          "@type": "RecurringCharge",
-          "billingPeriod": "P1M"
-        },
-        "description": "Pro — unlimited classifications"
-      }
-    ],
-    "featureList": [
-      "10-digit HTS code classification from plain-English product description",
-      "Section 301 tariff flags for China-origin goods",
-      "Section 232 tariff flags for steel and aluminum",
-      "GRI classification reasoning",
-      "CBP-format classification memo",
-      "USMCA preferential rate detection"
-    ]
-  }
-  </script>
+<!-- SEO Meta Tags -->
+<meta name="description" content="Tariffly classifies any product to its 10-digit HTS code, calculates Section 301 and 232 tariff exposure, and generates a CBP-ready classification memo in 15 seconds. Free to start.">
+<meta name="keywords" content="HTS classification, tariff code, customs classification, Section 301, import duty, HS code, CBP, USITC, customs broker, trade compliance">
+<meta name="author" content="Tariffly">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://customsai.vercel.app/">
+<!-- Open Graph (LinkedIn, Facebook) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://customsai.vercel.app/">
+<meta property="og:title" content="Tariffly — HTS Classification in 15 Seconds">
+<meta property="og:description" content="Know your real duty rate before the shipment moves. AI-powered HTS code classification with Section 301/232 flags and CBP-ready memos. Free to start.">
+<meta property="og:image" content="https://customsai.vercel.app/og-image.png">
+<meta property="og:site_name" content="Tariffly">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://customsai.vercel.app/">
+<meta name="twitter:title" content="Tariffly — HTS Classification in 15 Seconds">
+<meta name="twitter:description" content="Know your real duty rate before the shipment moves. AI-powered HTS classification with Section 301/232 flags and CBP memos.">
+<meta name="twitter:image" content="https://customsai.vercel.app/og-image.png">
+<!-- Structured Data (Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Tariffly",
+  "applicationCategory": "BusinessApplication",
+  "description": "AI-powered HTS tariff classification engine for US importers. Classifies products to 10-digit HTS codes, calculates Section 301 and 232 duty exposure, and generates CBP-ready classification memos in 15 seconds.",
+  "url": "https://customsai.vercel.app",
+  "offers": [
+    { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free — 3 classifications per month" },
+    { "@type": "Offer", "price": "199", "priceCurrency": "USD", "priceSpecification": { "@type": "RecurringCharge", "billingPeriod": "P1M" }, "description": "Pro — unlimited classifications" }
+  ],
+  "featureList": [
+    "10-digit HTS code classification from plain-English product description",
+    "Section 301 tariff flags for China-origin goods",
+    "Section 232 tariff flags for steel and aluminum",
+    "GRI classification reasoning",
+    "CBP-format classification memo",
+    "USMCA preferential rate detection"
+  ]
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tariffly — HTS Classification, Optimized by AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -91,12 +74,12 @@
 html{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;scroll-behavior:smooth;overflow-x:hidden;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 
 /* NAV */
 nav{
@@ -113,6 +96,7 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   width:32px;height:32px;background:var(--accent);border-radius:8px;
   display:flex;align-items:center;justify-content:center;
   font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;
+  flex-shrink:0;
 }
 .nav-logo-text{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.02em;}
 .nav-links{display:flex;gap:28px;align-items:center;}
@@ -122,7 +106,7 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   background:var(--accent);color:#fff;border:none;border-radius:8px;
   padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;
   font-family:var(--font);text-decoration:none;transition:all .2s;
-  box-shadow:0 2px 8px var(--accent-glow);
+  box-shadow:0 2px 8px var(--accent-glow);white-space:nowrap;
 }
 .nav-cta:hover{background:#0035CC;transform:translateY(-1px);box-shadow:0 4px 16px var(--accent-glow);}
 
@@ -152,17 +136,19 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);
   animation:fadeUp .5s ease both;
 }
-.hero-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;animation:pulse 2s infinite;}
 .hero-h1{
   font-size:clamp(48px,7vw,96px);font-weight:900;letter-spacing:-.04em;
   line-height:1.0;color:var(--ink);margin-bottom:22px;max-width:880px;
   animation:fadeUp .6s .1s ease both;opacity:0;
+  overflow-wrap:break-word;word-break:break-word;
 }
 .hero-h1 .accent{color:var(--accent);}
 .hero-sub{
   font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:560px;
   line-height:1.75;margin-bottom:38px;font-weight:400;
   animation:fadeUp .6s .2s ease both;opacity:0;
+  overflow-wrap:break-word;
 }
 .hero-btns{
   display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
@@ -184,7 +170,6 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   transition:all .2s;box-shadow:var(--shadow-sm);
 }
 .btn-secondary:hover{border-color:var(--ink);box-shadow:var(--shadow);}
-
 .hero-metrics{
   display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
   animation:fadeUp .6s .4s ease both;opacity:0;
@@ -195,8 +180,8 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   padding:12px 18px;box-shadow:var(--shadow-sm);transition:all .2s;
 }
 .hm:hover{border-color:rgba(0,71,255,0.25);box-shadow:var(--shadow);}
-.hm-val{font-size:20px;font-weight:800;color:var(--accent);font-family:var(--mono);letter-spacing:-.02em;}
-.hm-lbl{font-size:12px;color:var(--muted);font-weight:500;text-align:left;line-height:1.4;}
+.hm-val{font-size:20px;font-weight:800;color:var(--accent);font-family:var(--mono);letter-spacing:-.02em;flex-shrink:0;}
+.hm-lbl{font-size:12px;color:var(--muted);font-weight:500;text-align:left;line-height:1.4;white-space:nowrap;}
 
 /* DEMO CARD */
 .demo-wrap{padding:0 40px 100px;}
@@ -210,31 +195,32 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   background:#F9FAFB;border-bottom:1px solid var(--border);
   padding:12px 20px;display:flex;align-items:center;gap:8px;
 }
-.dot{width:11px;height:11px;border-radius:50%;}
+.dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
 .d1{background:#FF5F57;}.d2{background:#FEBC2E;}.d3{background:#28CA41;}
-.demo-url{font-size:11px;font-family:var(--mono);color:var(--faint);margin-left:8px;}
+.demo-url{font-size:11px;font-family:var(--mono);color:var(--faint);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .demo-body{padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;}
 .demo-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:10px;font-family:var(--mono);}
 .demo-input{
   background:#F9FAFB;border:1.5px solid var(--border);border-radius:10px;
   padding:14px 16px;font-size:13px;font-family:var(--mono);color:var(--ink);
   line-height:1.6;margin-bottom:14px;
+  overflow-wrap:break-word;word-break:break-word;
 }
 .demo-cursor{display:inline-block;width:2px;height:13px;background:var(--accent);vertical-align:middle;animation:pulse 1s step-end infinite;}
-.demo-row{display:flex;gap:10px;align-items:center;}
+.demo-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .demo-sel{background:#F9FAFB;border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-family:var(--mono);color:var(--ink);}
-.demo-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.demo-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
 .demo-btn:hover{background:#0035CC;}
-.result-panel{background:#F9FAFB;border:1.5px solid var(--border);border-radius:14px;padding:22px;}
-.r-hts{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--accent);letter-spacing:.04em;margin-bottom:6px;}
-.r-desc{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
-.r-chips{display:flex;gap:8px;margin-bottom:14px;}
-.rc{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px;text-align:center;box-shadow:var(--shadow-sm);}
-.rc-val{font-family:var(--mono);font-size:18px;font-weight:800;}
-.rc-lbl{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+.result-panel{background:#F9FAFB;border:1.5px solid var(--border);border-radius:14px;padding:22px;min-width:0;}
+.r-hts{font-family:var(--mono);font-size:clamp(24px,3vw,36px);font-weight:700;color:var(--accent);letter-spacing:.04em;margin-bottom:6px;overflow-wrap:break-word;word-break:break-all;}
+.r-desc{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;overflow-wrap:break-word;}
+.r-chips{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.rc{flex:1;min-width:60px;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px;text-align:center;box-shadow:var(--shadow-sm);}
+.rc-val{font-family:var(--mono);font-size:18px;font-weight:800;overflow-wrap:break-word;}
+.rc-lbl{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;white-space:nowrap;}
 .c-green{color:var(--green);}.c-red{color:var(--red);}
-.r-flag{display:inline-flex;align-items:center;gap:6px;background:#FFFBEB;border:1px solid rgba(217,119,6,.2);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--amber);font-weight:600;}
-.r-timing{font-size:10px;color:var(--faint);text-align:right;margin-top:10px;font-family:var(--mono);}
+.r-flag{display:inline-flex;align-items:center;gap:6px;background:#FFFBEB;border:1px solid rgba(217,119,6,.2);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--amber);font-weight:600;flex-wrap:wrap;overflow-wrap:break-word;}
+.r-timing{font-size:10px;color:var(--faint);text-align:right;margin-top:10px;font-family:var(--mono);overflow-wrap:break-word;}
 
 /* MARQUEE */
 .marquee-wrap{padding:28px 0;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff;}
@@ -250,9 +236,9 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
   font-size:11px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--accent);font-family:var(--mono);margin-bottom:18px;
 }
-.section-tag::before{content:'';width:24px;height:2px;background:var(--accent);border-radius:1px;}
-.section-h2{font-size:clamp(34px,5vw,56px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px;}
-.section-sub{font-size:17px;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:56px;font-weight:400;}
+.section-tag::before{content:'';width:24px;height:2px;background:var(--accent);border-radius:1px;flex-shrink:0;}
+.section-h2{font-size:clamp(34px,5vw,56px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px;overflow-wrap:break-word;}
+.section-sub{font-size:17px;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:56px;font-weight:400;overflow-wrap:break-word;}
 
 /* HOW IT WORKS */
 .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
@@ -266,10 +252,10 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
 .how-card:hover{background:#FAFBFF;box-shadow:var(--shadow);}
 .how-card:hover::before{opacity:1;}
 .how-num{font-size:11px;font-weight:700;color:var(--accent);font-family:var(--mono);margin-bottom:14px;text-transform:uppercase;letter-spacing:.1em;}
-.how-icon-box{width:44px;height:44px;background:var(--accent-lt);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.how-icon-box{width:44px;height:44px;background:var(--accent-lt);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;flex-shrink:0;}
 .how-icon-box svg{color:var(--accent);}
-.how-title{font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-.02em;}
-.how-body{font-size:14px;color:var(--muted);line-height:1.7;font-weight:400;}
+.how-title{font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-.02em;overflow-wrap:break-word;}
+.how-body{font-size:14px;color:var(--muted);line-height:1.7;font-weight:400;overflow-wrap:break-word;}
 .how-tag{display:inline-block;margin-top:16px;font-size:10px;font-family:var(--mono);color:var(--accent);background:var(--accent-lt);border:1px solid rgba(0,71,255,0.15);border-radius:4px;padding:3px 10px;}
 
 /* STATS */
@@ -278,20 +264,22 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
 .stat-box{
   background:#FAFAFA;border:1.5px solid var(--border);padding:36px 28px;
   transition:all .2s;position:relative;overflow:hidden;
+  min-width:0;
 }
 .stat-box::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;}
 .stat-box:hover{background:#fff;box-shadow:var(--shadow);}
 .stat-box:hover::after{transform:scaleX(1);}
-.stat-num{font-size:52px;font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1;margin-bottom:8px;}
+.stat-num{font-size:clamp(36px,4vw,52px);font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1;margin-bottom:8px;overflow-wrap:break-word;}
 .stat-num .accent{color:var(--accent);}
-.stat-lbl{font-size:14px;color:var(--muted);line-height:1.5;font-weight:500;}
-.stat-sub{font-size:11px;color:var(--faint);margin-top:5px;font-family:var(--mono);}
+.stat-lbl{font-size:14px;color:var(--muted);line-height:1.5;font-weight:500;overflow-wrap:break-word;}
+.stat-sub{font-size:11px;color:var(--faint);margin-top:5px;font-family:var(--mono);overflow-wrap:break-word;}
 
 /* PRICING */
 .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;}
 .price-card{
   background:#fff;border:1.5px solid var(--border);border-radius:18px;
   padding:32px;transition:all .25s;box-shadow:var(--shadow-sm);
+  min-width:0;
 }
 .price-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
 .price-card.featured{
@@ -303,16 +291,16 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
 .feat-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:3px 12px;margin-bottom:18px;text-transform:uppercase;letter-spacing:.06em;}
 .price-plan{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
 .price-card.featured .price-plan{color:rgba(255,255,255,0.6);}
-.price-amt{font-size:52px;font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1;}
+.price-amt{font-size:clamp(40px,4vw,52px);font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1;}
 .price-card.featured .price-amt{color:#fff;}
 .price-period{font-size:15px;color:var(--muted);font-weight:500;}
 .price-card.featured .price-period{color:rgba(255,255,255,0.6);}
-.price-desc{font-size:13px;color:var(--muted);margin:14px 0 22px;line-height:1.65;}
+.price-desc{font-size:13px;color:var(--muted);margin:14px 0 22px;line-height:1.65;overflow-wrap:break-word;}
 .price-card.featured .price-desc{color:rgba(255,255,255,0.7);}
 .price-divider{border:none;border-top:1px solid var(--border);margin:22px 0;}
 .price-card.featured .price-divider{border-top-color:rgba(255,255,255,0.2);}
 .price-features{list-style:none;display:flex;flex-direction:column;gap:8px;}
-.price-features li{font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.price-features li{font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;overflow-wrap:break-word;word-break:break-word;}
 .price-card.featured .price-features li{color:rgba(255,255,255,0.8);}
 .price-features li::before{content:'';width:16px;height:16px;background:var(--accent-lt);border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230047FF' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:10px;}
 .price-card.featured .price-features li::before{background-color:rgba(255,255,255,0.2);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");}
@@ -326,42 +314,157 @@ nav.scrolled{box-shadow:var(--shadow-sm);}
 .cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(255,255,255,0.08),transparent 65%);pointer-events:none;}
 .cta-tag{display:flex;align-items:center;justify-content:center;gap:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.6);font-family:var(--mono);margin-bottom:24px;}
 .cta-tag::before,.cta-tag::after{content:'';width:36px;height:1px;background:rgba(255,255,255,0.3);}
-.cta-h2{font-size:clamp(40px,6vw,72px);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:20px;}
+.cta-h2{font-size:clamp(40px,6vw,72px);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:20px;overflow-wrap:break-word;}
 .cta-sub{font-size:17px;color:rgba(255,255,255,0.7);margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.65;}
 .btn-cta-white{background:#fff;color:var(--accent);border:none;border-radius:12px;padding:16px 44px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
 .btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.2);}
 .cta-note{font-size:12px;color:rgba(255,255,255,0.45);margin-top:18px;font-family:var(--mono);}
 
 /* FOOTER */
-footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;background:#fff;}
+footer{border-top:1px solid var(--border);padding:44px;display:flex;flex-direction:column;gap:24px;background:#fff;}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;}
 .foot-logo{font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
 .foot-logo .accent{color:var(--accent);}
 .foot-tag{font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:4px;}
-.disclaimer{font-size:11px;color:var(--faint);max-width:440px;text-align:center;line-height:1.65;}
-.foot-links{display:flex;gap:24px;}
-.foot-links a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:500;transition:color .15s;}
+.foot-links{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.foot-links a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:500;transition:color .15s;cursor:pointer;}
 .foot-links a:hover{color:var(--accent);}
+.footer-disclaimer{
+  background:#FFFBEB;border:1px solid rgba(217,119,6,.25);border-radius:10px;
+  padding:14px 18px;
+  font-size:11.5px;color:#92400E;line-height:1.7;
+}
+.footer-disclaimer strong{font-weight:700;}
 
+/* CONTACT MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal-box{
+  background:#fff;border-radius:20px;padding:36px;
+  width:100%;max-width:480px;box-shadow:0 24px 80px rgba(0,0,0,0.2);
+  animation:modalIn .25s ease both;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.modal-title{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+.modal-close{
+  width:32px;height:32px;border:none;background:#F3F4F6;
+  border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+  flex-shrink:0;
+}
+.modal-close:hover{background:var(--border2);color:var(--ink);}
+.modal-sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.field-group{margin-bottom:16px;}
+.field-group label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px;letter-spacing:.01em;}
+.field-group input,
+.field-group textarea,
+.field-group select{
+  width:100%;background:#F9FAFB;border:1.5px solid var(--border);
+  border-radius:8px;padding:10px 14px;font-size:13px;font-family:var(--font);
+  color:var(--ink);transition:border-color .15s;outline:none;
+  resize:vertical;
+}
+.field-group input:focus,
+.field-group textarea:focus,
+.field-group select:focus{border-color:var(--accent);background:#fff;}
+.field-group input::placeholder,
+.field-group textarea::placeholder{color:var(--faint);}
+.cf-success{
+  text-align:center;padding:20px;
+  background:var(--green-lt);border:1px solid rgba(22,163,74,.2);
+  border-radius:10px;color:var(--green);font-size:14px;font-weight:600;
+  line-height:1.5;
+}
+.cf-error{
+  background:#FEF2F2;border:1px solid rgba(220,38,38,.2);border-radius:8px;
+  padding:10px 14px;color:var(--red);font-size:13px;margin-top:12px;
+}
+
+/* REVEAL ANIMATION */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
 .reveal.on{opacity:1;transform:translateY(0);}
 .reveal:nth-child(2){transition-delay:.1s;}
 .reveal:nth-child(3){transition-delay:.2s;}
 .reveal:nth-child(4){transition-delay:.3s;}
 
+/* RESPONSIVE */
 @media(max-width:768px){
   nav{padding:0 20px;}
   .nav-links{display:none;}
-  .hero,.section{padding-left:20px;padding-right:20px;}
-  .hero-h1{font-size:48px;}
+  .hero,.section,.stats-section,.cta-section{padding-left:20px;padding-right:20px;}
+  .demo-wrap{padding:0 20px 60px;}
+  .hero-h1{font-size:clamp(36px,10vw,48px);}
   .demo-body{grid-template-columns:1fr;}
   .how-grid,.stats-grid,.price-grid{grid-template-columns:1fr;}
   .how-card:first-child,.how-card:last-child{border-radius:12px;}
-  footer{flex-direction:column;text-align:center;padding:28px;}
+  .how-card{border-radius:12px !important;}
+  footer{padding:28px 20px;}
+  .footer-top{flex-direction:column;}
+  .modal-box{padding:24px;}
+  .hero-metrics{gap:8px;}
+  .hm{padding:10px 14px;}
+  .hm-lbl{white-space:normal;}
+}
+@media(max-width:480px){
+  .r-hts{font-size:22px;}
+  .price-grid{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat-box:first-child,.stat-box:last-child{border-radius:12px;}
 }
 </style>
 </head>
 <body>
 
+<!-- CONTACT MODAL -->
+<div id="contact-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Contact us">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Contact us</div>
+      <button class="modal-close" onclick="closeContact()" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-sub">Interested in the Team plan or have a question? We'll respond within one business day.</p>
+    <div id="cf-success" class="cf-success" style="display:none;">
+      ✓ Message sent — we'll be in touch within one business day.
+    </div>
+    <div id="cf-error" class="cf-error" style="display:none;"></div>
+    <form id="contact-form" onsubmit="submitContact(event)" novalidate>
+      <div class="field-group">
+        <label for="cf-name">Your name</label>
+        <input type="text" id="cf-name" name="name" placeholder="Jane Smith" required autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label for="cf-email">Work email</label>
+        <input type="email" id="cf-email" name="email" placeholder="jane@company.com" required autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label for="cf-subject">I'm interested in…</label>
+        <select id="cf-subject" name="subject">
+          <option value="Team plan inquiry">Team plan ($499/mo)</option>
+          <option value="Pro plan question">Pro plan question</option>
+          <option value="API access">API access</option>
+          <option value="General question">General question</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="cf-msg">Message <span style="color:var(--faint);font-weight:400;">(optional)</span></label>
+        <textarea id="cf-msg" name="message" rows="4" placeholder="Tell us about your use case — volume, team size, integration needs…"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;" id="cf-submit">
+        Send message
+      </button>
+      <p style="font-size:11px;color:var(--faint);text-align:center;margin-top:12px;font-family:var(--mono);">
+        Your message goes directly to ori@customsai.app
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- NAV -->
 <nav id="nav">
   <a class="nav-logo" href="/">
     <div class="nav-logo-mark">TF</div>
@@ -375,6 +478,7 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
   <a class="nav-cta" href="/app.html">Start free</a>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-badge">HTS Classification Engine &middot; 2026</div>
@@ -385,18 +489,19 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
     <a class="btn-secondary" href="#how">See how it works</a>
   </div>
   <div class="hero-metrics">
-    <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Average<br>classification</span></div>
-    <div class="hm"><span class="hm-val">98%</span><span class="hm-lbl">Classification<br>accuracy</span></div>
-    <div class="hm"><span class="hm-val">GRI</span><span class="hm-lbl">Rules 1&ndash;6<br>applied</span></div>
-    <div class="hm"><span class="hm-val">CBP</span><span class="hm-lbl">Memo format<br>output</span></div>
+    <div class="hm"><span class="hm-val">15s</span><span class="hm-lbl">Avg. classification</span></div>
+    <div class="hm"><span class="hm-val">98%</span><span class="hm-lbl">Classification accuracy</span></div>
+    <div class="hm"><span class="hm-val">GRI</span><span class="hm-lbl">Rules 1&ndash;6 applied</span></div>
+    <div class="hm"><span class="hm-val">CBP</span><span class="hm-lbl">Memo format output</span></div>
   </div>
 </section>
 
+<!-- DEMO CARD -->
 <div class="demo-wrap">
   <div class="demo-card">
     <div class="demo-bar">
       <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div>
-      <span class="demo-url">tariffly.vercel.app/app</span>
+      <span class="demo-url">customsai.vercel.app/app</span>
     </div>
     <div class="demo-body">
       <div>
@@ -415,16 +520,17 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
         <div class="r-desc">DC motors, output exceeding 750W but not exceeding 75kW</div>
         <div class="r-chips">
           <div class="rc"><div class="rc-val c-green">2.4%</div><div class="rc-lbl">Base rate</div></div>
-          <div class="rc"><div class="rc-val c-red">+25%</div><div class="rc-lbl">Section 301</div></div>
-          <div class="rc"><div class="rc-val c-red">27.4%</div><div class="rc-lbl">Total (China)</div></div>
+          <div class="rc"><div class="rc-val c-red">+25%</div><div class="rc-lbl">Sec. 301</div></div>
+          <div class="rc"><div class="rc-val c-red">27.4%</div><div class="rc-lbl">Total (CN)</div></div>
         </div>
-        <div class="r-flag">Section 301 List 3 &middot; Monitor USTR for exclusions</div>
+        <div class="r-flag">&#x26A0; Section 301 List 3 &middot; Monitor USTR for exclusions</div>
         <div class="r-timing">14s &middot; GRI-1 &middot; HIGH confidence &middot; CBP memo ready</div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
     <span class="mi">HTS Classification <span>&rarr;</span></span>
@@ -450,6 +556,7 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
   </div>
 </div>
 
+<!-- HOW IT WORKS -->
 <section class="section" id="how" style="background:#FAFAFA;">
   <div class="section-inner">
     <div class="section-tag">How it works</div>
@@ -481,6 +588,7 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
   </div>
 </section>
 
+<!-- STATS -->
 <section class="stats-section">
   <div class="section-inner">
     <div class="section-tag">The numbers</div>
@@ -494,12 +602,14 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
   </div>
 </section>
 
+<!-- PRICING -->
 <section class="section" id="pricing">
   <div class="section-inner">
     <div class="section-tag">Pricing</div>
     <h2 class="section-h2 reveal">Less than one broker phone call.</h2>
     <p class="section-sub reveal">A single broker consultation costs $150&ndash;300. Tariffly pays for itself the first time you use it.</p>
     <div class="price-grid">
+      <!-- Starter -->
       <div class="price-card reveal">
         <div class="price-plan">Starter</div>
         <div><span class="price-amt">Free</span></div>
@@ -513,6 +623,7 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
         </ul>
         <a class="price-btn" href="/app.html">Start free</a>
       </div>
+      <!-- Pro (featured) -->
       <div class="price-card featured reveal">
         <div class="feat-badge">Most Popular</div>
         <div class="price-plan">Professional</div>
@@ -527,8 +638,9 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
           <li>Alternative code analysis</li>
           <li>CSV export</li>
         </ul>
-        <a class="price-btn" href="https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806" target="_blank" rel="noopener">Get Pro Access</a>
+        <a class="price-btn" href="https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806" target="_blank" rel="noopener noreferrer">Get Pro Access</a>
       </div>
+      <!-- Team -->
       <div class="price-card reveal">
         <div class="price-plan">Team</div>
         <div><span class="price-amt">$499</span><span class="price-period"> /mo</span></div>
@@ -541,12 +653,13 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
           <li>API access</li>
           <li>Priority support</li>
         </ul>
-        <a class="price-btn" href="mailto:ori@customsai.app?subject=Tariffly%20Team%20Plan%20inquiry">Contact us</a>
+        <button class="price-btn" onclick="openContact()">Contact us</button>
       </div>
     </div>
   </div>
 </section>
 
+<!-- CTA SECTION -->
 <section class="cta-section">
   <div class="cta-tag">Get started today</div>
   <h2 class="cta-h2 reveal">Your shipment is moving.<br>Are you ready?</h2>
@@ -555,24 +668,104 @@ footer{border-top:1px solid var(--border);padding:44px;display:flex;justify-cont
   <div class="cta-note">No credit card &middot; 3 free classifications &middot; $199/mo after</div>
 </section>
 
+<!-- FOOTER -->
 <footer>
-  <div>
-    <div class="foot-logo">Customs<span class="accent">AI</span></div>
-    <div class="foot-tag">HTS Classification Engine &middot; Built for importers</div>
+  <div class="footer-top">
+    <div>
+      <div class="foot-logo">Tarif<span class="accent">fly</span></div>
+      <div class="foot-tag">HTS Classification Engine &middot; Built for importers</div>
+    </div>
+    <div class="foot-links">
+      <a onclick="openContact();return false;" href="#">Contact</a>
+      <a href="/app.html">App</a>
+    </div>
   </div>
-  <div class="disclaimer">Tariffly is a classification research assistant. All classifications are for informational purposes only. A licensed U.S. Customs Broker should review prior to filing.</div>
-  <div class="foot-links">
-    <a href="mailto:ori@customsai.app">Contact</a>
-    <a href="/app.html">App</a>
+  <div class="footer-disclaimer">
+    <strong>&#x26A0; Informational use only.</strong> Tariffly is an AI-powered tool for informational purposes only and is NOT a substitute for professional customs brokerage or legal advice. All classifications must be verified by a licensed U.S. Customs Broker prior to any CBP filing. Users assume 100% responsibility for any customs filings made using this tool.
   </div>
 </footer>
 
 <script>
-window.addEventListener('scroll',()=>{
-  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20);
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
 });
-const io=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('on');io.unobserve(en.target);}}),{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ── REVEAL ON SCROLL ── */
+const io = new IntersectionObserver(
+  entries => entries.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('on'); io.unobserve(en.target); }
+  }),
+  { threshold: 0.12 }
+);
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── CONTACT MODAL ── */
+function openContact() {
+  document.getElementById('contact-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeContact() {
+  document.getElementById('contact-modal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.getElementById('contact-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeContact();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeContact();
+});
+
+async function submitContact(e) {
+  e.preventDefault();
+
+  const name    = document.getElementById('cf-name').value.trim();
+  const email   = document.getElementById('cf-email').value.trim();
+  const subject = document.getElementById('cf-subject').value;
+  const message = document.getElementById('cf-msg').value.trim();
+  const errorEl = document.getElementById('cf-error');
+  const btn     = document.getElementById('cf-submit');
+
+  // Basic validation
+  if (!name || !email) {
+    errorEl.textContent = 'Please fill in your name and email.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  errorEl.style.display = 'none';
+
+  btn.textContent = 'Sending…';
+  btn.disabled    = true;
+
+  try {
+    const res = await fetch('https://formspree.io/f/mjgpnokp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message })
+    });
+
+    if (res.ok) {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('cf-success').style.display  = 'block';
+    } else {
+      const data = await res.json().catch(() => ({}));
+      errorEl.textContent = data.error || 'Failed to send — please try again.';
+      errorEl.style.display = 'block';
+      btn.textContent = 'Send message';
+      btn.disabled    = false;
+    }
+  } catch (err) {
+    errorEl.textContent = 'Network error — please check your connection and try again.';
+    errorEl.style.display = 'block';
+    btn.textContent = 'Send message';
+    btn.disabled    = false;
+  }
+}
 </script>
 </body>
 </html>
