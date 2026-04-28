@@ -765,7 +765,7 @@ async function loadClassifications() {
   try {
     const { data, error } = await supabase
       .from('classifications')
-      .select('id, description, origin, hts_10, total_pct, created_at, profiles(email)')
+      .select('id, product_desc, country_of_origin, hts_code, total_rate, created_at, user_id')
       .order('created_at', { ascending: false })
       .limit(200);
 
@@ -785,15 +785,18 @@ function renderClassificationsTable(rows) {
     return;
   }
   document.getElementById('classTableBody').innerHTML = rows.slice(0, 100).map(r => {
-    const email = r.profiles?.email || r.user_email || '—';
     const date  = r.created_at ? new Date(r.created_at).toLocaleDateString() : '—';
-    const desc  = (r.description || '').slice(0, 60) + ((r.description||'').length > 60 ? '…' : '');
+    const rawDesc = r.product_desc || r.description || '';
+    const desc  = rawDesc.slice(0, 60) + (rawDesc.length > 60 ? '…' : '');
+    const hts   = r.hts_code || r.hts_10 || '—';
+    const rate  = r.total_rate ?? r.total_pct;
+    const origin = r.country_of_origin || r.origin || '—';
     return `<tr>
       <td style="max-width:220px;overflow-wrap:break-word">${escHtml(desc)}</td>
-      <td>${escHtml(r.origin||'')}</td>
-      <td style="font-weight:600;font-variant-numeric:tabular-nums">${escHtml(r.hts_10||'')}</td>
-      <td>${r.total_pct != null ? r.total_pct + '%' : '—'}</td>
-      <td class="td-email">${escHtml(email)}</td>
+      <td>${escHtml(origin)}</td>
+      <td style="font-weight:600;font-variant-numeric:tabular-nums">${escHtml(hts)}</td>
+      <td>${rate != null ? rate + '%' : '—'}</td>
+      <td class="td-email" style="font-size:.75rem;color:var(--text-3)">${escHtml(r.user_id?.slice(0,8)||'—')}…</td>
       <td>${escHtml(date)}</td>
     </tr>`;
   }).join('');

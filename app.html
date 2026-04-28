@@ -575,6 +575,41 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ─── Shimmer skeleton ─────────────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 6px;
+    }
+
+    /* ─── USITC reference link ─────────────────────────────────────────────── */
+    .official-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .78rem; color: var(--accent); text-decoration: none;
+      padding: 4px 10px; border-radius: 20px;
+      border: 1px solid rgba(59,130,246,.25);
+      background: rgba(59,130,246,.06);
+      transition: all .15s;
+    }
+    .official-link:hover { background: rgba(59,130,246,.15); text-decoration: none; }
+
+    /* ─── Print / PDF export ───────────────────────────────────────────────── */
+    @media print {
+      .sidebar, .mobile-menu-btn, .result-actions, .main-header,
+      #emptyState, #loadingState, #recentsWrap, #skuTab, .auth-tabs { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .main { margin-left: 0 !important; }
+      .result-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+      .result-hts { color: #1a1a2e !important; }
+      .result-gri { color: #333 !important; }
+      .duty-chip { background: #f5f5f5 !important; border-color: #ddd !important; }
+    }
+
     /* ─── Responsive ───────────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       :root { --sidebar-w: 0px; }
@@ -1426,30 +1461,34 @@ async function checkUsageGate() {
   const apiKey = localStorage.getItem(LS.APIKEY);
   if (apiKey) return true; // Own API key = unlimited
 
-  // Check Supabase plan (server-side, tamper-proof)
+  // ── Supabase path: tamper-proof plan + classification_count check ──────────
   if (supabaseReady && supabase) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: prof } = await supabase
           .from('profiles')
-          .select('plan')
+          .select('plan, classification_count')
           .eq('id', user.id)
           .single();
         if (prof?.plan === 'pro' || prof?.plan === 'team') return true;
+        // Free tier: use Supabase count as the authoritative usage number
+        const used = prof?.classification_count ?? getUsage();
+        // Sync localStorage with Supabase truth
+        localStorage.setItem(LS.USAGE, String(used));
+        updateUsageDisplay();
+        if (used >= FREE_LIMIT) { showUpgradeModal(); return false; }
+        return true;
       }
     } catch(e) { /* fall through to localStorage check */ }
   }
 
-  // localStorage fallback (not tamper-proof, but acceptable for free tier)
+  // ── localStorage fallback (no Supabase or not logged in) ──────────────────
   const localProfile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
   if (localProfile?.plan === 'pro') return true;
 
   const used = getUsage();
-  if (used >= FREE_LIMIT) {
-    showUpgradeModal();
-    return false;
-  }
+  if (used >= FREE_LIMIT) { showUpgradeModal(); return false; }
   return true;
 }
 
@@ -1706,9 +1745,18 @@ function renderResult(result, meta, desc, origin) {
 
       ${audit.summary ? `<div style="margin-top:10px;font-size:.78rem;color:var(--text-3);overflow-wrap:break-word">Audit: ${escHtml(audit.summary)}</div>` : ''}
 
+      ${r.official_link ? `
+      <div style="margin-top:14px">
+        <a class="official-link" href="${escHtml(r.official_link)}" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View on USITC Official HTS
+        </a>
+      </div>` : ''}
+
       <div class="result-actions">
         <button class="result-action-btn" onclick="saveToLibrary()">Save to Library</button>
         <button class="result-action-btn" onclick="copyMemo()">Copy Memo</button>
+        <button class="result-action-btn" onclick="exportPdf()">Export PDF</button>
         <button class="result-action-btn" onclick="runClassify()">Re-classify</button>
       </div>
     </div>`;
@@ -1773,11 +1821,11 @@ function saveToLibrary() {
   const lib = loadSku();
   // Deduplicate by HTS + desc
   const exists = lib.some(s => s.hts === result.hts_10 && s.desc === desc);
-  if (exists) { alert('Already saved to your SKU Library.'); return; }
+  if (exists) { showToast('Already saved to your SKU Library.'); return; }
   lib.unshift({ hts: result.hts_10, desc, origin, duty: result.total_formatted, ts: Date.now() });
   saveSku(lib);
   renderSkuLibrary();
-  alert(`Saved! ${result.hts_10} added to your SKU Library.`);
+  showToast(`Saved! ${result.hts_10} added to your SKU Library.`);
 }
 
 function renderSkuLibrary() {
@@ -1895,36 +1943,70 @@ function downloadTemplate() {
 
 function copyMemo() {
   if (!currentResult) return;
+  // Use server-generated memo_text if available, otherwise build a local fallback
   const { result: r, desc, origin } = currentResult;
-  const memo = `TARIFFLY CLASSIFICATION MEMO
+  const memo = r.memo_text || buildLocalMemo(r, desc, origin);
+  navigator.clipboard.writeText(memo)
+    .then(() => showToast('Memo copied to clipboard!'))
+    .catch(() => prompt('Copy this memo:', memo));
+}
+
+function exportPdf() {
+  if (!currentResult) return;
+  // Use browser print dialog — our @media print CSS hides all non-result UI
+  window.print();
+}
+
+function buildLocalMemo(r, desc, origin) {
+  return `TARIFFLY — HTS CLASSIFICATION MEMO
 Generated: ${new Date().toLocaleString()}
 ─────────────────────────────────────────
-Product: ${desc}
-Country of Origin: ${origin}
+PRODUCT: ${desc}
+COUNTRY OF ORIGIN: ${origin}
 
-HTS-10: ${r.hts_10}
-Description: ${r.description}
+HTS CODE:    ${r.hts_10 || '—'}
+DESCRIPTION: ${r.description || '—'}
+CONFIDENCE:  ${r.confidence || 0}%
+
+DUTY RATES:
+  Column 1 General: ${r.duty_general_formatted || '—'}
+  Section 301:      ${r.section_301?.applies ? `+${r.section_301.rate_pct}% (${r.section_301.list})` : 'Not applicable'}
+  Section 232:      ${r.section_232?.applies ? `+${r.section_232.rate_pct}%` : 'Not applicable'}
+  TOTAL EFFECTIVE:  ${r.total_formatted || '—'}
+
+GRI ANALYSIS (${r.gri_rule || '—'}):
+${r.gri_rationale || '—'}
+${r.risk_flags?.length ? '\nRISK FLAGS:\n' + r.risk_flags.map(f => `  • ${f}`).join('\n') : ''}
+${r.savings_tip ? `\nSAVINGS OPPORTUNITY:\n  ${r.savings_tip}` : ''}
+${r.official_link ? `\nOFFICIAL REFERENCE: ${r.official_link}` : ''}
+
 ─────────────────────────────────────────
-DUTY BREAKDOWN
-  Column 1 General:  ${r.duty_general_formatted}
-  Section 301:       ${r.section_301?.applies ? r.section_301.rate_pct + '% (' + r.section_301.list + ')' : 'N/A'}
-  Section 232:       ${r.section_232?.applies ? r.section_232.rate_pct + '%' : 'N/A'}
-  ─────────────────
-  TOTAL EFFECTIVE:   ${r.total_formatted}
-─────────────────────────────────────────
-GRI ANALYSIS
-${r.gri_rule} — ${r.gri_rationale}
-─────────────────────────────────────────
-${r.risk_flags?.length ? 'RISK FLAGS\n' + r.risk_flags.map(f => '• ' + f).join('\n') + '\n─────────────────────────────────────────\n' : ''}
-SAVINGS OPPORTUNITY
-${r.savings_tip || 'None identified.'}
-─────────────────────────────────────────
-DISCLAIMER: For informational purposes only. Not a CBP binding ruling. Verify before filing.
-`;
-  navigator.clipboard.writeText(memo).then(() => alert('Memo copied to clipboard!')).catch(() => {
-    // Fallback: show in alert
-    prompt('Copy this memo:', memo);
-  });
+DISCLAIMER: For informational purposes only. Not a CBP binding ruling.
+Verify with a Licensed Customs Broker before filing.
+─────────────────────────────────────────`;
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('globalToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'globalToast';
+    toast.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+      background:var(--surface); border:1px solid var(--border); color:var(--text);
+      padding:10px 20px; border-radius:8px; font-size:.85rem; font-weight:500;
+      z-index:9999; opacity:0; transition:all .25s; pointer-events:none;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2500);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
