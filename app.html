@@ -14,8 +14,8 @@
   <!-- Supabase JS v2 (optional — set SUPABASE_URL + SUPABASE_ANON_KEY below to enable backend auth & admin) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
-  <!-- Google Sign-In — defer (not async) so handleGoogleResponse is defined first -->
-  <script src="https://accounts.google.com/gsi/client" defer></script>
+  <!-- Google Identity (kept for backward compat; primary flow uses signInWithOAuth) -->
+  <!-- <script src="https://accounts.google.com/gsi/client" defer></script> -->
 
   <style>
     /* ─── Reset & Base ─────────────────────────────────────────────────────── */
@@ -648,8 +648,8 @@
     </div>
 
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('signup')">Create account</div>
-      <div class="auth-tab" onclick="switchAuthTab('signin')">Sign in</div>
+      <div class="auth-tab active" data-tab="signup" onclick="switchAuthTab('signup')">Create account</div>
+      <div class="auth-tab" data-tab="signin" onclick="switchAuthTab('signin')">Sign in</div>
     </div>
 
     <!-- Error banner -->
@@ -657,22 +657,11 @@
 
     <!-- Sign Up panel -->
     <div id="signupPanel">
-      <!-- Google OAuth -->
-      <div id="googleBtnWrap" style="margin-bottom:8px">
-        <div id="g_id_onload"
-          data-client_id="301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com"
-          data-callback="handleGoogleResponse"
-          data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin"
-          data-type="standard"
-          data-shape="rectangular"
-          data-theme="filled_black"
-          data-text="signup_with"
-          data-size="large"
-          data-width="416">
-        </div>
-      </div>
+      <!-- Google OAuth (Supabase redirect flow) -->
+      <button class="oauth-btn" onclick="signInWithGoogle()" id="googleSignupBtn">
+        <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.09 7.54 2.87l5.62-5.62C33.84 3.55 29.27 1.5 24 1.5 14.93 1.5 7.26 6.97 3.82 14.73l6.55 5.09C12.06 13.81 17.54 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24c0-1.64-.15-3.22-.42-4.74H24v8.97h12.67C35.87 32.1 32.61 35 28.5 36.4v5.63h7.25C40.3 37.95 46.5 31.74 46.5 24z"/><path fill="#FBBC05" d="M10.37 28.18A14.54 14.54 0 0 1 9.5 24c0-1.45.2-2.86.57-4.18l-6.55-5.09A22.46 22.46 0 0 0 1.5 24c0 3.73.88 7.27 2.45 10.36l6.42-6.18z"/><path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.75 12.92-4.73l-6.35-4.93c-1.76 1.18-4.01 1.88-6.57 1.88-5.06 0-9.34-3.41-10.87-8.01l-6.42 6.18C7.26 41.03 14.93 46.5 24 46.5z"/></svg>
+        Continue with Google
+      </button>
 
       <!-- Apple Sign-In (via Supabase) -->
       <button class="oauth-btn" onclick="signInWithApple()" id="appleBtn" style="display:none">
@@ -724,14 +713,10 @@
 
     <!-- Sign In panel -->
     <div id="signinPanel" style="display:none">
-      <div class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="filled_black"
-        data-text="signin_with"
-        data-size="large"
-        data-width="416">
-      </div>
+      <button class="oauth-btn" onclick="signInWithGoogle()" id="googleSigninBtn">
+        <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.09 7.54 2.87l5.62-5.62C33.84 3.55 29.27 1.5 24 1.5 14.93 1.5 7.26 6.97 3.82 14.73l6.55 5.09C12.06 13.81 17.54 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24c0-1.64-.15-3.22-.42-4.74H24v8.97h12.67C35.87 32.1 32.61 35 28.5 36.4v5.63h7.25C40.3 37.95 46.5 31.74 46.5 24z"/><path fill="#FBBC05" d="M10.37 28.18A14.54 14.54 0 0 1 9.5 24c0-1.45.2-2.86.57-4.18l-6.55-5.09A22.46 22.46 0 0 0 1.5 24c0 3.73.88 7.27 2.45 10.36l6.42-6.18z"/><path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.75 12.92-4.73l-6.35-4.93c-1.76 1.18-4.01 1.88-6.57 1.88-5.06 0-9.34-3.41-10.87-8.01l-6.42 6.18C7.26 41.03 14.93 46.5 24 46.5z"/></svg>
+        Continue with Google
+      </button>
       <button class="oauth-btn" onclick="signInWithApple()" id="appleSigninBtn" style="display:none">
         <svg width="17" height="17" viewBox="0 0 814 1000"><path fill="currentColor" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-155.5-103.7C157.1 810.4 115 755.3 97 680.6c-20.6-88-25.3-175.9-25.3-260.6 0-80.1 10.8-161.4 41.6-236.4 42.8-102.7 131-164 224.8-164 70.6 0 130 43.7 174.8 43.7 43.2 0 111.3-45.9 194.3-45.9 31.3 0 108.2 5.2 168.2 59.4z"/><path fill="currentColor" d="M546.4 97.7c-29.3 34.8-77 60.1-124.8 60.1-5.8 0-11.6-.6-17.4-1.3-.6-5.8-.9-11.6-.9-17.4 0-35.9 14.2-75.4 38.9-106.1C466.2 6.2 514 .3 555.1 0c.6 5.8.9 11.6.9 17.4 0 27.5-6.4 57.9-9.6 80.3z"/></svg>
         Continue with Apple
@@ -1124,9 +1109,12 @@ function initSupabase() {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseReady = true;
 
-    // Listen for auth state changes — INITIAL_SESSION fires on page load with current session
+    // onAuthStateChange fires INITIAL_SESSION on page load (existing session check),
+    // SIGNED_IN after login, SIGNED_UP after signup (when email confirmation is OFF).
     supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+      console.log('[Tariffly Auth]', event, session?.user?.email || '—');
+      const activeEvents = ['INITIAL_SESSION','SIGNED_IN','SIGNED_UP','TOKEN_REFRESHED','USER_UPDATED'];
+      if (activeEvents.includes(event) && session?.user) {
         const u = session.user;
         const profile = {
           firstName: u.user_metadata?.first_name || u.email.split('@')[0],
@@ -1138,14 +1126,14 @@ function initSupabase() {
         localStorage.setItem(LS.USER, JSON.stringify(profile));
         onAuthSuccess(profile);
       } else if (event === 'INITIAL_SESSION' && !session) {
-        // No existing session — auth modal is already visible, nothing to do
+        // No existing session — auth modal stays visible (already active in HTML)
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(LS.USER);
         showAuthModal();
       }
     });
   } catch(e) {
-    console.warn('Supabase init failed', e);
+    console.error('[Tariffly] Supabase init failed:', e);
   }
 }
 
@@ -1163,22 +1151,29 @@ function clearAuthError() {
 }
 
 function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => {
-    t.classList.toggle('active', (tab === 'signup' ? i === 0 : i === 1));
+  // Use data-tab attributes for reliable selection regardless of DOM order
+  document.querySelectorAll('.auth-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
   });
-  document.getElementById('signupPanel').style.display = tab === 'signup' ? '' : 'none';
-  document.getElementById('signinPanel').style.display = tab === 'signin' ? '' : 'none';
+  const signupPanel = document.getElementById('signupPanel');
+  const signinPanel = document.getElementById('signinPanel');
+  if (signupPanel) signupPanel.style.display = tab === 'signup' ? '' : 'none';
+  if (signinPanel) signinPanel.style.display = tab === 'signin' ? '' : 'none';
   clearAuthError();
 }
 
 async function handleSignupSubmit(e) {
   e.preventDefault();
   clearAuthError();
+
   const firstName = document.getElementById('signupFirst').value.trim();
   const lastName  = document.getElementById('signupLast').value.trim();
   const email     = document.getElementById('signupEmail').value.trim();
   const password  = document.getElementById('signupPassword').value;
   const company   = document.getElementById('signupCompany').value.trim();
+
+  if (!email || !password) { showAuthError('Email and password are required.'); return; }
+  if (password.length < 8) { showAuthError('Password must be at least 8 characters.'); return; }
 
   const btn = document.getElementById('signupBtn');
   btn.disabled = true;
@@ -1186,21 +1181,26 @@ async function handleSignupSubmit(e) {
 
   try {
     if (supabaseReady) {
-      // Supabase email/password signup
-      // Note: do NOT pass emailRedirectTo unless that URL is whitelisted in
-      // Supabase → Authentication → URL Configuration → Redirect URLs.
+      console.log('[Tariffly] signUp →', email);
       const { data, error } = await supabase.auth.signUp({
         email, password,
         options: { data: { first_name: firstName, last_name: lastName, company } }
       });
+      console.log('[Tariffly] signUp result:', { error, hasSession: !!data?.session, identities: data?.user?.identities?.length });
+
       if (error) throw error;
 
-      // Notify via Formspree (no await — best effort)
+      // Supabase returns user with 0 identities when the email already exists and
+      // email confirmation is OFF (it creates a fake "success" without a real account).
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error('This email is already registered. Please sign in instead.');
+      }
+
+      // Notify via Formspree — fire and forget
       notifyFormspree({ firstName, lastName, email, company });
 
-      // If email confirmation is DISABLED in Supabase, data.session is non-null
-      // and we can log the user in immediately. Otherwise show the confirm email card.
       if (data.session) {
+        // Email confirmation is OFF — user is live immediately
         const u = data.user;
         const profile = {
           firstName: u.user_metadata?.first_name || firstName || email.split('@')[0],
@@ -1211,35 +1211,34 @@ async function handleSignupSubmit(e) {
         };
         localStorage.setItem(LS.USER, JSON.stringify(profile));
         onAuthSuccess(profile);
-        return; // skip success card — already in app
+        return;
       }
-      // else: email confirmation required
+
+      // Email confirmation is ON — show "check your inbox" card
       document.getElementById('signupForm').style.display = 'none';
       document.getElementById('signupSuccessTitle').textContent = 'Check your inbox';
       document.getElementById('signupSuccessMsg').textContent =
         `We sent a confirmation link to ${email}. Click it to activate your account, then sign in here.`;
       document.getElementById('signupSuccessBtn').textContent = 'Go to Sign In →';
       document.querySelector('#signupSuccess .success-icon').textContent = '✉';
+      document.getElementById('signupSuccess').classList.add('show');
+
     } else {
-      // localStorage fallback
-      await notifyFormspree({ firstName, lastName, email, company });
+      // ── localStorage fallback (no Supabase configured) ──────────────────────
+      notifyFormspree({ firstName, lastName, email, company }); // best-effort, no await
       const profile = { firstName, lastName, email, company, provider: 'email' };
       localStorage.setItem(LS.USER, JSON.stringify(profile));
-      document.getElementById('signupForm').style.display = 'none';
-      document.getElementById('signupSuccessTitle').textContent = 'Account created!';
-      document.getElementById('signupSuccessMsg').textContent =
-        'Welcome to Tariffly. You have 3 free classifications to start.';
-      document.getElementById('signupSuccessBtn').textContent = 'Start Classifying →';
-      document.querySelector('#signupSuccess .success-icon').textContent = '✓';
+      onAuthSuccess(profile);
     }
-    document.getElementById('signupSuccess').classList.add('show');
   } catch(err) {
-    // Give friendlier messages for common Supabase errors
+    console.error('[Tariffly] signup error:', err);
     let msg = err.message || 'Signup failed. Please try again.';
-    if (msg.includes('already registered') || msg.includes('already been registered')) {
+    if (msg.includes('already registered') || msg.includes('already been registered') || msg.includes('already registered')) {
       msg = 'This email is already registered. Please sign in instead.';
-    } else if (msg.includes('password')) {
+    } else if (msg.toLowerCase().includes('password')) {
       msg = 'Password must be at least 8 characters.';
+    } else if (msg.includes('rate')) {
+      msg = 'Too many attempts. Please wait a moment and try again.';
     }
     showAuthError(msg);
   } finally {
@@ -1251,17 +1250,26 @@ async function handleSignupSubmit(e) {
 async function handleSigninSubmit(e) {
   e.preventDefault();
   clearAuthError();
+
   const email    = document.getElementById('signinEmail').value.trim();
   const password = document.getElementById('signinPassword').value;
+
+  if (!email || !password) { showAuthError('Email and password are required.'); return; }
+
   const btn = document.getElementById('signinBtn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Signing in...';
 
   try {
     if (supabaseReady) {
+      console.log('[Tariffly] signIn →', email);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[Tariffly] signIn result:', { error, hasUser: !!data?.user });
+
       if (error) throw error;
-      // Explicitly call onAuthSuccess — don't rely solely on onAuthStateChange
+      if (!data?.user) throw new Error('Sign-in returned no user. Please try again.');
+
+      // Explicitly build profile and enter app — don't depend on onAuthStateChange timing
       const u = data.user;
       const profile = {
         firstName: u.user_metadata?.first_name || email.split('@')[0],
@@ -1272,8 +1280,9 @@ async function handleSigninSubmit(e) {
       };
       localStorage.setItem(LS.USER, JSON.stringify(profile));
       onAuthSuccess(profile);
+
     } else {
-      // localStorage fallback: accept any stored email
+      // ── localStorage fallback ────────────────────────────────────────────────
       const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
       if (!stored || stored.email !== email) {
         throw new Error('No account found with this email. Please sign up first.');
@@ -1281,12 +1290,13 @@ async function handleSigninSubmit(e) {
       onAuthSuccess(stored);
     }
   } catch(err) {
+    console.error('[Tariffly] signin error:', err);
     let msg = err.message || 'Sign-in failed. Please try again.';
     if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
       msg = 'Incorrect email or password. Please try again.';
     } else if (msg.includes('Email not confirmed')) {
-      msg = 'Please confirm your email first — check your inbox for the confirmation link.';
-    } else if (msg.includes('Too many requests')) {
+      msg = 'Please confirm your email first — check your inbox for a confirmation link.';
+    } else if (msg.includes('Too many requests') || msg.includes('rate')) {
       msg = 'Too many attempts. Please wait a minute and try again.';
     }
     showAuthError(msg);
@@ -1296,45 +1306,44 @@ async function handleSigninSubmit(e) {
   }
 }
 
-// Google GSI callback (called by Google after OAuth)
-function handleGoogleResponse(response) {
+// ─── Google OAuth via Supabase redirect (replaces GSI callback approach) ────
+async function signInWithGoogle() {
   clearAuthError();
+  if (!supabaseReady) {
+    showAuthError('Google Sign-In requires Supabase. Check your configuration.');
+    return;
+  }
   try {
-    const payload = parseJwt(response.credential);
-    const profile = {
-      firstName: payload.given_name || payload.name?.split(' ')[0] || 'User',
-      lastName:  payload.family_name || '',
-      email:     payload.email,
-      provider:  'google',
-      avatar:    payload.picture,
-    };
-
-    if (supabaseReady) {
-      supabase.auth.signInWithIdToken({
-        provider: 'google',
-        token: response.credential,
-      }).then(({ error }) => {
-        if (error) console.warn('Supabase Google auth error', error);
-      });
-    }
-
-    localStorage.setItem(LS.USER, JSON.stringify(profile));
-    onAuthSuccess(profile);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/app.html',
+        queryParams: { access_type: 'offline', prompt: 'consent' },
+      }
+    });
+    if (error) throw error;
+    // Page will redirect — nothing more to do here
   } catch(e) {
-    showAuthError('Google sign-in failed. Please try again.');
+    console.error('[Tariffly] Google OAuth error:', e);
+    showAuthError('Google sign-in failed. Please try again or use email.');
   }
 }
 
 async function signInWithApple() {
+  clearAuthError();
   if (!supabaseReady) {
-    showAuthError('Apple Sign-In requires Supabase. Configure your Supabase credentials in the source code.');
+    showAuthError('Apple Sign-In requires Supabase. Check your configuration.');
     return;
   }
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'apple',
-    options: { redirectTo: window.location.href }
-  });
-  if (error) showAuthError(error.message);
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: { redirectTo: window.location.origin + '/app.html' }
+    });
+    if (error) throw error;
+  } catch(e) {
+    showAuthError(e.message || 'Apple sign-in failed.');
+  }
 }
 
 function onSignupSuccessContinue() {
@@ -1375,11 +1384,7 @@ async function notifyFormspree(data) {
   } catch(e) { /* best effort */ }
 }
 
-// ─── JWT parser (for Google credential)
-function parseJwt(token) {
-  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-  return JSON.parse(atob(base64));
-}
+// (parseJwt removed — Google auth now uses signInWithOAuth redirect)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MODAL MANAGEMENT
