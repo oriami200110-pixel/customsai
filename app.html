@@ -1329,15 +1329,15 @@ async function signInWithGoogle() {
     return;
   }
   try {
+    // Always redirect to the canonical production URL — never a preview URL.
+    // This must match exactly what's in Google Cloud Console → Authorized redirect URIs
+    // AND in Supabase Authentication → URL Configuration → Redirect URLs.
+    const redirectTo = 'https://customsai.vercel.app/app.html';
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/app.html',
-        queryParams: { access_type: 'offline', prompt: 'consent' },
-      }
+      options: { redirectTo, queryParams: { access_type: 'offline', prompt: 'select_account' } }
     });
     if (error) throw error;
-    // Page will redirect — nothing more to do here
   } catch(e) {
     console.error('[Tariffly] Google OAuth error:', e);
     showAuthError('Google sign-in failed. Please try again or use email.');
@@ -1353,7 +1353,7 @@ async function signInWithApple() {
   try {
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'apple',
-      options: { redirectTo: window.location.origin + '/app.html' }
+      options: { redirectTo: 'https://customsai.vercel.app/app.html' }
     });
     if (error) throw error;
   } catch(e) {
@@ -1380,6 +1380,15 @@ function onAuthSuccess(profile) {
   updateSidebar(profile);
   document.getElementById('appLayout').style.display = 'flex';
   showConsentIfNeeded();
+  // Guarantee the profile row exists in Supabase (handles first OAuth login
+  // where the DB trigger may not have fired yet).
+  if (supabaseReady && sb && profile.id) {
+    sb.from('profiles')
+      .upsert({ id: profile.id, email: profile.email },
+               { onConflict: 'id', ignoreDuplicates: true })
+      .then(() => {})
+      .catch(() => {}); // best-effort, never blocks the UI
+  }
 }
 
 // ─── Formspree notification (signup leads to Ori's email)
@@ -1684,8 +1693,13 @@ async function persistClassification(result, description, origin) {
       risk_flags:         result.risk_flags || [],
       alternatives:       result.alternatives || [],
     });
-    // Increment classification count in profiles (parameter must match SQL function)
-    await sb.rpc('increment_classification_count', { user_id: user.id });
+    // Increment classification count — try RPC first, fall back to direct increment
+    const rpcRes = await sb.rpc('increment_classification_count', { user_id: user.id });
+    if (rpcRes.error) {
+      // RPC doesn't exist yet — fall back to reading then updating directly
+      const { data: prof } = await sb.from('profiles').select('classification_count').eq('id', user.id).single();
+      await sb.from('profiles').update({ classification_count: (prof?.classification_count || 0) + 1 }).eq('id', user.id);
+    }
   } catch(e) { console.warn('persistClassification error:', e.message); }
 }
 
@@ -2075,43 +2089,50 @@ function fillExample(el) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── App Init ─────────────────────────────────────────────────────────────────
-// IIFE so it runs immediately (script is at end of body — DOM is ready).
-// Auth modal is visible by default in HTML; we close it only after confirming a session.
 (function initApp() {
-  // 1. Wire up Supabase. onAuthStateChange fires INITIAL_SESSION synchronously
-  //    (or on next microtask) — it will call onAuthSuccess() if a session exists,
-  //    which closes the auth modal. If no session, modal stays visible.
-  initSupabase();
-
-  // 2. localStorage fallback — if Supabase isn't configured but we have a stored
-  //    profile, skip the auth modal immediately.
-  if (!supabaseReady) {
-    const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
-    if (stored?.email) {
-      onAuthSuccess(stored);
-    }
-    // else: auth modal stays visible (default state)
+  // 1. Handle OAuth callback — Supabase redirects back to app.html with URL params
+  //    on both success (hash fragment with access_token) and failure (?error=...).
+  const urlParams   = new URLSearchParams(window.location.search);
+  const oauthError  = urlParams.get('error_description') || urlParams.get('error');
+  if (oauthError) {
+    // Show error in auth modal (already visible by default)
+    const msg = decodeURIComponent(oauthError.replace(/\+/g, ' '));
+    // Delay slightly so DOM is ready and showAuthError is callable
+    setTimeout(() => {
+      let friendly = msg;
+      if (msg.includes('exchange') || msg.includes('code')) {
+        friendly = 'Google sign-in failed: the authorization code could not be exchanged. Make sure the Google Client Secret is configured in Supabase Authentication → Providers → Google.';
+      }
+      showAuthError(friendly);
+      switchAuthTab('signin');
+    }, 100);
+    // Clean the URL so the error doesn't persist on refresh
+    history.replaceState({}, '', window.location.pathname);
   }
 
-  // 3. Show Apple buttons only when Supabase is active
+  // 2. Wire up Supabase. onAuthStateChange handles both INITIAL_SESSION (existing
+  //    session) and the OAuth token exchange from the URL hash fragment.
+  initSupabase();
+
+  // 3. localStorage fallback
+  if (!supabaseReady) {
+    const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
+    if (stored?.email) onAuthSuccess(stored);
+  }
+
+  // 4. Apple buttons (only show when Supabase active)
   if (supabaseReady) {
     document.getElementById('appleBtn')?.removeAttribute('style');
     document.getElementById('appleSigninBtn')?.removeAttribute('style');
   }
 
-  // 4. Restore sidebar API key
+  // 5. Restore API key
   const key = localStorage.getItem(LS.APIKEY);
-  if (key) {
-    const inp = document.getElementById('sidebarApiKey');
-    if (inp) inp.value = key;
-  }
+  if (key) { const inp = document.getElementById('sidebarApiKey'); if (inp) inp.value = key; }
 
-  // 5. Global keyboard shortcuts
+  // 6. Keyboard shortcuts
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeTermsModal();
-      closeApiKeyModal();
-    }
+    if (e.key === 'Escape') { closeTermsModal(); closeApiKeyModal(); }
   });
 })();
 </script>
