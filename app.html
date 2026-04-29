@@ -908,7 +908,22 @@
       <div class="api-key-label">Gemini API Key</div>
       <input type="password" class="api-key-input" id="sidebarApiKey" placeholder="AIza..."
         onchange="saveSidebarApiKey(this.value)" autocomplete="off">
-      <div class="sidebar-version" id="sidebarVersion">Tariffly v0.2 · customsai.vercel.app</div>
+      <button onclick="handleSignOut()" style="
+        width:100%; margin-top:10px; padding:7px 10px; border-radius:6px;
+        border:1px solid var(--border); background:transparent;
+        color:var(--text-3); font-family:var(--font); font-size:.78rem;
+        cursor:pointer; display:flex; align-items:center; gap:6px;
+        transition:all .15s;
+      " onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'"
+         onmouseout="this.style.color='var(--text-3)';this.style.borderColor='var(--border)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign out
+      </button>
+      <div class="sidebar-version" id="sidebarVersion">Tariffly v0.3 · customsai.vercel.app</div>
     </div>
   </aside>
 
@@ -1390,8 +1405,25 @@ async function notifyFormspree(data) {
 // MODAL MANAGEMENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-function showAuthModal()    { document.getElementById('authOverlay').classList.add('active'); }
+function showAuthModal() {
+  document.getElementById('authOverlay').classList.add('active');
+  document.getElementById('appLayout').style.display = 'none';
+}
 function closeAuthModal()   { document.getElementById('authOverlay').classList.remove('active'); }
+
+async function handleSignOut() {
+  try {
+    if (supabaseReady && sb) await sb.auth.signOut();
+  } catch(e) { /* ignore */ }
+  localStorage.clear();
+  document.getElementById('appLayout').style.display = 'none';
+  document.getElementById('authOverlay').classList.add('active');
+  switchAuthTab('signin');
+  // Reset sidebar
+  document.getElementById('sidebarName').textContent = '—';
+  document.getElementById('sidebarEmail').textContent = '—';
+  clearAuthError();
+}
 function showConsentModal() { document.getElementById('consentOverlay').classList.add('active'); }
 function closeConsentModal(){ document.getElementById('consentOverlay').classList.remove('active'); }
 function openTermsModal()   { document.getElementById('termsOverlay').classList.add('active'); }
