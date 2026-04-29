@@ -1100,18 +1100,18 @@ const LS = {
 // SUPABASE INIT (optional — skipped when using placeholder keys)
 // ═══════════════════════════════════════════════════════════════════════════
 
-let supabase = null;
+let sb = null;           // our Supabase client (renamed to avoid clash with CDN's var supabase)
 let supabaseReady = false;
 
 function initSupabase() {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || !window.supabase) return;
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseReady = true;
 
     // onAuthStateChange fires INITIAL_SESSION on page load (existing session check),
     // SIGNED_IN after login, SIGNED_UP after signup (when email confirmation is OFF).
-    supabase.auth.onAuthStateChange((event, session) => {
+    sb.auth.onAuthStateChange((event, session) => {
       console.log('[Tariffly Auth]', event, session?.user?.email || '—');
       const activeEvents = ['INITIAL_SESSION','SIGNED_IN','SIGNED_UP','TOKEN_REFRESHED','USER_UPDATED'];
       if (activeEvents.includes(event) && session?.user) {
@@ -1182,7 +1182,7 @@ async function handleSignupSubmit(e) {
   try {
     if (supabaseReady) {
       console.log('[Tariffly] signUp →', email);
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email, password,
         options: { data: { first_name: firstName, last_name: lastName, company } }
       });
@@ -1263,7 +1263,7 @@ async function handleSigninSubmit(e) {
   try {
     if (supabaseReady) {
       console.log('[Tariffly] signIn →', email);
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       console.log('[Tariffly] signIn result:', { error, hasUser: !!data?.user });
 
       if (error) throw error;
@@ -1314,7 +1314,7 @@ async function signInWithGoogle() {
     return;
   }
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin + '/app.html',
@@ -1336,7 +1336,7 @@ async function signInWithApple() {
     return;
   }
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await sb.auth.signInWithOAuth({
       provider: 'apple',
       options: { redirectTo: window.location.origin + '/app.html' }
     });
@@ -1469,9 +1469,9 @@ async function checkUsageGate() {
   // ── Supabase path: tamper-proof plan + classification_count check ──────────
   if (supabaseReady && supabase) {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await sb.auth.getUser();
       if (user) {
-        const { data: prof } = await supabase
+        const { data: prof } = await sb
           .from('profiles')
           .select('plan, classification_count')
           .eq('id', user.id)
@@ -1633,11 +1633,11 @@ Return ONLY a JSON object with these fields: hts_10 (10-digit code XXXX.XX.XXXX)
 }
 
 async function persistClassification(result, description, origin) {
-  if (!supabase) return;
+  if (!sb) return;
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     if (!user) return;
-    await supabase.from('classifications').insert({
+    await sb.from('classifications').insert({
       user_id:            user.id,
       product_desc:       description,       // matches SQL schema
       country_of_origin:  origin,            // matches SQL schema
@@ -1653,7 +1653,7 @@ async function persistClassification(result, description, origin) {
       alternatives:       result.alternatives || [],
     });
     // Increment classification count in profiles (parameter must match SQL function)
-    await supabase.rpc('increment_classification_count', { user_id: user.id });
+    await sb.rpc('increment_classification_count', { user_id: user.id });
   } catch(e) { console.warn('persistClassification error:', e.message); }
 }
 
