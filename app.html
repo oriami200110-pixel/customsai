@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tariffly — HTS Classification Engine</title>
+  <title>Tariffly â HTS Classification Engine</title>
   <meta name="description" content="AI-powered HTS tariff classification. 10-digit codes, duty rates, Section 301 analysis in seconds.">
 
   <!-- Fonts -->
@@ -11,14 +11,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Supabase JS v2 (optional — set SUPABASE_URL + SUPABASE_ANON_KEY below to enable backend auth & admin) -->
+  <!-- Supabase JS v2 (optional â set SUPABASE_URL + SUPABASE_ANON_KEY below to enable backend auth & admin) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <!-- Google Identity (kept for backward compat; primary flow uses signInWithOAuth) -->
   <!-- <script src="https://accounts.google.com/gsi/client" defer></script> -->
 
   <style>
-    /* ─── Reset & Base ─────────────────────────────────────────────────────── */
+    /* âââ Reset & Base âââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -52,12 +52,12 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ─── Scrollbar ────────────────────────────────────────────────────────── */
+    /* âââ Scrollbar ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ─── Modal overlay ────────────────────────────────────────────────────── */
+    /* âââ Modal overlay ââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .overlay {
       position: fixed; inset: 0; z-index: 100;
       background: rgba(0,0,0,0.75);
@@ -88,7 +88,7 @@
     .modal h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
     .modal .modal-sub { color: var(--text-2); font-size: .9rem; margin-bottom: 24px; }
 
-    /* ─── Auth Modal ───────────────────────────────────────────────────────── */
+    /* âââ Auth Modal âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .auth-tabs { display: flex; gap: 2px; background: var(--surface); border-radius: 8px; padding: 3px; margin-bottom: 24px; }
     .auth-tab {
       flex: 1; padding: 8px; text-align: center; font-size: .85rem; font-weight: 500;
@@ -164,7 +164,7 @@
     .success-card h3 { font-size: 1.1rem; margin-bottom: 6px; }
     .success-card p { color: var(--text-2); font-size: .85rem; margin-bottom: 20px; }
 
-    /* ─── Consent Modal ────────────────────────────────────────────────────── */
+    /* âââ Consent Modal ââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .legal-badge {
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3);
@@ -206,7 +206,7 @@
     }
     .consent-check label a { color: var(--accent); }
 
-    /* ─── Terms Modal ──────────────────────────────────────────────────────── */
+    /* âââ Terms Modal ââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .terms-content h3 {
       font-size: .95rem; font-weight: 600; color: var(--text);
       margin: 20px 0 6px;
@@ -219,7 +219,7 @@
     .terms-content ul { margin: 6px 0 6px 20px; }
     .terms-content ul li { margin-bottom: 4px; }
 
-    /* ─── Upgrade Modal ────────────────────────────────────────────────────── */
+    /* âââ Upgrade Modal ââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .upgrade-plan {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 20px; margin: 16px 0;
@@ -233,14 +233,14 @@
       padding: 4px 0; font-size: .85rem; color: var(--text-2);
       overflow-wrap: break-word;
     }
-    .upgrade-features li::before { content: '✓'; color: var(--green); flex-shrink: 0; font-weight: 700; }
+    .upgrade-features li::before { content: 'â'; color: var(--green); flex-shrink: 0; font-weight: 700; }
 
-    /* ─── App Layout ───────────────────────────────────────────────────────── */
+    /* âââ App Layout âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .app-layout {
       display: flex; min-height: 100vh;
     }
 
-    /* ─── Sidebar ──────────────────────────────────────────────────────────── */
+    /* âââ Sidebar ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .sidebar {
       width: var(--sidebar-w); min-width: var(--sidebar-w);
       background: var(--bg2); border-right: 1px solid var(--border);
@@ -296,7 +296,7 @@
     .api-key-input::placeholder { color: var(--text-3); }
     .sidebar-version { font-size: .68rem; color: var(--text-3); margin-top: 10px; overflow-wrap: break-word; }
 
-    /* ─── Main Content ─────────────────────────────────────────────────────── */
+    /* âââ Main Content âââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .main {
       margin-left: var(--sidebar-w);
       flex: 1; min-width: 0;
@@ -335,7 +335,7 @@
 
     .main-body { padding: 24px; flex: 1; overflow-y: auto; }
 
-    /* ─── Classify Tab ─────────────────────────────────────────────────────── */
+    /* âââ Classify Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .classify-panel {
       max-width: 780px;
     }
@@ -403,7 +403,7 @@
     }
     .example-chip:hover { background: var(--border); color: var(--text); }
 
-    /* ─── Batch CSV ────────────────────────────────────────────────────────── */
+    /* âââ Batch CSV ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .batch-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .batch-btn {
       padding: 8px 14px; border-radius: 7px;
@@ -415,7 +415,7 @@
     #fileInput { display: none; }
     .batch-note { font-size: .75rem; color: var(--text-3); }
 
-    /* ─── Results ──────────────────────────────────────────────────────────── */
+    /* âââ Results ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .results-wrap { margin-top: 4px; }
 
     .result-card {
@@ -495,7 +495,7 @@
     .audit-badge.passed { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: var(--green); }
     .audit-badge.failed { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: var(--amber); }
 
-    /* ─── Empty / Loading States ───────────────────────────────────────────── */
+    /* âââ Empty / Loading States âââââââââââââââââââââââââââââââââââââââââââââ */
     .empty-state {
       text-align: center; padding: 40px 20px;
     }
@@ -520,7 +520,7 @@
 
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
 
-    /* ─── Recent Classifications ───────────────────────────────────────────── */
+    /* âââ Recent Classifications âââââââââââââââââââââââââââââââââââââââââââââ */
     .recents-wrap { margin-top: 8px; }
     .recents-title { font-size: .72rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
     .recent-item {
@@ -533,7 +533,7 @@
     .recent-item .recent-desc { font-size: .8rem; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .recent-item .recent-duty { font-size: .75rem; color: var(--text-3); flex-shrink: 0; }
 
-    /* ─── Disclaimer footer ────────────────────────────────────────────────── */
+    /* âââ Disclaimer footer ââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .classify-footer {
       margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
       font-size: .75rem; color: var(--text-3); line-height: 1.55;
@@ -542,7 +542,7 @@
     .classify-footer a { color: var(--text-3); text-decoration: underline; }
     .classify-footer a:hover { color: var(--text-2); }
 
-    /* ─── SKU Library ──────────────────────────────────────────────────────── */
+    /* âââ SKU Library ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .sku-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
     .sku-title { font-size: 1.1rem; font-weight: 700; }
     .sku-count { font-size: .8rem; color: var(--text-2); }
@@ -566,7 +566,7 @@
     }
     .sku-delete:hover { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.4); color: var(--red); }
 
-    /* ─── Spinner ──────────────────────────────────────────────────────────── */
+    /* âââ Spinner ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     .spinner {
       width: 16px; height: 16px; border-radius: 50%;
       border: 2px solid rgba(255,255,255,.3);
@@ -575,7 +575,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── Shimmer skeleton ─────────────────────────────────────────────────── */
+    /* âââ Shimmer skeleton âââââââââââââââââââââââââââââââââââââââââââââââââââ */
     @keyframes shimmer {
       0%   { background-position: -600px 0; }
       100% { background-position:  600px 0; }
@@ -587,7 +587,7 @@
       border-radius: 6px;
     }
 
-    /* ─── USITC reference link ─────────────────────────────────────────────── */
+    /* âââ USITC reference link âââââââââââââââââââââââââââââââââââââââââââââââ */
     .official-link {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: .78rem; color: var(--accent); text-decoration: none;
@@ -598,7 +598,7 @@
     }
     .official-link:hover { background: rgba(59,130,246,.15); text-decoration: none; }
 
-    /* ─── Print / PDF export ───────────────────────────────────────────────── */
+    /* âââ Print / PDF export âââââââââââââââââââââââââââââââââââââââââââââââââ */
     @media print {
       .sidebar, .mobile-menu-btn, .result-actions, .main-header,
       #emptyState, #loadingState, #recentsWrap, #skuTab, .auth-tabs { display: none !important; }
@@ -610,7 +610,7 @@
       .duty-chip { background: #f5f5f5 !important; border-color: #ddd !important; }
     }
 
-    /* ─── Responsive ───────────────────────────────────────────────────────── */
+    /* âââ Responsive âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
     @media (max-width: 768px) {
       :root { --sidebar-w: 0px; }
       .sidebar { transform: translateX(-100%); transition: transform .25s; }
@@ -633,11 +633,11 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
      MODALS
-═══════════════════════════════════════════════════════════════ -->
+âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
 
-<!-- Auth Modal — active by default so it's always visible even if JS fails -->
+<!-- Auth Modal â active by default so it's always visible even if JS fails -->
 <div class="overlay active" id="authOverlay">
   <div class="modal">
     <div class="modal-logo">
@@ -661,12 +661,6 @@
       <button class="oauth-btn" onclick="signInWithGoogle()" id="googleSignupBtn">
         <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.09 7.54 2.87l5.62-5.62C33.84 3.55 29.27 1.5 24 1.5 14.93 1.5 7.26 6.97 3.82 14.73l6.55 5.09C12.06 13.81 17.54 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24c0-1.64-.15-3.22-.42-4.74H24v8.97h12.67C35.87 32.1 32.61 35 28.5 36.4v5.63h7.25C40.3 37.95 46.5 31.74 46.5 24z"/><path fill="#FBBC05" d="M10.37 28.18A14.54 14.54 0 0 1 9.5 24c0-1.45.2-2.86.57-4.18l-6.55-5.09A22.46 22.46 0 0 0 1.5 24c0 3.73.88 7.27 2.45 10.36l6.42-6.18z"/><path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.75 12.92-4.73l-6.35-4.93c-1.76 1.18-4.01 1.88-6.57 1.88-5.06 0-9.34-3.41-10.87-8.01l-6.42 6.18C7.26 41.03 14.93 46.5 24 46.5z"/></svg>
         Continue with Google
-      </button>
-
-      <!-- Apple Sign-In (via Supabase) -->
-      <button class="oauth-btn" onclick="signInWithApple()" id="appleBtn" style="display:none">
-        <svg width="17" height="17" viewBox="0 0 814 1000"><path fill="currentColor" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-155.5-103.7C157.1 810.4 115 755.3 97 680.6c-20.6-88-25.3-175.9-25.3-260.6 0-80.1 10.8-161.4 41.6-236.4 42.8-102.7 131-164 224.8-164 70.6 0 130 43.7 174.8 43.7 43.2 0 111.3-45.9 194.3-45.9 31.3 0 108.2 5.2 168.2 59.4z"/><path fill="currentColor" d="M546.4 97.7c-29.3 34.8-77 60.1-124.8 60.1-5.8 0-11.6-.6-17.4-1.3-.6-5.8-.9-11.6-.9-17.4 0-35.9 14.2-75.4 38.9-106.1C466.2 6.2 514 .3 555.1 0c.6 5.8.9 11.6.9 17.4 0 27.5-6.4 57.9-9.6 80.3z"/></svg>
-        Continue with Apple
       </button>
 
       <div class="divider">or sign up with email</div>
@@ -701,10 +695,10 @@
 
       <!-- Supabase signup: show email confirmation message -->
       <div class="success-card" id="signupSuccess" data-mode="confirm">
-        <div class="success-icon">✉</div>
+        <div class="success-icon">â</div>
         <h3 id="signupSuccessTitle">Check your email</h3>
         <p id="signupSuccessMsg">We sent a confirmation link to your email. Click it to activate your account, then come back and sign in.</p>
-        <button class="btn btn-primary" id="signupSuccessBtn" onclick="onSignupSuccessContinue()">Go to Sign In →</button>
+        <button class="btn btn-primary" id="signupSuccessBtn" onclick="onSignupSuccessContinue()">Go to Sign In â</button>
       </div>
 
       <p class="auth-footer">By creating an account you agree to our <a href="#" onclick="openTermsModal();return false">Terms of Use</a> and <a href="#" onclick="openTermsModal();return false">Privacy Policy</a>.</p>
@@ -716,10 +710,6 @@
       <button class="oauth-btn" onclick="signInWithGoogle()" id="googleSigninBtn">
         <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.09 7.54 2.87l5.62-5.62C33.84 3.55 29.27 1.5 24 1.5 14.93 1.5 7.26 6.97 3.82 14.73l6.55 5.09C12.06 13.81 17.54 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24c0-1.64-.15-3.22-.42-4.74H24v8.97h12.67C35.87 32.1 32.61 35 28.5 36.4v5.63h7.25C40.3 37.95 46.5 31.74 46.5 24z"/><path fill="#FBBC05" d="M10.37 28.18A14.54 14.54 0 0 1 9.5 24c0-1.45.2-2.86.57-4.18l-6.55-5.09A22.46 22.46 0 0 0 1.5 24c0 3.73.88 7.27 2.45 10.36l6.42-6.18z"/><path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.75 12.92-4.73l-6.35-4.93c-1.76 1.18-4.01 1.88-6.57 1.88-5.06 0-9.34-3.41-10.87-8.01l-6.42 6.18C7.26 41.03 14.93 46.5 24 46.5z"/></svg>
         Continue with Google
-      </button>
-      <button class="oauth-btn" onclick="signInWithApple()" id="appleSigninBtn" style="display:none">
-        <svg width="17" height="17" viewBox="0 0 814 1000"><path fill="currentColor" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-155.5-103.7C157.1 810.4 115 755.3 97 680.6c-20.6-88-25.3-175.9-25.3-260.6 0-80.1 10.8-161.4 41.6-236.4 42.8-102.7 131-164 224.8-164 70.6 0 130 43.7 174.8 43.7 43.2 0 111.3-45.9 194.3-45.9 31.3 0 108.2 5.2 168.2 59.4z"/><path fill="currentColor" d="M546.4 97.7c-29.3 34.8-77 60.1-124.8 60.1-5.8 0-11.6-.6-17.4-1.3-.6-5.8-.9-11.6-.9-17.4 0-35.9 14.2-75.4 38.9-106.1C466.2 6.2 514 .3 555.1 0c.6 5.8.9 11.6.9 17.4 0 27.5-6.4 57.9-9.6 80.3z"/></svg>
-        Continue with Apple
       </button>
       <div class="divider">or sign in with email</div>
       <form id="signinForm" onsubmit="handleSigninSubmit(event)">
@@ -741,14 +731,14 @@
 <!-- Consent / Legal Disclosure Modal -->
 <div class="overlay" id="consentOverlay">
   <div class="modal modal-sm">
-    <div class="legal-badge">⚖ Decision Support Tool — Not Legal Advice</div>
+    <div class="legal-badge">â Decision Support Tool â Not Legal Advice</div>
     <h2>One quick disclosure</h2>
     <p class="modal-sub">Before you classify, please review these important limitations.</p>
 
     <ul class="consent-list">
-      <li><span class="icon">⚠</span> Tariffly generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions rest with CBP.</li>
-      <li><span class="icon">📅</span> Duty rates and Section 301/232 data are updated periodically but may not reflect real-time changes. Always verify before filing.</li>
-      <li><span class="icon">⚖</span> A licensed U.S. Customs Broker should review all classifications prior to formal entry filing.</li>
+      <li><span class="icon">â </span> Tariffly generates <strong>classification suggestions</strong>, not binding customs determinations. Final decisions rest with CBP.</li>
+      <li><span class="icon">ð</span> Duty rates and Section 301/232 data are updated periodically but may not reflect real-time changes. Always verify before filing.</li>
+      <li><span class="icon">â</span> A licensed U.S. Customs Broker should review all classifications prior to formal entry filing.</li>
     </ul>
 
     <div class="legal-notice">
@@ -761,9 +751,9 @@
     </div>
 
     <button class="btn btn-primary" id="consentBtn" onclick="acceptConsent()" disabled>
-      Start Classifying →
+      Start Classifying â
     </button>
-    <p style="font-size:.72rem;color:var(--text-3);margin-top:8px;text-align:center">Stored locally · Reset anytime</p>
+    <p style="font-size:.72rem;color:var(--text-3);margin-top:8px;text-align:center">Stored locally Â· Reset anytime</p>
   </div>
 </div>
 
@@ -772,7 +762,7 @@
   <div class="modal modal-lg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <h2 style="font-size:1.2rem">Terms of Use &amp; Privacy Policy</h2>
-      <button onclick="closeTermsModal()" style="background:none;border:none;color:var(--text-2);cursor:pointer;font-size:1.3rem;padding:4px">✕</button>
+      <button onclick="closeTermsModal()" style="background:none;border:none;color:var(--text-2);cursor:pointer;font-size:1.3rem;padding:4px">â</button>
     </div>
     <div class="terms-content">
       <h3>1. Nature of Service</h3>
@@ -785,7 +775,7 @@
       <ul>
         <li>The importer of record bears full legal responsibility for all customs declarations</li>
         <li>Users must verify all classifications with USITC, CBP, or a licensed broker before filing</li>
-        <li>HTS schedules and trade-action rates change frequently — users must always verify current rates</li>
+        <li>HTS schedules and trade-action rates change frequently â users must always verify current rates</li>
         <li><strong>Users assume 100% responsibility for any customs filings based on Tariffly outputs</strong></li>
         <li>Tariffly expressly disclaims any liability for customs penalties, duties, fines, or losses arising from use of its outputs</li>
       </ul>
@@ -820,7 +810,7 @@
       <p style="font-size:.82rem;color:var(--text-2);margin:6px 0 0">Save $200 vs. one broker call</p>
       <ul class="upgrade-features">
         <li>Unlimited HTS classifications</li>
-        <li>SKU Library — save and track all codes</li>
+        <li>SKU Library â save and track all codes</li>
         <li>Full CBP-format classification memos</li>
         <li>Section 301 &amp; 232 alerts + USMCA logic</li>
         <li>Batch CSV import (up to 500 SKUs)</li>
@@ -828,15 +818,15 @@
       </ul>
     </div>
 
-    <!-- ─── TODO: Replace with your Lemon Squeezy checkout URL ─── -->
+    <!-- âââ TODO: Replace with your Lemon Squeezy checkout URL âââ -->
     <a href="https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806"
        target="_blank" class="btn btn-green" style="display:flex;width:100%;margin-bottom:10px">
-      Upgrade to Pro — $199/mo
+      Upgrade to Pro â $199/mo
     </a>
     <button class="btn btn-ghost" style="width:100%" onclick="showApiKeyInput()">
       Add my Gemini API key (continue free)
     </button>
-    <p style="font-size:.75rem;color:var(--text-3);text-align:center;margin-top:10px">14-day money-back guarantee · Cancel anytime</p>
+    <p style="font-size:.75rem;color:var(--text-3);text-align:center;margin-top:10px">14-day money-back guarantee Â· Cancel anytime</p>
   </div>
 </div>
 
@@ -864,9 +854,9 @@
   </svg>
 </button>
 
-<!-- ═══════════════════════════════════════════════════════════════
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
      MAIN APP LAYOUT
-═══════════════════════════════════════════════════════════════ -->
+âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
 <div class="app-layout" id="appLayout" style="display:none">
 
   <!-- Sidebar -->
@@ -877,8 +867,8 @@
     </div>
 
     <div class="sidebar-user">
-      <div class="sidebar-user-name" id="sidebarName">—</div>
-      <div class="sidebar-user-email" id="sidebarEmail">—</div>
+      <div class="sidebar-user-name" id="sidebarName">â</div>
+      <div class="sidebar-user-email" id="sidebarEmail">â</div>
     </div>
 
     <div class="usage-bar-wrap">
@@ -923,7 +913,7 @@
         </svg>
         Sign out
       </button>
-      <div class="sidebar-version" id="sidebarVersion">Tariffly v0.3 · customsai.vercel.app</div>
+      <div class="sidebar-version" id="sidebarVersion">Tariffly v0.3 Â· customsai.vercel.app</div>
     </div>
   </aside>
 
@@ -946,7 +936,7 @@
 
     <div class="main-body">
 
-      <!-- ── Classify Tab ─────────────────────────────────────────────── -->
+      <!-- ââ Classify Tab âââââââââââââââââââââââââââââââââââââââââââââââ -->
       <div id="classifyTab">
         <div class="classify-panel">
 
@@ -982,7 +972,7 @@
                   Classify
                 </button>
               </div>
-              <div class="shortcut-hint"><kbd>⌘</kbd> + <kbd>Enter</kbd> to classify</div>
+              <div class="shortcut-hint"><kbd>â</kbd> + <kbd>Enter</kbd> to classify</div>
               <div>
                 <div style="font-size:.75rem;color:var(--text-3);margin-bottom:6px">Try:</div>
                 <div class="examples">
@@ -1004,7 +994,7 @@
             <div class="batch-row">
               <input type="file" id="fileInput" accept=".csv" onchange="handleFileSelect(event)">
               <button class="batch-btn" onclick="document.getElementById('fileInput').click()">
-                📁 Upload CSV
+                ð Upload CSV
               </button>
               <button class="batch-btn" onclick="downloadTemplate()">Template</button>
             </div>
@@ -1035,7 +1025,7 @@
           <!-- Empty State -->
           <div id="emptyState" class="panel-section">
             <div class="empty-state">
-              <div class="empty-icon">🔍</div>
+              <div class="empty-icon">ð</div>
               <h3>Ready to classify</h3>
               <p>Enter a product description above and click Classify. Results include the 10-digit HTS code, duty rates, GRI analysis, and a CBP-format memo.</p>
             </div>
@@ -1044,15 +1034,15 @@
           <!-- Disclaimer Footer -->
           <div class="classify-footer">
             Tariffly is a classification research assistant. Outputs are informational only and not binding. HTS codes and duty rates must be verified before filing.
-            <a href="https://hts.usitc.gov" target="_blank" rel="noopener">USITC</a> ·
-            <a href="https://ustr.gov" target="_blank" rel="noopener">USTR Section 301</a> ·
+            <a href="https://hts.usitc.gov" target="_blank" rel="noopener">USITC</a> Â·
+            <a href="https://ustr.gov" target="_blank" rel="noopener">USTR Section 301</a> Â·
             <a href="#" onclick="openTermsModal();return false">Terms &amp; Disclaimer</a>
           </div>
 
         </div><!-- /classify-panel -->
       </div><!-- /classifyTab -->
 
-      <!-- ── SKU Library Tab ──────────────────────────────────────────── -->
+      <!-- ââ SKU Library Tab ââââââââââââââââââââââââââââââââââââââââââââ -->
       <div id="skuTab" style="display:none">
         <div class="sku-header">
           <div>
@@ -1066,7 +1056,7 @@
         </div>
         <div id="skuList"></div>
         <div id="skuEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">🏷</div>
+          <div class="empty-icon">ð·</div>
           <h3>No saved SKUs yet.</h3>
           <p>Classify a product and click "Save to Library" to build your reference catalog.</p>
         </div>
@@ -1079,30 +1069,30 @@
 <script>
 'use strict';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CONFIGURATION — Replace placeholders with your actual values
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// CONFIGURATION â Replace placeholders with your actual values
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-// ─── TODO: Create a Supabase project at https://supabase.com, then paste
+// âââ TODO: Create a Supabase project at https://supabase.com, then paste
 //           your project URL and anon (public) key below.
 //           Leave as-is if you want to run in localStorage-only mode.
-const SUPABASE_URL      = 'https://wqkuliasszkgwllifinp.supabase.co';
+const SUPABASE_URL      = 'https://wpkuliasszkgwllifinp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indxa3VsaWFzc3prZ3dsbGlmaW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNDgxODAsImV4cCI6MjA5MjkyNDE4MH0.7qBUMVuz9myH8cWBPjb_nWY-vM0_d7xGr93HhNmnKxM';
 
-// ─── TODO: Your Lemon Squeezy checkout link
+// âââ TODO: Your Lemon Squeezy checkout link
 const PAYMENT_LINK = 'https://tariffly.lemonsqueezy.com/checkout/buy/ec96bd09-48bd-4370-ba38-304f70b6a806';
 
-// ─── TODO: Replace with YOUR Formspree form ID (from formspree.io)
+// âââ TODO: Replace with YOUR Formspree form ID (from formspree.io)
 //           Current endpoint routes to your configured email address.
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mjgpnokp';
 
-// ─── TODO: Your Google OAuth Client ID (already configured in GSI above)
+// âââ TODO: Your Google OAuth Client ID (already configured in GSI above)
 const GOOGLE_CLIENT_ID = '301888250996-9ba0l1ojvef1uk91504qcqv912fj74cf.apps.googleusercontent.com';
 
-// ─── Free tier limit
+// âââ Free tier limit
 const FREE_LIMIT = 3;
 
-// ─── localStorage keys
+// âââ localStorage keys
 const LS = {
   USER:    'cai_user',
   USAGE:   'cai_usage',
@@ -1111,9 +1101,9 @@ const LS = {
   SKU:     'cai_sku',
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SUPABASE INIT (optional — skipped when using placeholder keys)
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SUPABASE INIT (optional â skipped when using placeholder keys)
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 let sb = null;           // our Supabase client (renamed to avoid clash with CDN's var supabase)
 let supabaseReady = false;
@@ -1127,7 +1117,7 @@ function initSupabase() {
     // onAuthStateChange fires INITIAL_SESSION on page load (existing session check),
     // SIGNED_IN after login, SIGNED_UP after signup (when email confirmation is OFF).
     sb.auth.onAuthStateChange((event, session) => {
-      console.log('[Tariffly Auth]', event, session?.user?.email || '—');
+      console.log('[Tariffly Auth]', event, session?.user?.email || 'â');
       const activeEvents = ['INITIAL_SESSION','SIGNED_IN','SIGNED_UP','TOKEN_REFRESHED','USER_UPDATED'];
       if (activeEvents.includes(event) && session?.user) {
         const u = session.user;
@@ -1141,7 +1131,7 @@ function initSupabase() {
         localStorage.setItem(LS.USER, JSON.stringify(profile));
         onAuthSuccess(profile);
       } else if (event === 'INITIAL_SESSION' && !session) {
-        // No existing session — auth modal stays visible (already active in HTML)
+        // No existing session â auth modal stays visible (already active in HTML)
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(LS.USER);
         showAuthModal();
@@ -1152,9 +1142,9 @@ function initSupabase() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // AUTH FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function showAuthError(msg) {
   const el = document.getElementById('authError');
@@ -1196,7 +1186,7 @@ async function handleSignupSubmit(e) {
 
   try {
     if (supabaseReady) {
-      console.log('[Tariffly] signUp →', email);
+      console.log('[Tariffly] signUp â', email);
       const { data, error } = await sb.auth.signUp({
         email, password,
         options: { data: { first_name: firstName, last_name: lastName, company } }
@@ -1211,11 +1201,11 @@ async function handleSignupSubmit(e) {
         throw new Error('This email is already registered. Please sign in instead.');
       }
 
-      // Notify via Formspree — fire and forget
+      // Notify via Formspree â fire and forget
       notifyFormspree({ firstName, lastName, email, company });
 
       if (data.session) {
-        // Email confirmation is OFF — user is live immediately
+        // Email confirmation is OFF â user is live immediately
         const u = data.user;
         const profile = {
           firstName: u.user_metadata?.first_name || firstName || email.split('@')[0],
@@ -1229,17 +1219,17 @@ async function handleSignupSubmit(e) {
         return;
       }
 
-      // Email confirmation is ON — show "check your inbox" card
+      // Email confirmation is ON â show "check your inbox" card
       document.getElementById('signupForm').style.display = 'none';
       document.getElementById('signupSuccessTitle').textContent = 'Check your inbox';
       document.getElementById('signupSuccessMsg').textContent =
         `We sent a confirmation link to ${email}. Click it to activate your account, then sign in here.`;
-      document.getElementById('signupSuccessBtn').textContent = 'Go to Sign In →';
-      document.querySelector('#signupSuccess .success-icon').textContent = '✉';
+      document.getElementById('signupSuccessBtn').textContent = 'Go to Sign In â';
+      document.querySelector('#signupSuccess .success-icon').textContent = 'â';
       document.getElementById('signupSuccess').classList.add('show');
 
     } else {
-      // ── localStorage fallback (no Supabase configured) ──────────────────────
+      // ââ localStorage fallback (no Supabase configured) ââââââââââââââââââââââ
       notifyFormspree({ firstName, lastName, email, company }); // best-effort, no await
       const profile = { firstName, lastName, email, company, provider: 'email' };
       localStorage.setItem(LS.USER, JSON.stringify(profile));
@@ -1277,14 +1267,14 @@ async function handleSigninSubmit(e) {
 
   try {
     if (supabaseReady) {
-      console.log('[Tariffly] signIn →', email);
+      console.log('[Tariffly] signIn â', email);
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       console.log('[Tariffly] signIn result:', { error, hasUser: !!data?.user });
 
       if (error) throw error;
       if (!data?.user) throw new Error('Sign-in returned no user. Please try again.');
 
-      // Explicitly build profile and enter app — don't depend on onAuthStateChange timing
+      // Explicitly build profile and enter app â don't depend on onAuthStateChange timing
       const u = data.user;
       const profile = {
         firstName: u.user_metadata?.first_name || email.split('@')[0],
@@ -1297,7 +1287,7 @@ async function handleSigninSubmit(e) {
       onAuthSuccess(profile);
 
     } else {
-      // ── localStorage fallback ────────────────────────────────────────────────
+      // ââ localStorage fallback ââââââââââââââââââââââââââââââââââââââââââââââââ
       const stored = JSON.parse(localStorage.getItem(LS.USER) || 'null');
       if (!stored || stored.email !== email) {
         throw new Error('No account found with this email. Please sign up first.');
@@ -1310,7 +1300,7 @@ async function handleSigninSubmit(e) {
     if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
       msg = 'Incorrect email or password. Please try again.';
     } else if (msg.includes('Email not confirmed')) {
-      msg = 'Please confirm your email first — check your inbox for a confirmation link.';
+      msg = 'Please confirm your email first â check your inbox for a confirmation link.';
     } else if (msg.includes('Too many requests') || msg.includes('rate')) {
       msg = 'Too many attempts. Please wait a minute and try again.';
     }
@@ -1321,7 +1311,7 @@ async function handleSigninSubmit(e) {
   }
 }
 
-// ─── Google OAuth via Supabase redirect (replaces GSI callback approach) ────
+// âââ Google OAuth via Supabase redirect (replaces GSI callback approach) ââââ
 async function signInWithGoogle() {
   clearAuthError();
   if (!supabaseReady) {
@@ -1329,9 +1319,9 @@ async function signInWithGoogle() {
     return;
   }
   try {
-    // Always redirect to the canonical production URL — never a preview URL.
-    // This must match exactly what's in Google Cloud Console → Authorized redirect URIs
-    // AND in Supabase Authentication → URL Configuration → Redirect URLs.
+    // Always redirect to the canonical production URL â never a preview URL.
+    // This must match exactly what's in Google Cloud Console â Authorized redirect URIs
+    // AND in Supabase Authentication â URL Configuration â Redirect URLs.
     const redirectTo = 'https://customsai.vercel.app/app.html';
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
@@ -1344,31 +1334,15 @@ async function signInWithGoogle() {
   }
 }
 
-async function signInWithApple() {
-  clearAuthError();
-  if (!supabaseReady) {
-    showAuthError('Apple Sign-In requires Supabase. Check your configuration.');
-    return;
-  }
-  try {
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'apple',
-      options: { redirectTo: 'https://customsai.vercel.app/app.html' }
-    });
-    if (error) throw error;
-  } catch(e) {
-    showAuthError(e.message || 'Apple sign-in failed.');
-  }
-}
 
 function onSignupSuccessContinue() {
-  // If Supabase is active, user needs to confirm email first — go to sign-in tab
+  // If Supabase is active, user needs to confirm email first â go to sign-in tab
   if (supabaseReady) {
     document.getElementById('signupSuccess').classList.remove('show');
     document.getElementById('signupForm').style.display = '';
     switchAuthTab('signin');
   } else {
-    // localStorage mode — go straight to app
+    // localStorage mode â go straight to app
     const profile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
     if (profile) onAuthSuccess(profile);
     else closeAuthModal();
@@ -1391,7 +1365,7 @@ function onAuthSuccess(profile) {
   }
 }
 
-// ─── Formspree notification (signup leads to Ori's email)
+// âââ Formspree notification (signup leads to Ori's email)
 async function notifyFormspree(data) {
   try {
     await fetch(FORMSPREE_ENDPOINT, {
@@ -1408,11 +1382,11 @@ async function notifyFormspree(data) {
   } catch(e) { /* best effort */ }
 }
 
-// (parseJwt removed — Google auth now uses signInWithOAuth redirect)
+// (parseJwt removed â Google auth now uses signInWithOAuth redirect)
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // MODAL MANAGEMENT
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function showAuthModal() {
   document.getElementById('authOverlay').classList.add('active');
@@ -1429,8 +1403,8 @@ async function handleSignOut() {
   document.getElementById('authOverlay').classList.add('active');
   switchAuthTab('signin');
   // Reset sidebar
-  document.getElementById('sidebarName').textContent = '—';
-  document.getElementById('sidebarEmail').textContent = '—';
+  document.getElementById('sidebarName').textContent = 'â';
+  document.getElementById('sidebarEmail').textContent = 'â';
   clearAuthError();
 }
 function showConsentModal() { document.getElementById('consentOverlay').classList.add('active'); }
@@ -1466,9 +1440,9 @@ function saveSidebarApiKey(val) {
   else localStorage.removeItem(LS.APIKEY);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // SIDEBAR & USAGE
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function updateSidebar(profile) {
   document.getElementById('sidebarName').textContent =
@@ -1502,12 +1476,12 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
-// Async paywall gate — checks Supabase plan first, falls back to localStorage
+// Async paywall gate â checks Supabase plan first, falls back to localStorage
 async function checkUsageGate() {
   const apiKey = localStorage.getItem(LS.APIKEY);
   if (apiKey) return true; // Own API key = unlimited
 
-  // ── Supabase path: tamper-proof plan + classification_count check ──────────
+  // ââ Supabase path: tamper-proof plan + classification_count check ââââââââââ
   if (supabaseReady && supabase) {
     try {
       const { data: { user } } = await sb.auth.getUser();
@@ -1529,7 +1503,7 @@ async function checkUsageGate() {
     } catch(e) { /* fall through to localStorage check */ }
   }
 
-  // ── localStorage fallback (no Supabase or not logged in) ──────────────────
+  // ââ localStorage fallback (no Supabase or not logged in) ââââââââââââââââââ
   const localProfile = JSON.parse(localStorage.getItem(LS.USER) || 'null');
   if (localProfile?.plan === 'pro') return true;
 
@@ -1538,9 +1512,9 @@ async function checkUsageGate() {
   return true;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // CLASSIFICATION LOGIC
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 let currentResult = null;
 const loadingSteps = ['step1','step2','step3','step4','step5','step6'];
@@ -1574,7 +1548,7 @@ async function runClassify() {
   // Consent gate
   if (!localStorage.getItem(LS.CONSENT)) { showConsentModal(); return; }
 
-  // Usage gate (async — verifies plan in Supabase before allowing classification)
+  // Usage gate (async â verifies plan in Supabase before allowing classification)
   if (!(await checkUsageGate())) return;
 
   // UI: loading
@@ -1592,7 +1566,7 @@ async function runClassify() {
 
     const apiKey = localStorage.getItem(LS.APIKEY);
     if (apiKey) {
-      // User's own key — call Gemini directly (single broker pass)
+      // User's own key â call Gemini directly (single broker pass)
       ({ result, meta } = await classifyWithUserKey(desc, origin, apiKey));
     } else {
       // Server-side two-pass classifier
@@ -1693,10 +1667,10 @@ async function persistClassification(result, description, origin) {
       risk_flags:         result.risk_flags || [],
       alternatives:       result.alternatives || [],
     });
-    // Increment classification count — try RPC first, fall back to direct increment
+    // Increment classification count â try RPC first, fall back to direct increment
     const rpcRes = await sb.rpc('increment_classification_count', { user_id: user.id });
     if (rpcRes.error) {
-      // RPC doesn't exist yet — fall back to reading then updating directly
+      // RPC doesn't exist yet â fall back to reading then updating directly
       const { data: prof } = await sb.from('profiles').select('classification_count').eq('id', user.id).single();
       await sb.from('profiles').update({ classification_count: (prof?.classification_count || 0) + 1 }).eq('id', user.id);
     }
@@ -1707,7 +1681,7 @@ function showError(msg) {
   document.getElementById('resultsWrap').innerHTML =
     `<div class="panel-section" style="border-color:var(--red)">
        <div style="display:flex;gap:10px;align-items:flex-start">
-         <span style="font-size:1.3rem;flex-shrink:0">⚠</span>
+         <span style="font-size:1.3rem;flex-shrink:0">â </span>
          <div>
            <div style="font-weight:600;color:var(--red);margin-bottom:4px">Classification Error</div>
            <div style="font-size:.85rem;color:var(--text-2);overflow-wrap:break-word">${escHtml(msg)}</div>
@@ -1717,23 +1691,23 @@ function showError(msg) {
   document.getElementById('resultsWrap').style.display = '';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // RESULT RENDERING
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function renderResult(result, meta, desc, origin) {
   const r = result;
   const audit = meta?.audit || {};
   const auditBadge = audit.passed === true
-    ? `<span class="audit-badge passed">✓ Audit passed</span>`
+    ? `<span class="audit-badge passed">â Audit passed</span>`
     : audit.passed === false
-    ? `<span class="audit-badge failed">⚠ Auditor corrected</span>`
+    ? `<span class="audit-badge failed">â  Auditor corrected</span>`
     : '';
 
   const s301 = r.section_301?.applies
     ? `<div class="duty-chip s301">
          <div class="duty-val">+${r.section_301.rate_pct}%</div>
-         <div class="duty-label">Section 301 · ${r.section_301.list || ''}</div>
+         <div class="duty-label">Section 301 Â· ${r.section_301.list || ''}</div>
        </div>` : '';
   const s232 = r.section_232?.applies
     ? `<div class="duty-chip">
@@ -1742,18 +1716,18 @@ function renderResult(result, meta, desc, origin) {
        </div>` : '';
 
   const flags = (r.risk_flags || []).map(f =>
-    `<span class="flag-chip">⚠ ${escHtml(f)}</span>`
+    `<span class="flag-chip">â  ${escHtml(f)}</span>`
   ).join('');
 
   const alts = (r.alternatives || []).map(a =>
     `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem">
        <span style="font-weight:600;margin-right:8px;font-variant-numeric:tabular-nums">${escHtml(a.hts||'')}</span>
-       <span style="color:var(--text-2)">${escHtml(a.desc||'')} — ${escHtml(a.reason||'')}</span>
+       <span style="color:var(--text-2)">${escHtml(a.desc||'')} â ${escHtml(a.reason||'')}</span>
      </div>`
   ).join('');
 
   const corrections = (audit.corrections || []).map(c =>
-    `<div style="padding:4px 0;font-size:.8rem;color:var(--amber)">• ${escHtml(c)}</div>`
+    `<div style="padding:4px 0;font-size:.8rem;color:var(--amber)">â¢ ${escHtml(c)}</div>`
   ).join('');
 
   const html = `
@@ -1771,26 +1745,26 @@ function renderResult(result, meta, desc, origin) {
 
       <div class="result-duty-row">
         <div class="duty-chip">
-          <div class="duty-val">${escHtml(r.duty_general_formatted||'—')}</div>
+          <div class="duty-val">${escHtml(r.duty_general_formatted||'*')}</div>
           <div class="duty-label">Column 1 General</div>
         </div>
         ${s301}${s232}
         <div class="duty-chip total">
-          <div class="duty-val">${escHtml(r.total_formatted||'—')}</div>
-          <div class="duty-label">Total Effective · ${escHtml(origin||'')}</div>
+          <div class="duty-val">${escHtml(r.total_formatted||'â')}</div>
+          <div class="duty-label">Total Effective Â· ${escHtml(origin||'')}</div>
         </div>
       </div>
 
       <div class="result-section-title">GRI Analysis</div>
       <div class="result-gri">
-        <strong>${escHtml(r.gri_rule||'')}</strong> — ${escHtml(r.gri_rationale||'')}
+        <strong>${escHtml(r.gri_rule||'')}</strong> â ${escHtml(r.gri_rationale||'')}
       </div>
 
       ${flags ? `<div class="result-section-title">Risk Flags</div><div class="result-flags">${flags}</div>` : ''}
 
       ${alts ? `<div class="result-section-title">Alternative Headings Considered</div>${alts}` : ''}
 
-      ${r.savings_tip ? `<div class="result-tip">💡 ${escHtml(r.savings_tip)}</div>` : ''}
+      ${r.savings_tip ? `<div class="result-tip">ð¡ ${escHtml(r.savings_tip)}</div>` : ''}
 
       ${corrections ? `<div class="result-section-title">Auditor Corrections</div><div style="background:var(--bg2);border-radius:6px;padding:10px 12px">${corrections}</div>` : ''}
 
@@ -1823,9 +1797,9 @@ function escHtml(str) {
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // RECENT CLASSIFICATIONS
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const recents = [];
 const MAX_RECENTS = 5;
@@ -1859,9 +1833,9 @@ function showRecent(i) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // SKU LIBRARY
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function loadSku() { return JSON.parse(localStorage.getItem(LS.SKU) || '[]'); }
 function saveSku(arr) { localStorage.setItem(LS.SKU, JSON.stringify(arr)); }
@@ -1896,7 +1870,7 @@ function renderSkuLibrary() {
        <div class="sku-hts">${escHtml(s.hts)}</div>
        <div class="sku-info">
          <div class="sku-desc">${escHtml(s.desc)}</div>
-         <div class="sku-meta">${escHtml(s.origin)} · ${escHtml(s.duty)} · ${new Date(s.ts).toLocaleDateString()}</div>
+         <div class="sku-meta">${escHtml(s.origin)} Â· ${escHtml(s.duty)} Â· ${new Date(s.ts).toLocaleDateString()}</div>
        </div>
        <button class="sku-delete" onclick="deleteSku(${i})">Remove</button>
      </div>`
@@ -1922,9 +1896,9 @@ function exportSkuCsv() {
   a.click();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // BATCH CSV
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function handleFileSelect(e) {
   const file = e.target.files[0];
@@ -1977,7 +1951,7 @@ async function handleFileSelect(e) {
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'tariffly-batch-results.csv' });
   a.click();
 
-  status.textContent = `✓ Done! ${results.length} products classified and exported.`;
+  status.textContent = `â Done! ${results.length} products classified and exported.`;
   renderSkuLibrary();
 }
 
@@ -1988,9 +1962,9 @@ function downloadTemplate() {
   a.click();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // MEMO COPY
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function copyMemo() {
   if (!currentResult) return;
@@ -2004,37 +1978,37 @@ function copyMemo() {
 
 function exportPdf() {
   if (!currentResult) return;
-  // Use browser print dialog — our @media print CSS hides all non-result UI
+  // Use browser print dialog â our @media print CSS hides all non-result UI
   window.print();
 }
 
 function buildLocalMemo(r, desc, origin) {
-  return `TARIFFLY — HTS CLASSIFICATION MEMO
+  return `TARIFFLY â HTS CLASSIFICATION MEMO
 Generated: ${new Date().toLocaleString()}
-─────────────────────────────────────────
+âââââââââââââââââââââââââââââââââââââââââ
 PRODUCT: ${desc}
 COUNTRY OF ORIGIN: ${origin}
 
-HTS CODE:    ${r.hts_10 || '—'}
-DESCRIPTION: ${r.description || '—'}
+HTS CODE:    ${r.hts_10 || 'â'}
+DESCRIPTION: ${r.description || 'â'}
 CONFIDENCE:  ${r.confidence || 0}%
 
 DUTY RATES:
-  Column 1 General: ${r.duty_general_formatted || '—'}
+  Column 1 General: ${r.duty_general_formatted || 'â'}
   Section 301:      ${r.section_301?.applies ? `+${r.section_301.rate_pct}% (${r.section_301.list})` : 'Not applicable'}
   Section 232:      ${r.section_232?.applies ? `+${r.section_232.rate_pct}%` : 'Not applicable'}
-  TOTAL EFFECTIVE:  ${r.total_formatted || '—'}
+  TOTAL EFFECTIVE:  ${r.total_formatted || 'â'}
 
-GRI ANALYSIS (${r.gri_rule || '—'}):
-${r.gri_rationale || '—'}
-${r.risk_flags?.length ? '\nRISK FLAGS:\n' + r.risk_flags.map(f => `  • ${f}`).join('\n') : ''}
+GRI ANALYSIS (${r.gri_rule || 'â'}):
+${r.gri_rationale || 'â'}
+${r.risk_flags?.length ? '\nRISK FLAGS:\n' + r.risk_flags.map(f => `  â¢ ${f}`).join('\n') : ''}
 ${r.savings_tip ? `\nSAVINGS OPPORTUNITY:\n  ${r.savings_tip}` : ''}
 ${r.official_link ? `\nOFFICIAL REFERENCE: ${r.official_link}` : ''}
 
-─────────────────────────────────────────
+âââââââââââââââââââââââââââââââââââââââââ
 DISCLAIMER: For informational purposes only. Not a CBP binding ruling.
 Verify with a Licensed Customs Broker before filing.
-─────────────────────────────────────────`;
+âââââââââââââââââââââââââââââââââââââââââ`;
 }
 
 function showToast(msg) {
@@ -2060,9 +2034,9 @@ function showToast(msg) {
   }, 2500);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // TAB NAVIGATION
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function switchTab(tab) {
   const tabs = { classify: ['classifyTab','tabClassify','navClassify'], sku: ['skuTab','tabSku','navSku'] };
@@ -2075,22 +2049,22 @@ function switchTab(tab) {
   if (tab === 'sku') renderSkuLibrary();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // EXAMPLES
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function fillExample(el) {
   document.getElementById('productInput').value = el.textContent;
   document.getElementById('productInput').focus();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // INIT
-// ═══════════════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-// ─── App Init ─────────────────────────────────────────────────────────────────
+// âââ App Init âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 (function initApp() {
-  // 1. Handle OAuth callback — Supabase redirects back to app.html with URL params
+  // 1. Handle OAuth callback â Supabase redirects back to app.html with URL params
   //    on both success (hash fragment with access_token) and failure (?error=...).
   const urlParams   = new URLSearchParams(window.location.search);
   const oauthError  = urlParams.get('error_description') || urlParams.get('error');
@@ -2101,7 +2075,7 @@ function fillExample(el) {
     setTimeout(() => {
       let friendly = msg;
       if (msg.includes('exchange') || msg.includes('code')) {
-        friendly = 'Google sign-in failed: the authorization code could not be exchanged. Make sure the Google Client Secret is configured in Supabase Authentication → Providers → Google.';
+        friendly = 'Google sign-in failed: the authorization code could not be exchanged. Make sure the Google Client Secret is configured in Supabase Authentication â Providers â Google.';
       }
       showAuthError(friendly);
       switchAuthTab('signin');
@@ -2120,13 +2094,7 @@ function fillExample(el) {
     if (stored?.email) onAuthSuccess(stored);
   }
 
-  // 4. Apple buttons (only show when Supabase active)
-  if (supabaseReady) {
-    document.getElementById('appleBtn')?.removeAttribute('style');
-    document.getElementById('appleSigninBtn')?.removeAttribute('style');
-  }
-
-  // 5. Restore API key
+  // 4. Restore API key
   const key = localStorage.getItem(LS.APIKEY);
   if (key) { const inp = document.getElementById('sidebarApiKey'); if (inp) inp.value = key; }
 
